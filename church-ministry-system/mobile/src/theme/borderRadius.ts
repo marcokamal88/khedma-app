@@ -1,0 +1,9 @@
+export const borderRadius = {
+  sm: 4,
+  md: 6,
+  lg: 8,
+  xl: 12,
+  full: 9999,
+} as const;
+
+export type AppBorderRadius = typeof borderRadius;
