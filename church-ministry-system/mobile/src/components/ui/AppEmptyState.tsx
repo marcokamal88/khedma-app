@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { colors, typography, spacing } from '../../theme';
 
 const ICONS: Record<string, string> = {
@@ -36,7 +36,7 @@ interface AppEmptyStateProps {
   icon?: string;
   title: string;
   description?: string;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function AppEmptyState({ icon = 'inbox', title, description, style }: AppEmptyStateProps) {

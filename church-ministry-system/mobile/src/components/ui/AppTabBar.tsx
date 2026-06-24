@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { colors, typography, spacing } from '../../theme';
 
 interface Tab {
@@ -12,6 +12,7 @@ interface AppTabBarProps {
   tabs: Tab[];
   activeTab: string;
   onTabChange: (key: string) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 const TAB_ICONS: Record<string, string> = {
@@ -36,9 +37,9 @@ const TAB_ICONS: Record<string, string> = {
   default: '\u25CF',
 };
 
-export function AppTabBar({ tabs, activeTab, onTabChange }: AppTabBarProps) {
+export function AppTabBar({ tabs, activeTab, onTabChange, style }: AppTabBarProps) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
         return (

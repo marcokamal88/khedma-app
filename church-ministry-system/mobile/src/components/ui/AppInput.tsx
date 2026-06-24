@@ -1,21 +1,27 @@
 import React from 'react';
-import { TextInput, StyleSheet, TextInputProps, View, Text } from 'react-native';
+import { TextInput, StyleSheet, TextInputProps, View, Text, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../../theme';
 
 interface AppInputProps extends TextInputProps {
   label?: string;
   error?: string;
+  style?: StyleProp<TextStyle>;
+  wrapperStyle?: StyleProp<ViewStyle>;
+  rightIcon?: React.ReactNode;
 }
 
-export function AppInput({ label, error, style, ...props }: AppInputProps) {
+export function AppInput({ label, error, style, wrapperStyle, rightIcon, ...props }: AppInputProps) {
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, wrapperStyle]}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TextInput
-        placeholderTextColor={colors.mutedGray}
-        style={[styles.input, error && styles.inputError, style]}
-        {...props}
-      />
+      <View style={styles.inputRow}>
+        <TextInput
+          placeholderTextColor={colors.mutedGray}
+          style={[styles.input, error ? styles.inputError : undefined, style]}
+          {...props}
+        />
+        {rightIcon && <View style={styles.inputIcon}>{rightIcon}</View>}
+      </View>
       {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
@@ -30,15 +36,28 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
+  inputRow: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
   input: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.surfaceAlt,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: borderRadius.md,
+    borderRadius: 28,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     ...typography.body,
     color: colors.textPrimary,
+    paddingRight: 44, // room for icon
+  },
+  inputIcon: {
+    position: 'absolute',
+    right: spacing.md,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputError: {
     borderColor: colors.error,

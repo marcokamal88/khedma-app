@@ -1,16 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, typography, spacing, borderRadius } from '../../theme';
+import React from "react";
+import { View, Text, StyleSheet, ViewStyle, StyleProp } from "react-native";
+import { colors, typography, spacing, borderRadius } from "../../theme";
 
-type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral';
+type BadgeVariant = "success" | "warning" | "error" | "info" | "neutral";
 
 interface AppBadgeProps {
   label: string;
   variant?: BadgeVariant;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
-export function AppBadge({ label, variant = 'info', style }: AppBadgeProps) {
+export function AppBadge({ label, variant = "info", style }: AppBadgeProps) {
   return (
     <View style={[styles.base, styles[variant], style]}>
       <Text style={styles.text}>{label}</Text>
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   success: { backgroundColor: colors.success },
   warning: { backgroundColor: colors.warning },

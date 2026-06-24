@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../../theme';
 
 const LEFT_ICONS: Record<string, string> = {
@@ -21,7 +21,7 @@ interface AppListItemProps {
   rightIcon?: string;
   onPress?: () => void;
   children?: ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function AppListItem({

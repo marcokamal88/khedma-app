@@ -1,18 +1,18 @@
-import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, typography, spacing, borderRadius } from '../../theme';
+import React from "react";
+import { View, Text, StyleSheet, ViewStyle, StyleProp } from "react-native";
+import { colors, typography, spacing, borderRadius } from "../../theme";
 
 interface AppAvatarProps {
   name: string;
   size?: number;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function AppAvatar({ name, size = 40, style }: AppAvatarProps) {
   const initials = name
-    .split(' ')
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .toUpperCase()
     .slice(0, 2);
 
@@ -32,11 +32,11 @@ export function AppAvatar({ name, size = 40, style }: AppAvatarProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.charcoal,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   text: {
     color: colors.offWhite,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

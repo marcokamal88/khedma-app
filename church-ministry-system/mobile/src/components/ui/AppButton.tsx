@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   TouchableOpacity,
   Text,
@@ -6,10 +6,11 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
-} from 'react-native';
-import { colors, typography, spacing, borderRadius } from '../../theme';
+  StyleProp,
+} from "react-native";
+import { colors, typography, spacing, borderRadius } from "../../theme";
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "success";
 
 interface AppButtonProps {
   title: string;
@@ -17,23 +18,24 @@ interface AppButtonProps {
   variant?: ButtonVariant;
   disabled?: boolean;
   loading?: boolean;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-  size?: 'sm' | 'md' | 'lg';
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  size?: "sm" | "md" | "lg";
 }
 
 export function AppButton({
   title,
   onPress,
-  variant = 'primary',
+  variant = "primary",
   disabled = false,
   loading = false,
   style,
   textStyle,
-  size = 'md',
+  size = "md",
 }: AppButtonProps) {
-  const height = size === 'sm' ? 36 : size === 'lg' ? 52 : 44;
-  const paddingHorizontal = size === 'sm' ? spacing.sm : size === 'lg' ? spacing.xl : spacing.md;
+  const height = size === "sm" ? 36 : size === "lg" ? 52 : 44;
+  const paddingHorizontal =
+    size === "sm" ? spacing.sm : size === "lg" ? spacing.xl : spacing.md;
 
   return (
     <TouchableOpacity
@@ -51,14 +53,20 @@ export function AppButton({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'primary' || variant === 'danger' || variant === 'success' ? colors.offWhite : colors.charcoal}
+          color={
+            variant === "primary" ||
+            variant === "danger" ||
+            variant === "success"
+              ? colors.offWhite
+              : colors.charcoal
+          }
         />
       ) : (
         <Text
           style={[
             styles[`${variant}Text` as keyof typeof styles] as TextStyle,
-            size === 'sm' && typography.buttonSmall,
-            size !== 'sm' && typography.button,
+            size === "sm" && typography.buttonSmall,
+            size !== "sm" && typography.button,
             disabled && styles.disabledText,
             textStyle,
           ]}
@@ -73,20 +81,20 @@ export function AppButton({
 const styles = StyleSheet.create({
   base: {
     borderRadius: borderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
   primary: {
     backgroundColor: colors.charcoal,
   },
   secondary: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: colors.charcoal40,
   },
   ghost: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   danger: {
     backgroundColor: colors.error,

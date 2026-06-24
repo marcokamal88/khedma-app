@@ -1,20 +1,20 @@
-import React, { ReactNode } from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
-import { colors, spacing, borderRadius } from '../../theme';
+import React, { ReactNode } from "react";
+import { View, StyleSheet, ViewStyle, StyleProp } from "react-native";
+import { colors, spacing, borderRadius } from "../../theme";
 
 interface AppCardProps {
   children: ReactNode;
-  style?: ViewStyle;
-  variant?: 'flat' | 'bordered' | 'highlighted';
+  style?: StyleProp<ViewStyle>;
+  variant?: "flat" | "bordered" | "highlighted";
 }
 
-export function AppCard({ children, style, variant = 'flat' }: AppCardProps) {
+export function AppCard({ children, style, variant = "flat" }: AppCardProps) {
   return (
     <View
       style={[
         styles.base,
-        variant === 'bordered' && styles.bordered,
-        variant === 'highlighted' && styles.highlighted,
+        variant === "bordered" && styles.bordered,
+        variant === "highlighted" && styles.highlighted,
         style,
       ]}
     >
