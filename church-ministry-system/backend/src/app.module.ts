@@ -24,6 +24,7 @@ import { FollowUpsModule } from './modules/follow-ups/follow-ups.module';
 import { LessonLibraryModule } from './modules/lesson-library/lesson-library.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { AuditModule } from './shared/interceptors/audit.module';
 import { AuditInterceptor } from './shared/interceptors/audit.interceptor';
 import { JwtAuthGuard } from './core/auth/jwt-auth.guard';
@@ -60,6 +61,7 @@ import { ContextGuard } from './core/auth/context.guard';
     LessonLibraryModule,
     ActivitiesModule,
     AchievementsModule,
+    DashboardModule,
     AuditModule,
   ],
   providers: [

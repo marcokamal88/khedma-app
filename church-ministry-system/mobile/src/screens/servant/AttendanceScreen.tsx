@@ -45,8 +45,8 @@ export default function AttendanceScreen() {
       return;
     }
     await attendanceApi.createSession({
-      serviceId,
-      serviceYearId,
+      serviceId: String(serviceId),
+      serviceYearId: String(serviceYearId),
       sessionDate,
       sessionType: 'service',
     });

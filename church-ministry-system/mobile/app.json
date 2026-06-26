@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Church Ministry",
-    "slug": "church-ministry",
+    "name": "Khedma App",
+    "slug": "khedma-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -18,7 +18,8 @@
       "adaptiveIcon": {
         "backgroundColor": "#4A90D9"
       },
-      "package": "com.church.ministry"
+      "package": "com.church.ministry",
+      "permissions": ["DETECT_SCREEN_CAPTURE"]
     }
   }
 }

@@ -30,6 +30,7 @@ const TAB_ICONS: Record<string, string> = {
   reports: '\u2261',
   reviews: '\u2691',
   switchContext: '\u21C4',
+  more: '\u2630',
   children: '\u263A',
   events: '\u2637',
   activities: '\u2692',
@@ -49,6 +50,7 @@ export function AppTabBar({ tabs, activeTab, onTabChange, style }: AppTabBarProp
             style={styles.tab}
             activeOpacity={0.7}
           >
+            {isActive && <View style={styles.activeLine} />}
             <Text style={[styles.icon, isActive && styles.iconActive]}>
               {TAB_ICONS[tab.icon] || TAB_ICONS[tab.key] || TAB_ICONS.default}
             </Text>
@@ -65,14 +67,31 @@ export function AppTabBar({ tabs, activeTab, onTabChange, style }: AppTabBarProp
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: colors.cream,
+    backgroundColor: '#ffffff',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: '#e8e4d8',
     paddingBottom: 4,
   },
-  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.xs },
-  icon: { fontSize: 20, color: colors.tabInactive },
-  iconActive: { color: colors.charcoal },
-  label: { ...typography.caption, color: colors.tabInactive, marginTop: 2 },
-  labelActive: { color: colors.charcoal, fontWeight: '600' },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.xs,
+    position: 'relative',
+  },
+  activeLine: {
+    position: 'absolute',
+    top: 0,
+    left: '25%',
+    right: '25%',
+    height: 3,
+    backgroundColor: '#1f2d56',
+    borderBottomLeftRadius: 3,
+    borderBottomRightRadius: 3,
+  },
+  icon: { fontSize: 20, color: '#9e9e9e', marginBottom: 2 },
+  iconActive: { color: '#1f2d56' },
+  label: { ...typography.caption, color: '#9e9e9e', fontSize: 11 },
+  labelActive: { color: '#1f2d56', fontWeight: '600' },
 });

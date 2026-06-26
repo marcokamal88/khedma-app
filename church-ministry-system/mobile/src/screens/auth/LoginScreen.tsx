@@ -7,7 +7,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useAuth } from '../../hooks/useAuth';
 import { useLocale } from '../../hooks/useLocale';
 import { AppInput, AppButton } from '../../components/ui';
@@ -19,6 +18,7 @@ export default function LoginScreen({ navigation }: any) {
   const styles = createStyles(isRTL);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleLogin = async () => {
@@ -46,7 +46,7 @@ export default function LoginScreen({ navigation }: any) {
 
       <View style={styles.topBrand}>
         <View style={styles.logoWrap}>
-          <MaterialCommunityIcons name={'church'} size={30} color={colors.charcoal} />
+          <Text style={{ fontSize: 28, color: colors.charcoal }}>+</Text>
         </View>
         <Text style={styles.appName}>{t('app.name')}</Text>
         <Text style={styles.tagline}>{t('app.tagline')}</Text>
@@ -62,15 +62,21 @@ export default function LoginScreen({ navigation }: any) {
             onChangeText={setEmail}
             autoCapitalize="none"
             style={{ textAlign: isRTL ? 'right' : 'left' }}
-            rightIcon={<Feather name={'mail'} size={18} color={colors.mutedGray} />}
+            rightIcon={<Text style={{ fontSize: 16, color: colors.mutedGray }}>@</Text>}
           />
           <AppInput
             placeholder={t('auth.password')}
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={!showPassword}
             style={{ textAlign: isRTL ? 'right' : 'left' }}
-            rightIcon={<Feather name={'lock'} size={18} color={colors.mutedGray} />}
+            rightIcon={
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} activeOpacity={0.6}>
+                <Text style={{ fontSize: 20, color: colors.mutedGray, opacity: showPassword ? 1 : 0.5 }}>
+                  👁
+                </Text>
+              </TouchableOpacity>
+            }
           />
 
           <TouchableOpacity style={styles.forgotRow} activeOpacity={0.7}>

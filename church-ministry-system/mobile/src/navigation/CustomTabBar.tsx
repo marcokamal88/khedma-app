@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppTabBar } from '../components/ui';
+import { useDrawer } from '../contexts/DrawerContext';
 
 const ROUTE_ICON_NAME: Record<string, string> = {
   Dashboard: 'dashboard',
@@ -12,29 +13,37 @@ const ROUTE_ICON_NAME: Record<string, string> = {
   Library: 'library',
   Store: 'store',
   Notifications: 'notifications',
-  SwitchContext: 'switchContext',
+  SwitchContext: 'more',
   Reviews: 'reviews',
   Reports: 'reports',
 };
 
 export default function CustomTabBar(props: any) {
-  const tabs = props.state.routes.map((route: any) => {
-    const options = props.descriptors[route.key].options;
-    const label =
-      typeof options.tabBarLabel === 'string'
-        ? options.tabBarLabel
-        : (options.title as string) || route.name;
+  const { openDrawer } = useDrawer();
+  const tabs = props.state.routes
+    .filter((route: any) => !props.descriptors[route.key].options?.tabBarButton)
+    .map((route: any) => {
+      const options = props.descriptors[route.key].options;
+      const label =
+        typeof options.tabBarLabel === 'string'
+          ? options.tabBarLabel
+          : (options.title as string) || route.name;
 
-    return {
-      key: route.name,
-      label,
-      icon: ROUTE_ICON_NAME[route.name] || 'default',
-    };
-  });
+      return {
+        key: route.name,
+        label,
+        icon: ROUTE_ICON_NAME[route.name] || 'default',
+      };
+    });
 
   const activeTab = props.state.routeNames[props.state.index];
 
   const handleTabChange = (routeName: string) => {
+    if (routeName === 'SwitchContext') {
+      openDrawer();
+      return;
+    }
+
     const route = props.state.routes.find((item: any) => item.name === routeName);
     const event = props.navigation.emit({
       type: 'tabPress',

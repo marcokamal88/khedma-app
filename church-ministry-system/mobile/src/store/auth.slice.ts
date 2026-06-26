@@ -22,6 +22,7 @@ interface AuthState {
   contexts: ActiveContext[];
   activeContext: ActiveContext | null;
   isLoading: boolean;
+  needsContextSelection: boolean;
 }
 
 const initialState: AuthState = {
@@ -33,6 +34,7 @@ const initialState: AuthState = {
   contexts: [],
   activeContext: null,
   isLoading: false,
+  needsContextSelection: false,
 };
 
 const authSlice = createSlice({
@@ -55,6 +57,7 @@ const authSlice = createSlice({
       state.roles = action.payload.roles;
       state.contexts = action.payload.contexts;
       state.activeContext = action.payload.activeContext;
+      state.needsContextSelection = action.payload.contexts?.length > 1;
     },
     setContexts(state, action: PayloadAction<{
       roles: string[];
@@ -70,6 +73,7 @@ const authSlice = createSlice({
     }>) {
       state.token = action.payload.accessToken;
       state.activeContext = action.payload.activeContext;
+      state.needsContextSelection = false;
     },
     logout(state) {
       state.token = null;
@@ -79,6 +83,7 @@ const authSlice = createSlice({
       state.roles = [];
       state.contexts = [];
       state.activeContext = null;
+      state.needsContextSelection = false;
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.isLoading = action.payload;
