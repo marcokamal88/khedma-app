@@ -142,6 +142,13 @@ export default function TaioAwardScreen() {
       });
       Alert.alert(t("app.success"), t("award.success"));
       setAwardModalVisible(false);
+      setStudents((prev) =>
+        prev.map((s) =>
+          s.id === selectedStudent.id
+            ? { ...s, taioBalance: (s.taioBalance ?? 0) + pointsNum }
+            : s,
+        ),
+      );
     } catch (err: any) {
       Alert.alert(
         t("app.error"),
@@ -228,23 +235,21 @@ export default function TaioAwardScreen() {
             ) : (
               students.map((student) => (
                 <View key={student.id} style={styles.memberRow}>
-                  <View style={styles.memberRowRight}>
-                    <Text style={styles.memberName} numberOfLines={1}>
-                      {student.fullName}
+                  <Text style={styles.memberName} numberOfLines={1}>
+                    {student.fullName}
+                  </Text>
+                  <View style={styles.balanceBadge}>
+                    <Text style={styles.balanceBadgeValue}>
+                      {student.taioBalance ?? 0}
                     </Text>
-                    <View style={styles.balanceBadge}>
-                      <Text style={styles.balanceBadgeValue}>
-                        {student.taioBalance ?? 0}
-                      </Text>
-                      <Text style={styles.balanceBadgeLabel}>{t("")}</Text>
-                    </View>
+                    <Text style={styles.balanceBadgeLabel}>{t('taio.points')}</Text>
                   </View>
                   <TouchableOpacity
                     style={styles.awardBtn}
                     onPress={() => openAwardModal(student)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.awardBtnText}>{t("award.give")}</Text>
+                    <Text style={styles.awardBtnText}>{t('award.give')}</Text>
                   </TouchableOpacity>
                 </View>
               ))
@@ -416,7 +421,7 @@ const styles = StyleSheet.create({
   },
 
   memberRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: OFF_WHITE,
@@ -428,30 +433,10 @@ const styles = StyleSheet.create({
     borderColor: BORDER,
     ...shadows.card,
   },
-  memberRowRight: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    flex: 1,
-  },
-  memberAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: NAVY,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
-  },
-  memberAvatarText: {
-    ...typography.subHeading,
-    color: "#ffffff",
-    fontWeight: "700",
-  },
   memberName: {
     ...typography.body,
     color: CHARCOAL,
     fontWeight: "600",
-    flex: 1,
   },
   balanceBadge: {
     flexDirection: "row",

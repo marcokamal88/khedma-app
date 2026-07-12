@@ -179,7 +179,7 @@ function createStyles(isRTL: boolean) {
       ...typography.subHeading,
       color: colors.charcoal,
       marginBottom: spacing.lg,
-      textAlign: isRTL ? 'right' : 'left',
+      textAlign: isRTL ? 'left' : 'right',
     },
     forgotRow: {
       alignSelf: isRTL ? 'flex-start' : 'flex-end',
