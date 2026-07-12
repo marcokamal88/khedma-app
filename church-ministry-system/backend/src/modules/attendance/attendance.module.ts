@@ -4,9 +4,10 @@ import { AttendanceController } from './attendance.controller';
 import { AttendanceService } from './attendance.service';
 import { AttendanceSession } from './entities/attendance-session.entity';
 import { AttendanceRecord } from './entities/attendance-record.entity';
+import { Class } from '../church/entities/class.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([AttendanceSession, AttendanceRecord])],
+  imports: [SequelizeModule.forFeature([AttendanceSession, AttendanceRecord, Class])],
   controllers: [AttendanceController],
   providers: [AttendanceService],
   exports: [AttendanceService],

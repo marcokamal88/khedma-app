@@ -3,7 +3,7 @@ import { AppTabBar } from '../components/ui';
 import { useDrawer } from '../contexts/DrawerContext';
 
 const ROUTE_ICON_NAME: Record<string, string> = {
-  Dashboard: 'dashboard',
+  Home: 'home',
   Attendance: 'calendar',
   Preparations: 'check-square',
   Tasks: 'tasks',

@@ -18,6 +18,7 @@ interface AppTabBarProps {
 const TAB_ICONS: Record<string, string> = {
   home: '\u2302',
   dashboard: '\u2302',
+  calendar: '\u2637',
   tasks: '\u2611',
   attendance: '\u2637',
   preparation: '\u270E',

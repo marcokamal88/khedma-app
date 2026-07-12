@@ -20,7 +20,7 @@ export default function ServedMemberStack() {
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="Dashboard" component={ServedMemberDashboard} />
+      <Tab.Screen name="Home" component={ServedMemberDashboard} options={{ title: t('tabs.home') }} />
       <Tab.Screen name="Tasks" component={TasksScreen} />
       <Tab.Screen name="Taiao" component={TaioBalanceScreen} />
       <Tab.Screen name="Store" component={StoreScreen} />

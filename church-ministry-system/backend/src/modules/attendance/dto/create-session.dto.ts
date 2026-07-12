@@ -14,6 +14,9 @@ export class CreateSessionDto {
   @IsIn(['service', 'event', 'meeting', 'activity'])
   sessionType: string;
 
+  @IsString()
+  classId: string;
+
   @IsOptional()
   @IsString()
   notes?: string;

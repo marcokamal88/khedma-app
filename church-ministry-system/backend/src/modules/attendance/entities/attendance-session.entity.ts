@@ -3,6 +3,7 @@ import {
 } from 'sequelize-typescript';
 import { Service } from '../../church/entities/service.entity';
 import { ServiceYear } from '../../service-year/entities/service-year.entity';
+import { Class } from '../../church/entities/class.entity';
 import { AttendanceRecord } from './attendance-record.entity';
 
 @Table({ tableName: 'attendance_sessions', timestamps: false })
@@ -23,6 +24,10 @@ export class AttendanceSession extends Model {
   @Column({ field: 'service_id', type: DataType.INTEGER, allowNull: false })
   serviceId: number;
 
+  @ForeignKey(() => Class)
+  @Column({ field: 'class_id', type: DataType.INTEGER, allowNull: true })
+  classId: number;
+
   @Column({ field: 'session_type', type: DataType.ENUM('service','event','meeting','activity'), allowNull: false })
   sessionType: string;
 
@@ -40,6 +45,9 @@ export class AttendanceSession extends Model {
 
   @BelongsTo(() => ServiceYear)
   serviceYear: ServiceYear;
+
+  @BelongsTo(() => Class)
+  class: Class;
 
   @HasMany(() => AttendanceRecord)
   records: AttendanceRecord[];

@@ -1,7 +1,8 @@
 import {
-  Table, Column, Model, DataType, ForeignKey, BelongsTo, PrimaryKey, AutoIncrement,
+  Table, Column, Model, DataType, ForeignKey, BelongsTo, HasMany, PrimaryKey, AutoIncrement,
 } from 'sequelize-typescript';
 import { Service } from './service.entity';
+import { Class } from './class.entity';
 
 @Table({ tableName: 'stage_groups', timestamps: false })
 export class StageGroup extends Model {
@@ -28,4 +29,7 @@ export class StageGroup extends Model {
 
   @BelongsTo(() => Service)
   service: Service;
+
+  @HasMany(() => Class)
+  classes: Class[];
 }

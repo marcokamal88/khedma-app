@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ChurchService } from './church.service';
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -34,6 +34,11 @@ export class ChurchController {
     return this.churchService.getService(churchId, id);
   }
 
+  @Get('services/:id/structure')
+  async getServiceStructure(@Param('id') id: string, @CurrentTenant() churchId: string) {
+    return this.churchService.getServiceStructure(churchId, id);
+  }
+
   @Get('services/:id/stage-groups')
   async getStageGroups(@Param('id') serviceId: string, @CurrentTenant() churchId: string) {
     return this.churchService.getStageGroups(churchId, serviceId);
@@ -42,6 +47,24 @@ export class ChurchController {
   @Get('services/:id/classes')
   async getClasses(@Param('id') serviceId: string, @CurrentTenant() churchId: string) {
     return this.churchService.getClasses(churchId, serviceId);
+  }
+
+  @Get('stage-groups/:id/classes')
+  async getStageGroupClasses(@Param('id') id: string, @CurrentTenant() churchId: string) {
+    return this.churchService.getStageGroupClasses(churchId, id);
+  }
+
+  @Get('classes/:id/students')
+  async getClassStudents(@Param('id') id: string, @CurrentTenant() churchId: string) {
+    return this.churchService.getClassStudents(churchId, id);
+  }
+
+  @Post('enrollments')
+  async enrollMember(
+    @Body() body: { churchMemberId: string; serviceId: string; classId: string; serviceYearId: string; stageGroupId?: string },
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.churchService.enrollMember(churchId, body);
   }
 
   @Roles('priest', 'sector_leader')

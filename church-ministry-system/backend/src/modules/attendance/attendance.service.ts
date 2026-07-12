@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { AttendanceSession } from './entities/attendance-session.entity';
 import { AttendanceRecord } from './entities/attendance-record.entity';
+import { Class } from '../church/entities/class.entity';
+import { Enrollment } from '../users/entities/enrollment.entity';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { RecordAttendanceDto } from './dto/record-attendance.dto';
 
@@ -11,11 +13,26 @@ export class AttendanceService {
   constructor(
     @InjectModel(AttendanceSession) private sessionModel: typeof AttendanceSession,
     @InjectModel(AttendanceRecord) private recordModel: typeof AttendanceRecord,
+    @InjectModel(Class) private classModel: typeof Class,
+    @InjectModel(Enrollment) private enrollmentModel: typeof Enrollment,
   ) {}
 
   async createSession(churchId: string, dto: CreateSessionDto, recordedBy: string) {
+    if (dto.classId) {
+      const existing = await this.sessionModel.findOne({
+        where: { churchId, classId: dto.classId, sessionDate: dto.sessionDate },
+      });
+      if (existing) {
+        throw new BadRequestException('A session already exists for this class on this date');
+      }
+    }
     return this.sessionModel.create({
-      ...dto,
+      serviceId: dto.serviceId,
+      serviceYearId: dto.serviceYearId,
+      sessionDate: dto.sessionDate,
+      sessionType: dto.sessionType,
+      classId: dto.classId,
+      notes: dto.notes,
       churchId,
       recordedBy,
     } as any);
@@ -23,11 +40,12 @@ export class AttendanceService {
 
   async getSessions(
     churchId: string,
-    filters: { serviceId?: string; from?: string; to?: string; serviceYearId?: string },
+    filters: { serviceId?: string; from?: string; to?: string; serviceYearId?: string; classId?: string },
   ) {
     const where: any = { churchId };
     if (filters.serviceId) where.serviceId = filters.serviceId;
     if (filters.serviceYearId) where.serviceYearId = filters.serviceYearId;
+    if (filters.classId) where.classId = filters.classId;
     if (filters.from || filters.to) {
       where.sessionDate = {};
       if (filters.from) where.sessionDate[Op.gte] = filters.from;
@@ -49,7 +67,10 @@ export class AttendanceService {
   async getSession(churchId: string, id: string) {
     const session = await this.sessionModel.findOne({
       where: { id, churchId },
-      include: [{ model: AttendanceRecord }],
+      include: [
+        { model: AttendanceRecord },
+        { model: Class, attributes: ['id', 'name'] },
+      ],
     });
 
     if (!session) throw new NotFoundException('Session not found');
@@ -65,6 +86,26 @@ export class AttendanceService {
       where: { id: sessionId, churchId },
     });
     if (!session) throw new NotFoundException('Session not found');
+
+    if (session.classId) {
+      const enrolled = await this.enrollmentModel.findAll({
+        where: {
+          churchId,
+          classId: session.classId,
+          serviceYearId: session.serviceYearId,
+          isActive: true,
+        },
+        attributes: ['churchMemberId'],
+      });
+      const enrolledIds = new Set(enrolled.map((e) => String(e.churchMemberId)));
+      for (const record of dto.records) {
+        if (!enrolledIds.has(record.churchMemberId)) {
+          throw new NotFoundException(
+            `Member ${record.churchMemberId} is not enrolled in class ${session.classId}`,
+          );
+        }
+      }
+    }
 
     const records = [];
     for (const record of dto.records) {

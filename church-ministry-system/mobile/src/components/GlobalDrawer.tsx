@@ -8,6 +8,7 @@ import {
   Dimensions,
   ScrollView,
   SafeAreaView,
+  Switch,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -15,24 +16,39 @@ import { useAuth } from '../hooks/useAuth';
 import { typography, spacing } from '../theme';
 import { DrawerProvider } from '../contexts/DrawerContext';
 
+const NAVY = '#192f5f';
+const GOLD = '#d4a843';
+const CRIMSON = '#9b1b30';
+const CHARCOAL = '#1c1c1c';
+
+interface MenuItem {
+  key: string;
+  icon: string;
+  label: string;
+}
+
 interface MenuGroup {
   title: string;
-  items: { key: string; icon: string; label: string }[];
+  items: MenuItem[];
 }
 
 const SERVANT_MENU: MenuGroup[] = [
   {
     title: 'الخدمة',
     items: [
+      { key: 'Home', icon: '\u2302', label: 'الرئيسية' },
       { key: 'Preparations', icon: '\u270E', label: 'إعداد الدرس' },
-      { key: 'FollowUp', icon: '\u263C', label: 'المتابعة' },
+      { key: 'Attendance', icon: '\u2637', label: 'الحضور' },
+      { key: 'Tasks', icon: '\u2611', label: 'المهام' },
+      { key: 'FollowUp', icon: '\u2606', label: 'المتابعة' },
       { key: 'Library', icon: '\u2702', label: 'مكتبة الدروس' },
+      { key: 'Achievements', icon: '\u2605', label: 'الإنجازات' },
     ],
   },
   {
     title: 'التفاعل',
     items: [
-      { key: 'Achievements', icon: '\u2606', label: 'الإنجازات' },
+      { key: 'Taiao', icon: '\u2693', label: 'نقاط طايو' },
     ],
   },
   {
@@ -45,6 +61,12 @@ const SERVANT_MENU: MenuGroup[] = [
 
 const MEMBER_MENU: MenuGroup[] = [
   {
+    title: 'الرئيسية',
+    items: [
+      { key: 'Home', icon: '\u2302', label: 'الرئيسية' },
+    ],
+  },
+  {
     title: 'الحساب',
     items: [
       { key: 'Notifications', icon: '\u2630', label: 'الإشعارات' },
@@ -53,7 +75,7 @@ const MEMBER_MENU: MenuGroup[] = [
 ];
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.82;
+const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
 
 interface GlobalDrawerProps {
   children: React.ReactNode;
@@ -118,6 +140,7 @@ function DrawerContent({
 }) {
   const { logout, switchContext } = useAuth();
   const user = useSelector((state: RootState) => state.auth.user);
+  const activeContext = useSelector((state: RootState) => state.auth.activeContext);
 
   const initials = user?.fullName
     ?.split(' ')
@@ -129,19 +152,40 @@ function DrawerContent({
   const groups = menuConfig || SERVANT_MENU;
 
   return (
-    <SafeAreaView style={styles.drawerContainer}>
-      <ScrollView contentContainerStyle={styles.drawerScroll}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.topBar}>
         <TouchableOpacity onPress={closeDrawer} style={styles.closeBtn} activeOpacity={0.7}>
           <Text style={styles.closeIcon}>{'\u2715'}</Text>
         </TouchableOpacity>
-
-        <View style={styles.userInfo}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials}</Text>
+        <View style={styles.profileRow}>
+          <View style={styles.profileTextWrap}>
+            <Text style={styles.profileName}>{user?.fullName}</Text>
+            <Text style={styles.profileRole}>{activeContext?.role || 'خادم'}</Text>
           </View>
-          <Text style={styles.userName}>{user?.fullName}</Text>
+          <View style={styles.profileAvatar}>
+            <Text style={styles.profileAvatarText}>{initials}</Text>
+          </View>
         </View>
+      </View>
 
+      <View style={styles.contextCard}>
+        <View style={styles.contextCardBody}>
+          <View style={styles.contextInfo}>
+            <Text style={styles.contextLabel}>السابق الحالي</Text>
+            <Text style={styles.contextValue}>{t('home.classInfo')}</Text>
+          </View>
+          <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={switchContext}>
+            <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
+            <Text style={styles.contextSwitchText}>تبديل</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.menuScroll}
+        contentContainerStyle={styles.menuScrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {groups.map((group, gi) => (
           <View key={gi} style={styles.menuGroup}>
             <Text style={styles.groupTitle}>{group.title}</Text>
@@ -161,15 +205,29 @@ function DrawerContent({
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.switchRoleBtn} onPress={switchContext} activeOpacity={0.7}>
-          <Text style={styles.switchRoleLabel}>{'\u21C4'}  تغيير الدور</Text>
-        </TouchableOpacity>
+        <View style={styles.toggleRow}>
+          <View style={styles.toggleBtn}>
+            <Text style={styles.toggleIcon}>{'\uD83C\uDF10'}</Text>
+            <Text style={styles.toggleLabel}>English</Text>
+          </View>
+          <View style={[styles.toggleBtn, styles.toggleBtnActive]}>
+            <Text style={styles.toggleLabelActive}>عربي</Text>
+          </View>
+        </View>
         <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.7}>
+          <Text style={styles.logoutIcon}>{'\u2190'}</Text>
           <Text style={styles.logoutLabel}>تسجيل الخروج</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
+}
+
+function t(key: string): string {
+  const map: Record<string, string> = {
+    'home.classInfo': 'مدارس الأحد - الصف الثالث',
+  };
+  return map[key] || key;
 }
 
 const styles = StyleSheet.create({
@@ -184,73 +242,142 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     width: DRAWER_WIDTH,
-    backgroundColor: '#192f5f',
+    backgroundColor: NAVY,
     zIndex: 1001,
     elevation: 10,
   },
-  drawerContainer: { flex: 1 },
-  drawerScroll: { paddingHorizontal: spacing.lg, paddingTop: spacing.xxl, paddingBottom: spacing.lg },
+  container: { flex: 1 },
+
+  topBar: {
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
   closeBtn: {
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-start',
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: 16,
   },
   closeIcon: { fontSize: 16, color: '#ffffff' },
-  userInfo: { alignItems: 'center', marginBottom: spacing.xl },
-  avatar: {
+
+  profileRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+  },
+  profileAvatar: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.25)',
   },
-  avatarText: { ...typography.subHeading, color: '#ffffff' },
-  userName: { ...typography.cardTitle, color: '#ffffff' },
-  menuGroup: { marginBottom: spacing.md },
+  profileAvatarText: { ...typography.subHeading, color: '#ffffff', fontWeight: '700' },
+  profileTextWrap: { flex: 1, marginRight: 14 },
+  profileName: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700' },
+  profileRole: { ...typography.caption, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
+
+  contextCard: {
+    marginHorizontal: 20,
+    marginBottom: 8,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    padding: 14,
+  },
+  contextCardBody: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  contextInfo: { flex: 1, marginRight: 10 },
+  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2 },
+  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600' },
+  contextSwitchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: GOLD,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+  },
+  contextSwitchIcon: { fontSize: 13, color: CHARCOAL, marginRight: 4 },
+  contextSwitchText: { ...typography.buttonSmall, color: CHARCOAL, fontWeight: '700' },
+
+  menuScroll: { flex: 1 },
+  menuScrollContent: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
+
+  menuGroup: { marginBottom: 16 },
   groupTitle: {
     ...typography.overline,
-    color: 'rgba(255,255,255,0.5)',
-    marginBottom: spacing.sm,
+    color: 'rgba(255,255,255,0.4)',
+    textAlign: 'right',
+    marginBottom: 8,
+    paddingRight: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   menuItem: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    justifyContent: 'space-between',
+    paddingVertical: 13,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
-  menuIcon: { fontSize: 18, color: '#ffffff', marginRight: spacing.md, width: 24, textAlign: 'center' },
-  menuLabel: { ...typography.body, color: '#ffffff' },
+  menuIcon: {
+    fontSize: 18,
+    color: 'rgba(255,255,255,0.7)',
+    width: 28,
+    textAlign: 'center',
+  },
+  menuLabel: { ...typography.body, color: '#ffffff', flex: 1, textAlign: 'right' },
+
   footer: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderTopColor: 'rgba(255,255,255,0.08)',
   },
-  switchRoleBtn: {
+  toggleRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  toggleBtn: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 12,
-    paddingVertical: spacing.md,
-    marginBottom: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 10,
+    paddingVertical: 10,
+    gap: 6,
   },
-  switchRoleLabel: { ...typography.button, color: '#ffffff' },
+  toggleBtnActive: {
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+  toggleIcon: { fontSize: 14, color: 'rgba(255,255,255,0.5)' },
+  toggleLabel: { ...typography.buttonSmall, color: 'rgba(255,255,255,0.4)' },
+  toggleLabelActive: { ...typography.buttonSmall, color: '#ffffff', fontWeight: '600' },
+
   logoutBtn: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#c62828',
-    borderRadius: 12,
-    paddingVertical: spacing.md,
+    backgroundColor: CRIMSON,
+    borderRadius: 14,
+    paddingVertical: 14,
+    gap: 8,
   },
-  logoutLabel: { ...typography.button, color: '#ffffff' },
+  logoutIcon: { fontSize: 16, color: '#ffffff' },
+  logoutLabel: { ...typography.button, color: '#ffffff', fontWeight: '600' },
 });

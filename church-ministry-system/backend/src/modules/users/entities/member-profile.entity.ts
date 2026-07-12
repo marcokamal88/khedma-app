@@ -30,6 +30,9 @@ export class MemberProfile extends Model {
   @Column({ type: DataType.TEXT, allowNull: true })
   address: string;
 
+  @Column({ type: DataType.TEXT, allowNull: true })
+  notes: string;
+
   @BelongsTo(() => ChurchMember)
   churchMember: ChurchMember;
 }

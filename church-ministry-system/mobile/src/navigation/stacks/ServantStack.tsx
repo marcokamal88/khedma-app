@@ -25,7 +25,7 @@ export default function ServantStack() {
       screenOptions={{ headerShown: false }}
     >
       {/* Visible tabs */}
-      <Tab.Screen name="Dashboard" component={ServantDashboard} />
+      <Tab.Screen name="Home" component={ServantDashboard} options={{ title: t('tabs.home') }} />
       <Tab.Screen name="Attendance" component={AttendanceScreen} />
       <Tab.Screen name="Tasks" component={TasksScreen} />
       <Tab.Screen name="Taiao" component={TaioAwardScreen} options={{ title: t('tabs.taio') }} />
