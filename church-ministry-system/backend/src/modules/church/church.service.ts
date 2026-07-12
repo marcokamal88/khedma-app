@@ -8,6 +8,7 @@ import { Class } from './entities/class.entity';
 import { Enrollment } from '../users/entities/enrollment.entity';
 import { User } from '../users/entities/user.entity';
 import { ChurchMember } from '../users/entities/church-member.entity';
+import { TaioService } from '../taio/taio.service';
 
 @Injectable()
 export class ChurchService {
@@ -17,6 +18,7 @@ export class ChurchService {
     @InjectModel(StageGroup) private stageGroupModel: typeof StageGroup,
     @InjectModel(Class) private classModel: typeof Class,
     @InjectModel(Enrollment) private enrollmentModel: typeof Enrollment,
+    private taioService: TaioService,
   ) {}
 
   async getSectors(churchId: string) {
@@ -98,6 +100,8 @@ export class ChurchService {
         },
       ],
     });
+    const memberIds = enrollments.map((e) => e.churchMemberId);
+    const balances = memberIds.length ? await this.taioService.getBalances(churchId, memberIds.map(String)) : {};
     return enrollments.map((e) => ({
       enrollmentId: e.id,
       id: e.churchMemberId,
@@ -106,6 +110,7 @@ export class ChurchService {
       email: (e as any).churchMember?.user?.email,
       phone: (e as any).churchMember?.user?.phone,
       avatarUrl: (e as any).churchMember?.user?.avatarUrl,
+      taioBalance: balances[e.churchMemberId] || 0,
     }));
   }
 

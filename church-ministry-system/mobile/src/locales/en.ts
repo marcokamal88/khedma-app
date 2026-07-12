@@ -49,7 +49,7 @@ export const en = {
     achievements: 'Achievements',
     library: 'Lesson Library',
     more: 'More',
-    taio: 'Points',
+    points: 'Points',
   },
   roles: {
     priest: 'Priest',
@@ -199,6 +199,13 @@ export const en = {
     button: 'Award Points',
     success: 'Points awarded successfully!',
     failure: 'Failed to award points',
+    awardTo: 'Award Taio to',
+    give: 'Give Taio',
+    selectStudent: 'Select a student from your class',
+  },
+  taio: {
+    balance: 'Balance',
+    points: 'pts',
   },
   errors: {
     noServiceYear: 'No active service year',

@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { TaioTransaction } from './entities/taio-transaction.entity';
 import { StoreItem } from './entities/store-item.entity';
 import { StoreRedemption } from './entities/store-redemption.entity';
+import { Enrollment } from '../users/entities/enrollment.entity';
+import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 
 @Injectable()
 export class TaioService {
@@ -13,6 +15,8 @@ export class TaioService {
     @InjectModel(TaioTransaction) private txModel: typeof TaioTransaction,
     @InjectModel(StoreItem) private itemModel: typeof StoreItem,
     @InjectModel(StoreRedemption) private redemptionModel: typeof StoreRedemption,
+    @InjectModel(Enrollment) private enrollmentModel: typeof Enrollment,
+    @InjectModel(ServantAssignment) private assignmentModel: typeof ServantAssignment,
   ) {}
 
   async getBalance(churchId: string, memberId: string, serviceYearId?: string) {
@@ -23,6 +27,22 @@ export class TaioService {
     return { balance };
   }
 
+  async getBalances(churchId: string, memberIds: (string | number)[], serviceYearId?: string) {
+    const where: any = { churchId, churchMemberId: { [Op.in]: memberIds.map(Number) } };
+    if (serviceYearId) where.serviceYearId = serviceYearId;
+    const rows = await this.txModel.findAll({
+      where,
+      attributes: [
+        'churchMemberId',
+        [this.txModel.sequelize!.fn('SUM', this.txModel.sequelize!.col('points')), 'balance'],
+      ],
+      group: ['churchMemberId'],
+    });
+    const map: Record<number, number> = {};
+    rows.forEach((r: any) => { map[r.churchMemberId] = Number(r.getDataValue('balance')); });
+    return map;
+  }
+
   async getTransactions(churchId: string, memberId: string, serviceYearId?: string) {
     const where: any = { churchId, churchMemberId: memberId };
     if (serviceYearId) where.serviceYearId = serviceYearId;
@@ -31,6 +51,17 @@ export class TaioService {
 
   async awardPoints(churchId: string, body: any, awardedBy: string) {
     const { churchMemberId, points, reason, sourceType, sourceId, serviceYearId } = body;
+
+    const assignment = await this.assignmentModel.findOne({
+      where: { churchMemberId: awardedBy, churchId, serviceYearId, isActive: true },
+    });
+    if (!assignment) throw new BadRequestException('You are not assigned to any class');
+
+    const enrollment = await this.enrollmentModel.findOne({
+      where: { churchMemberId, churchId, classId: assignment.classId, serviceYearId, isActive: true },
+    });
+    if (!enrollment) throw new BadRequestException('Student not found in your class');
+
     return this.txModel.create({
       churchId, churchMemberId, points, reason, sourceType, sourceId, assignedBy: awardedBy, serviceYearId,
     } as any);

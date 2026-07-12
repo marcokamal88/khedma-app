@@ -12,14 +12,13 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
 import { attendanceApi } from '../../api/attendance.api';
 import { churchApi } from '../../api/church.api';
 import apiClient from '../../api/client';
 import { useLocale } from '../../hooks/useLocale';
 import { typography, shadows } from '../../theme';
 import CalendarPicker from '../../components/CalendarPicker';
+import AppHeader from '../../components/AppHeader';
 
 const NAVY = '#192f5f';
 const GOLD = '#d4a843';
@@ -38,6 +37,7 @@ interface Student {
   id: string;
   fullName: string;
   avatarUrl?: string;
+  taioBalance?: number;
 }
 
 interface SessionRecord {
@@ -81,7 +81,6 @@ interface MyClassAssignment {
 
 export default function AttendanceScreen() {
   const { t } = useLocale();
-  const user = useSelector((state: RootState) => state.auth.user);
 
   const [loading, setLoading] = useState(true);
   const [classAssignment, setClassAssignment] = useState<MyClassAssignment | null>(null);
@@ -325,13 +324,6 @@ export default function AttendanceScreen() {
     }
   }, [selectedSession, memberStatuses, loadData, t]);
 
-  const initials = user?.fullName
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
-
   const getMemberInitials = (name: string) =>
     name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 
@@ -355,16 +347,7 @@ export default function AttendanceScreen() {
   if (noClass) {
     return (
       <View style={styles.root}>
-        <View style={styles.headerSection}>
-          <View style={styles.headerTop}>
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarText}>{initials}</Text>
-            </View>
-          </View>
-          <Text style={styles.greeting}>{t('attendance.title')}</Text>
-          <Text style={styles.userName}>{user?.fullName}</Text>
-        </View>
-        <View style={styles.waveContainer}><Text style={styles.waveDummy}>{''}</Text></View>
+        <AppHeader greetingText={t('attendance.title')} />
         <View style={styles.emptyState}>
           <Text style={styles.emptyIcon}>{'\u2637'}</Text>
           <Text style={styles.emptyText}>{t('attendance.noClass')}</Text>
@@ -376,14 +359,7 @@ export default function AttendanceScreen() {
   if (loadingDetail) {
     return (
       <View style={styles.root}>
-        <View style={styles.headerSection}>
-          <View style={styles.headerTop}>
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarText}>{initials}</Text>
-            </View>
-          </View>
-        </View>
-        <View style={styles.waveContainer}><Text style={styles.waveDummy}>{''}</Text></View>
+        <AppHeader greetingText={''} />
         <View style={styles.detailLoadingContainer}>
           <ActivityIndicator size="large" color={NAVY} />
         </View>
@@ -396,18 +372,7 @@ export default function AttendanceScreen() {
     return (
       <View style={styles.root}>
         <ScrollView style={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
-          <View style={styles.headerSection}>
-            <View style={styles.headerTop}>
-              <TouchableOpacity style={styles.headerBtn} activeOpacity={0.7}>
-                <Text style={styles.bellIcon}>{'\uD83D\uDD14'}</Text>
-              </TouchableOpacity>
-              <View style={styles.avatarCircle}>
-                <Text style={styles.avatarText}>{initials}</Text>
-              </View>
-            </View>
-            <Text style={styles.greeting}>{t('attendance.title')}</Text>
-            <Text style={styles.userName}>{user?.fullName}</Text>
-
+          <AppHeader greetingText={t('attendance.title')}>
             <View style={styles.sessionInfoCard}>
               <View style={styles.sessionInfoRow}>
                 <View style={styles.sessionInfoIconWrap}>
@@ -421,11 +386,7 @@ export default function AttendanceScreen() {
                 </View>
               </View>
             </View>
-          </View>
-
-          <View style={styles.waveContainer}>
-            <Text style={styles.waveDummy}>{''}</Text>
-          </View>
+          </AppHeader>
 
           <View style={styles.contentSection}>
             <View style={styles.sessionHeader}>
@@ -507,18 +468,7 @@ export default function AttendanceScreen() {
   return (
     <View style={styles.root}>
       <ScrollView style={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerSection}>
-          <View style={styles.headerTop}>
-            <TouchableOpacity style={styles.headerBtn} activeOpacity={0.7}>
-              <Text style={styles.bellIcon}>{'\uD83D\uDD14'}</Text>
-            </TouchableOpacity>
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarText}>{initials}</Text>
-            </View>
-          </View>
-          <Text style={styles.greeting}>{t('attendance.title')}</Text>
-          <Text style={styles.userName}>{user?.fullName}</Text>
-
+        <AppHeader greetingText={t('attendance.title')}>
           <View style={styles.classInfoCard}>
             <View style={styles.classInfoRow}>
               <View style={styles.classInfoIconWrap}>
@@ -534,11 +484,7 @@ export default function AttendanceScreen() {
               </View>
             </View>
           </View>
-        </View>
-
-        <View style={styles.waveContainer}>
-          <Text style={styles.waveDummy}>{''}</Text>
-        </View>
+        </AppHeader>
 
         <View style={styles.contentSection}>
           <View style={styles.metricsRow}>
@@ -597,6 +543,10 @@ export default function AttendanceScreen() {
                         <Text style={styles.studentAvatarText}>{getMemberInitials(student.fullName)}</Text>
                       </View>
                       <Text style={styles.studentName} numberOfLines={1}>{student.fullName}</Text>
+                      <View style={styles.taioBadge}>
+                        <Text style={styles.taioBadgeText}>{student.taioBalance ?? 0}</Text>
+                        <Text style={styles.taioBadgeLabel}>{t('taio.points')}</Text>
+                      </View>
                     </View>
                     <Text style={styles.editIcon}>{'\u270E'}</Text>
                   </TouchableOpacity>
@@ -856,6 +806,10 @@ export default function AttendanceScreen() {
                       <Text style={styles.studentAvatarText}>{getMemberInitials(student.fullName)}</Text>
                     </View>
                     <Text style={styles.studentName} numberOfLines={1}>{student.fullName}</Text>
+                    <View style={styles.taioBadge}>
+                      <Text style={styles.taioBadgeText}>{student.taioBalance ?? 0}</Text>
+                      <Text style={styles.taioBadgeLabel}>{t('taio.points')}</Text>
+                    </View>
                   </View>
                   <Text style={styles.editIcon}>{'\u270E'}</Text>
                 </TouchableOpacity>
@@ -883,41 +837,6 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: NAVY },
   detailLoadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: CREAM },
   scroll: { flex: 1 },
-
-  headerSection: {
-    backgroundColor: NAVY,
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 40,
-  },
-  headerTop: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  headerBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bellIcon: { fontSize: 20, color: '#ffffff' },
-  avatarCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  avatarText: { ...typography.subHeading, color: '#ffffff', fontWeight: '700' },
-  greeting: { ...typography.body, color: 'rgba(255,255,255,0.6)', marginBottom: 2, textAlign: 'right' },
-  userName: { ...typography.sectionHeading, color: '#ffffff', marginBottom: 16, textAlign: 'right' },
 
   classInfoCard: {
     backgroundColor: 'rgba(255,255,255,0.10)',
@@ -969,15 +888,6 @@ const styles = StyleSheet.create({
   sessionInfoTextWrap: { flex: 1 },
   sessionInfoTitle: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700', textAlign: 'right' },
   sessionInfoMeta: { ...typography.caption, color: 'rgba(255,255,255,0.6)', marginTop: 2, textAlign: 'right' },
-
-  waveContainer: {
-    height: 30,
-    backgroundColor: NAVY,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    marginBottom: -8,
-  },
-  waveDummy: { height: 0 },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },
 
@@ -1104,6 +1014,17 @@ const styles = StyleSheet.create({
   },
   studentAvatarText: { ...typography.subHeading, color: '#ffffff', fontWeight: '700', fontSize: 14 },
   studentName: { ...typography.body, color: CHARCOAL, fontWeight: '600', textAlign: 'right', flex: 1 },
+  taioBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E6F5EE',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginLeft: 8,
+  },
+  taioBadgeText: { ...typography.caption, color: GREEN, fontWeight: '700', fontSize: 12 },
+  taioBadgeLabel: { ...typography.caption, color: GREEN, fontSize: 10, marginLeft: 2 },
   editIcon: { fontSize: 16, color: MUTED, marginLeft: 8 },
 
   sessionRow: {
@@ -1173,7 +1094,7 @@ const styles = StyleSheet.create({
   memberName: { ...typography.body, color: CHARCOAL, fontWeight: '600', textAlign: 'right', flex: 1 },
 
   statusButtons: {
-    flexDirection: 'row',
+    flexDirection: 'row-reverse',
     gap: 6,
   },
   statusBtn: {

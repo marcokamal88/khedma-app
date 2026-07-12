@@ -21,9 +21,9 @@ export default function ServedMemberStack() {
       screenOptions={{ headerShown: false }}
     >
       <Tab.Screen name="Home" component={ServedMemberDashboard} options={{ title: t('tabs.home') }} />
-      <Tab.Screen name="Tasks" component={TasksScreen} />
-      <Tab.Screen name="Taiao" component={TaioBalanceScreen} />
-      <Tab.Screen name="Store" component={StoreScreen} />
+      <Tab.Screen name="Tasks" component={TasksScreen} options={{ title: t('tabs.tasks') }} />
+      <Tab.Screen name="Taiao" component={TaioBalanceScreen} options={{ title: t('tabs.taio') }} />
+      <Tab.Screen name="Store" component={StoreScreen} options={{ title: t('tabs.store') }} />
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
 
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />

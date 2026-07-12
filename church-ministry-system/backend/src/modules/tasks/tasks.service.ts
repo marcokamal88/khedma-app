@@ -81,7 +81,7 @@ export class TasksService {
     return this.assignmentModel.findAll({
       where: { churchId, churchMemberId: memberId },
       include: [{ model: Task }],
-      order: [['createdAt', 'DESC']],
+      order: [['id', 'DESC']],
     });
   }
 

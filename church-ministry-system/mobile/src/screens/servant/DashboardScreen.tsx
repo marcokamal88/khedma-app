@@ -13,6 +13,7 @@ import { RootState } from '../../store';
 import { useLocale } from '../../hooks/useLocale';
 import { dashboardApi } from '../../api/dashboard.api';
 import { typography, spacing, shadows } from '../../theme';
+import AppHeader from '../../components/AppHeader';
 
 const NAVY = '#192f5f';
 const NAVY_LIGHT = '#243a6e';
@@ -25,7 +26,6 @@ const MUTED = '#5f5f5d';
 
 export default function ServantDashboard() {
   const { t } = useLocale();
-  const user = useSelector((state: RootState) => state.auth.user);
   const [stats, setStats] = useState<any>(null);
   const [todaySessions, setTodaySessions] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
@@ -50,13 +50,6 @@ export default function ServantDashboard() {
     })();
   }, []);
 
-  const initials = user?.fullName
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -68,19 +61,7 @@ export default function ServantDashboard() {
   return (
     <View style={styles.root}>
       <ScrollView style={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
-        <View style={styles.headerSection}>
-          <View style={styles.headerTop}>
-            <TouchableOpacity style={styles.headerBtn} activeOpacity={0.7}>
-              <Text style={styles.bellIcon}>{'\uD83D\uDD14'}</Text>
-            </TouchableOpacity>
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarText}>{initials}</Text>
-            </View>
-          </View>
-
-          <Text style={styles.greeting}>{t('home.welcomeBack')}</Text>
-          <Text style={styles.userName}>{user?.fullName}</Text>
-
+        <AppHeader greetingText={t('home.welcomeBack')}>
           <View style={styles.contextCard}>
             <View style={styles.contextCardBody}>
               <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7}>
@@ -93,11 +74,7 @@ export default function ServantDashboard() {
               </View>
             </View>
           </View>
-        </View>
-
-        <View style={styles.waveContainer}>
-          <Text style={styles.waveDummy}>{''}</Text>
-        </View>
+        </AppHeader>
 
         <View style={styles.contentSection}>
           <View style={styles.metricsGrid}>
@@ -209,41 +186,6 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: NAVY },
   scroll: { flex: 1 },
 
-  headerSection: {
-    backgroundColor: NAVY,
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 40,
-  },
-  headerTop: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  headerBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bellIcon: { fontSize: 20, color: '#ffffff' },
-  avatarCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  avatarText: { ...typography.subHeading, color: '#ffffff', fontWeight: '700' },
-  greeting: { ...typography.body, color: 'rgba(255,255,255,0.6)', marginBottom: 2, textAlign: 'right' },
-  userName: { ...typography.sectionHeading, color: '#ffffff', marginBottom: 16, textAlign: 'right' },
-
   contextCard: {
     backgroundColor: 'rgba(255,255,255,0.10)',
     borderRadius: 16,
@@ -269,15 +211,6 @@ const styles = StyleSheet.create({
   },
   contextSwitchIcon: { fontSize: 14, color: CHARCOAL, marginRight: 4 },
   contextSwitchLabel: { ...typography.buttonSmall, color: CHARCOAL, fontWeight: '700' },
-
-  waveContainer: {
-    height: 30,
-    backgroundColor: NAVY,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    marginBottom: -8,
-  },
-  waveDummy: { height: 0 },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },
 

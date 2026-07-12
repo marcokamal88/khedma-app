@@ -49,7 +49,7 @@ export const ar = {
     achievements: 'الإنجازات',
     library: 'مكتبة الدروس',
     more: 'المزيد',
-    taio: 'النقاط',
+    points: 'النقاط',
   },
   roles: {
     priest: 'كاهن',
@@ -182,7 +182,7 @@ export const ar = {
   store: {
     title: 'متجر طايو',
     balance: 'رصيدك: ',
-    points: 'نقطة',
+    points: 'طايو',
     redeem: 'استبدال',
     unlimited: 'غير محدود',
     stock: 'المخزون: ',
@@ -199,6 +199,13 @@ export const ar = {
     button: 'منح النقاط',
     success: 'تم منح النقاط بنجاح!',
     failure: 'فشل منح النقاط',
+    awardTo: 'منح طايو لـ',
+    give: 'منح طايو',
+    selectStudent: 'اختر طالباً من فصلك',
+  },
+  taio: {
+    balance: 'الرصيد',
+    points: 'طايو',
   },
   errors: {
     noServiceYear: 'لا توجد سنة خدمة نشطة',

@@ -6,9 +6,10 @@ import { Sector } from './entities/sector.entity';
 import { Service } from './entities/service.entity';
 import { StageGroup } from './entities/stage-group.entity';
 import { Class } from './entities/class.entity';
+import { TaioModule } from '../taio/taio.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Sector, Service, StageGroup, Class])],
+  imports: [SequelizeModule.forFeature([Sector, Service, StageGroup, Class]), TaioModule],
   controllers: [ChurchController],
   providers: [ChurchService],
   exports: [ChurchService],

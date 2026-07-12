@@ -20,8 +20,8 @@ export default function LeaderStack() {
       tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="Reviews" component={PreparationsReviewScreen} />
-      <Tab.Screen name="Reports" component={ReportsScreen} />
+      <Tab.Screen name="Reviews" component={PreparationsReviewScreen} options={{ title: t('tabs.preparation') }} />
+      <Tab.Screen name="Reports" component={ReportsScreen} options={{ title: t('tabs.reports') }} />
       <Tab.Screen name="FollowUp" component={FollowUpStack} options={{ title: t("followUp.title") }} />
       <Tab.Screen name="Achievements" component={AchievementsScreen} options={{ title: t("achievements.title") }} />
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
