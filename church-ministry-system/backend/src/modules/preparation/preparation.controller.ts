@@ -12,17 +12,16 @@ import { Request } from 'express';
 export class PreparationController {
   constructor(private prepService: PreparationService) {}
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post()
   async create(@Body() body: any, @CurrentTenant() churchId: number, @Req() req: Request) {
     const user = req.user as any;
     return this.prepService.create(churchId, body, user.memberId);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Get()
   async findAll(@Query() filters: any, @CurrentTenant() churchId: number) {
-    // Parse string query params to numbers for ID filters
     if (filters.servantId) filters.servantId = +filters.servantId;
     if (filters.serviceId) filters.serviceId = +filters.serviceId;
     return this.prepService.findAll(churchId, filters);
@@ -33,7 +32,7 @@ export class PreparationController {
     return this.prepService.findOne(churchId, +id);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -45,14 +44,14 @@ export class PreparationController {
     return this.prepService.update(churchId, +id, body, user.memberId);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post(':id/submit')
   async submit(@Param('id') id: string, @CurrentTenant() churchId: number, @Req() req: Request) {
     const user = req.user as any;
     return this.prepService.submit(churchId, +id, user.memberId);
   }
 
-  @Roles('sector_leader', 'priest')
+  @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
   @Patch(':id/review')
   async review(
     @Param('id') id: string,
@@ -64,7 +63,7 @@ export class PreparationController {
     return this.prepService.review(churchId, +id, user.memberId, body);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Delete(':id')
   async remove(@Param('id') id: string, @CurrentTenant() churchId: number) {
     return this.prepService.remove(churchId, +id);

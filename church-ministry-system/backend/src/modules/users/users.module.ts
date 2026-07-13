@@ -8,6 +8,7 @@ import { MemberRole } from './entities/member-role.entity';
 import { Role } from './entities/role.entity';
 import { ServantAssignment } from './entities/servant-assignment.entity';
 import { Enrollment } from './entities/enrollment.entity';
+import { SectorAssignment } from './entities/sector-assignment.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Enrollment } from './entities/enrollment.entity';
       Role,
       ServantAssignment,
       Enrollment,
+      SectorAssignment,
     ]),
   ],
   controllers: [UsersController],

@@ -9,7 +9,7 @@ export class ContextGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const requiredContext = this.reflector.getAllAndOverride<{
       role?: string;
-      serviceId?: string;
+      scope?: string;
     }>(REQUIRED_CONTEXT_KEY, [context.getHandler(), context.getClass()]);
 
     if (!requiredContext) return true;
@@ -28,8 +28,14 @@ export class ContextGuard implements CanActivate {
       );
     }
 
-    if (requiredContext.serviceId && activeContext.serviceId !== requiredContext.serviceId) {
-      throw new ForbiddenException('Context serviceId does not match');
+    if (requiredContext.scope) {
+      const scopeKeys = requiredContext.scope.split('|').map((s) => s.trim());
+      const hasScope = scopeKeys.some((key) => activeContext.scope?.[key] != null);
+      if (!hasScope) {
+        throw new ForbiddenException(
+          `Context requires one of scopes: ${requiredContext.scope}, none found in active context`,
+        );
+      }
     }
 
     return true;

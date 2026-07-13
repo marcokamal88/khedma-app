@@ -174,7 +174,7 @@ function DrawerContent({
             <Text style={styles.contextLabel}>السابق الحالي</Text>
             <Text style={styles.contextValue}>{t('home.classInfo')}</Text>
           </View>
-          <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={switchContext}>
+          <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => switchContext({ role: '' })}>
             <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
             <Text style={styles.contextSwitchText}>تبديل</Text>
           </TouchableOpacity>

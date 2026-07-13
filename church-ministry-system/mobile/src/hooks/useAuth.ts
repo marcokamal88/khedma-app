@@ -61,7 +61,7 @@ export const useAuth = () => {
     return payload;
   }, [dispatch]);
 
-  const doSwitchContext = useCallback(async (data: { role: string; serviceId?: string }) => {
+  const doSwitchContext = useCallback(async (data: { role: string; scope?: Record<string, any> }) => {
     dispatch(setLoading(true));
     try {
       const response: any = await authApi.switchContext(data);

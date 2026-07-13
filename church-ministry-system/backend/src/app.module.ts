@@ -25,11 +25,13 @@ import { LessonLibraryModule } from './modules/lesson-library/lesson-library.mod
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { UtilsModule } from './core/utils/utils.module';
 import { AuditModule } from './shared/interceptors/audit.module';
 import { AuditInterceptor } from './shared/interceptors/audit.interceptor';
 import { JwtAuthGuard } from './core/auth/jwt-auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { ContextGuard } from './core/auth/context.guard';
+import { ScopeGuard } from './shared/guards/scope.guard';
 
 @Module({
   imports: [
@@ -62,6 +64,7 @@ import { ContextGuard } from './core/auth/context.guard';
     ActivitiesModule,
     AchievementsModule,
     DashboardModule,
+    UtilsModule,
     AuditModule,
   ],
   providers: [
@@ -69,6 +72,7 @@ import { ContextGuard } from './core/auth/context.guard';
     { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: ContextGuard },
+    { provide: APP_GUARD, useClass: ScopeGuard },
   ],
 })
 export class AppModule {}

@@ -26,6 +26,9 @@ const BORDER = '#eceae4';
 const CHARCOAL = '#1c1c1c';
 const MUTED = '#5f5f5d';
 
+const roleToLocaleKey = (role: string) =>
+  role.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+
 export default function ServantDashboard({ navigation }: any) {
   const { t } = useLocale();
   const { contexts, activeContext, switchContext } = useAuth();
@@ -69,8 +72,12 @@ export default function ServantDashboard({ navigation }: any) {
           <View style={styles.contextCard}>
             <View style={styles.contextCardBody}>
               <View style={styles.contextInfo}>
-                <Text style={styles.contextRole}>{t('roles.servant')}</Text>
-                <Text style={styles.contextDetail}>{t('home.classInfo')}</Text>
+                <Text style={styles.contextRole}>
+                  {t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}
+                </Text>
+                <Text style={styles.contextDetail} numberOfLines={1}>
+                  {activeContext?.displayLabel || t('home.classInfo')}
+                </Text>
               </View>
               <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => setShowContextModal(true)}>
                 <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
@@ -178,11 +185,12 @@ export default function ServantDashboard({ navigation }: any) {
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowContextModal(false)}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{t('home.switch')}</Text>
-            {contexts.length === 0 ? (
+              {contexts.length === 0 ? (
               <Text style={styles.modalEmpty}>{t('app.noData')}</Text>
             ) : (
               contexts.map((ctx: any, i: number) => {
-                const isActive = ctx.role === activeContext?.role && ctx.serviceId === activeContext?.serviceId;
+                const isActive = ctx.role === activeContext?.role &&
+                  JSON.stringify(ctx.scope || {}) === JSON.stringify(activeContext?.scope || {});
                 return (
                   <TouchableOpacity
                     key={i}
@@ -191,17 +199,17 @@ export default function ServantDashboard({ navigation }: any) {
                     onPress={async () => {
                       if (isActive) { setShowContextModal(false); return; }
                       try {
-                        await switchContext({ role: ctx.role, serviceId: ctx.serviceId });
+                        await switchContext({ role: ctx.role, scope: ctx.scope });
                         setShowContextModal(false);
                       } catch {}
                     }}
                   >
                     <Text style={[styles.contextOptionRole, isActive && styles.contextOptionTextActive]}>
-                      {ctx.role}
+                      {t(`roles.${roleToLocaleKey(ctx.role)}`) || ctx.role}
                     </Text>
-                    {ctx.serviceName ? (
+                    {ctx.displayLabel ? (
                       <Text style={[styles.contextOptionService, isActive && styles.contextOptionTextActive]}>
-                        {ctx.serviceName}
+                        {ctx.displayLabel}
                       </Text>
                     ) : null}
                   </TouchableOpacity>

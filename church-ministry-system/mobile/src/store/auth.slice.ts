@@ -1,10 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ActiveContext {
+export interface ActiveContext {
   role: string;
-  serviceId?: string;
-  classId?: string;
-  serviceName?: string;
+  churchId?: number;
+  scope: {
+    sectorId?: number;
+    serviceId?: number;
+    stageGroupId?: number;
+    classId?: number;
+  };
+  displayLabel?: string;
 }
 
 interface AuthState {

@@ -24,7 +24,7 @@ export const authApi = {
     return apiClient.get('/auth/contexts');
   },
 
-  switchContext: (data: { role: string; serviceId?: string }) => {
+  switchContext: (data: { role: string; scope?: Record<string, any> }) => {
     console.log(`[AUTH API] switchContext() called | role: ${data.role}`);
     return apiClient.post('/auth/switch-context', data);
   },

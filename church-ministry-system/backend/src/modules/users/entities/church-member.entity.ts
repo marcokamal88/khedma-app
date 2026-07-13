@@ -3,6 +3,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { MemberRole } from './member-role.entity';
+import { SectorAssignment } from './sector-assignment.entity';
 
 @Table({ tableName: 'church_members' })
 export class ChurchMember extends Model {
@@ -29,4 +30,7 @@ export class ChurchMember extends Model {
 
   @HasMany(() => MemberRole)
   memberRoles: MemberRole[];
+
+  @HasMany(() => SectorAssignment)
+  sectorAssignments: SectorAssignment[];
 }

@@ -1,15 +1,15 @@
-import { IsString, IsNumber, IsOptional, IsIn } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsObject } from 'class-validator';
 
 export class SwitchContextDto {
   @IsString()
-  @IsIn(['servant', 'served_member', 'parent', 'sector_leader', 'priest'])
   role: string;
 
   @IsOptional()
-  @IsNumber()
-  serviceId?: number;
-
-  @IsOptional()
-  @IsNumber()
-  classId?: number;
+  @IsObject()
+  scope?: {
+    sectorId?: number;
+    serviceId?: number;
+    stageGroupId?: number;
+    classId?: number;
+  };
 }

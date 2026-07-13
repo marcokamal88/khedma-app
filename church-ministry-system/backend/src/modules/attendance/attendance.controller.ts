@@ -15,7 +15,7 @@ import { Request } from 'express';
 export class AttendanceController {
   constructor(private attendanceService: AttendanceService) {}
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post('sessions')
   async createSession(
     @Body() dto: CreateSessionDto,
@@ -26,7 +26,7 @@ export class AttendanceController {
     return this.attendanceService.createSession(churchId, dto, user.memberId);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Get('sessions')
   async getSessions(
     @Query() filters: any,
@@ -40,7 +40,7 @@ export class AttendanceController {
     return this.attendanceService.getSession(churchId, id);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post('sessions/:id/records')
   async recordAttendance(
     @Param('id') sessionId: string,
@@ -50,7 +50,7 @@ export class AttendanceController {
     return this.attendanceService.recordAttendance(churchId, sessionId, dto);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Put('records/:id')
   async updateRecord(
     @Param('id') id: string,

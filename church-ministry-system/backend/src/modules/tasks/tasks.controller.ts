@@ -12,7 +12,7 @@ import { Request } from 'express';
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post('tasks')
   async create(@Body() body: any, @CurrentTenant() churchId: string, @Req() req: Request) {
     const user = req.user as any;
@@ -29,7 +29,7 @@ export class TasksController {
     return this.tasksService.findOne(churchId, id);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Patch('tasks/:id')
   async update(
     @Param('id') id: string, @Body() body: any, @CurrentTenant() churchId: string,
@@ -37,13 +37,13 @@ export class TasksController {
     return this.tasksService.update(churchId, id, body);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Delete('tasks/:id')
   async remove(@Param('id') id: string, @CurrentTenant() churchId: string) {
     return this.tasksService.remove(churchId, id);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post('tasks/:id/assign')
   async assign(
     @Param('id') id: string, @Body() body: { memberIds: string[] }, @CurrentTenant() churchId: string,
@@ -65,7 +65,7 @@ export class TasksController {
     return this.tasksService.completeTask(churchId, id, user.memberId);
   }
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Post('tasks/:id/verify/:memberId')
   async verifyTask(
     @Param('id') id: string, @Param('memberId') memberId: string,

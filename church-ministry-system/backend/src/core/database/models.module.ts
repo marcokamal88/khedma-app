@@ -44,6 +44,7 @@ import { AuditLog } from '../../shared/interceptors/audit-log.entity';
 import { FcmToken } from '../../modules/notifications/entities/fcm-token.entity';
 import { PreparationComment } from '../../modules/preparation/entities/preparation-comment.entity';
 import { MemberProfile } from '../../modules/users/entities/member-profile.entity';
+import { SectorAssignment } from '../../modules/users/entities/sector-assignment.entity';
 
 const ALL_ENTITIES = [
   User, ChurchMember, MemberRole, Role, ServantAssignment, Enrollment,
@@ -63,6 +64,7 @@ const ALL_ENTITIES = [
   AuditLog,
   FcmToken,
   PreparationComment, MemberProfile,
+  SectorAssignment,
 ];
 
 @Global()
