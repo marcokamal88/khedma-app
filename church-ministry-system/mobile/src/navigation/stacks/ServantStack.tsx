@@ -11,6 +11,7 @@ import NotificationsScreen from "../../screens/shared/NotificationsScreen";
 import FollowUpStack from "./FollowUpStack";
 import LessonLibraryScreen from "../../screens/lesson-library/LessonLibraryScreen";
 import AchievementsScreen from "../../screens/achievements/AchievementsScreen";
+import TaskDetailScreen from "../../screens/servant/TaskDetailScreen";
 import CustomTabBar from "../CustomTabBar";
 
 const Tab = createBottomTabNavigator();
@@ -37,6 +38,7 @@ export default function ServantStack() {
       <Tab.Screen name="Achievements" component={AchievementsScreen} options={{ title: t("achievements.title"), tabBarButton: () => null }} />
       <Tab.Screen name="Library" component={LessonLibraryScreen} options={{ title: t("tabs.library"), tabBarButton: () => null }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="TaskDetail" component={TaskDetailScreen} options={{ tabBarButton: () => null }} />
     </Tab.Navigator>
   );
 }

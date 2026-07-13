@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 // Android emulator uses 10.0.2.2 to reach host machine.
 // iOS simulator can use localhost. Physical device needs your machine's LAN IP.
-const HOST = Platform.OS === 'android' ? '192.168.1.17' : 'localhost';
+const HOST = Platform.OS === 'android' ? '10.237.55.1' : 'localhost';
 const BASE_URL = `http://${HOST}:3000/api/v1`;
 console.log(`[API] Platform: ${Platform.OS} | BASE_URL: ${BASE_URL}`);
 

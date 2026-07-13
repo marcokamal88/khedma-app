@@ -6,11 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
   I18nManager,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useLocale } from '../../hooks/useLocale';
+import { useAuth } from '../../hooks/useAuth';
 import { dashboardApi } from '../../api/dashboard.api';
 import { typography, spacing, shadows } from '../../theme';
 import AppHeader from '../../components/AppHeader';
@@ -24,12 +26,14 @@ const BORDER = '#eceae4';
 const CHARCOAL = '#1c1c1c';
 const MUTED = '#5f5f5d';
 
-export default function ServantDashboard() {
+export default function ServantDashboard({ navigation }: any) {
   const { t } = useLocale();
+  const { contexts, activeContext, switchContext } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [todaySessions, setTodaySessions] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showContextModal, setShowContextModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -64,14 +68,14 @@ export default function ServantDashboard() {
         <AppHeader greetingText={t('home.welcomeBack')}>
           <View style={styles.contextCard}>
             <View style={styles.contextCardBody}>
-              <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7}>
-                <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
-                <Text style={styles.contextSwitchLabel}>{t('home.switch')}</Text>
-              </TouchableOpacity>
               <View style={styles.contextInfo}>
                 <Text style={styles.contextRole}>{t('roles.servant')}</Text>
                 <Text style={styles.contextDetail}>{t('home.classInfo')}</Text>
               </View>
+              <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => setShowContextModal(true)}>
+                <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
+                <Text style={styles.contextSwitchLabel}>{t('home.switch')}</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </AppHeader>
@@ -114,16 +118,14 @@ export default function ServantDashboard() {
               </View>
               {todaySessions.map((session: any) => (
                 <View key={session.id} style={styles.taskRow}>
-                  <View style={styles.taskRowRight}>
-                    <View style={styles.taskIconWrap}>
-                      <Text style={styles.taskIcon}>{'\u2637'}</Text>
-                    </View>
-                    <View style={styles.taskTextWrap}>
-                      <Text style={styles.taskTitle} numberOfLines={1}>{session.title}</Text>
-                      <Text style={styles.taskMeta} numberOfLines={1}>
-                        {session.time} - {session.location}
-                      </Text>
-                    </View>
+                  <View style={styles.taskIconWrap}>
+                    <Text style={styles.taskIcon}>{'\u2637'}</Text>
+                  </View>
+                  <View style={styles.taskTextWrap}>
+                    <Text style={styles.taskTitle} numberOfLines={1}>{session.title}</Text>
+                    <Text style={styles.taskMeta} numberOfLines={1}>
+                      {session.time} - {session.location}
+                    </Text>
                   </View>
                   <View style={styles.statusPill}>
                     <Text style={styles.statusPillText}>{t('home.due')}</Text>
@@ -142,22 +144,28 @@ export default function ServantDashboard() {
                 </TouchableOpacity>
               </View>
               {tasks.map((task: any) => (
-                <View key={task.id} style={styles.taskRow}>
-                  <View style={styles.taskRowRight}>
-                    <View style={styles.taskIconWrap}>
-                      <Text style={styles.taskIcon}>{'\u2611'}</Text>
-                    </View>
-                    <View style={styles.taskTextWrap}>
-                      <Text style={styles.taskTitle} numberOfLines={1}>{task.title}</Text>
-                      <Text style={styles.taskMeta} numberOfLines={1}>
-                        {task.isOverdue ? t('home.tomorrow') : task.dueDate || ''}
-                      </Text>
-                    </View>
+                <TouchableOpacity key={task.id} style={styles.taskRow} activeOpacity={0.7}
+                  onPress={() => navigation.navigate('TaskDetail', {
+                    taskId: task.id,
+                    title: task.title,
+                    dueDate: task.dueDate,
+                    taskType: task.taskType || '',
+                    status: task.status || 'pending',
+                  })}
+                >
+                  <View style={styles.taskIconWrap}>
+                    <Text style={styles.taskIcon}>{'\u2611'}</Text>
+                  </View>
+                  <View style={styles.taskTextWrap}>
+                    <Text style={styles.taskTitle} numberOfLines={1}>{task.title}</Text>
+                    <Text style={styles.taskMeta} numberOfLines={1}>
+                      {task.isOverdue ? t('home.tomorrow') : task.dueDate || ''}
+                    </Text>
                   </View>
                   <View style={[styles.statusPill, styles.statusPillProgress]}>
                     <Text style={styles.statusPillProgressText}>{task.progress}%</Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )}
@@ -165,6 +173,44 @@ export default function ServantDashboard() {
           <View style={{ height: 24 }} />
         </View>
       </ScrollView>
+
+      <Modal visible={showContextModal} transparent animationType="fade" onRequestClose={() => setShowContextModal(false)}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowContextModal(false)}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{t('home.switch')}</Text>
+            {contexts.length === 0 ? (
+              <Text style={styles.modalEmpty}>{t('app.noData')}</Text>
+            ) : (
+              contexts.map((ctx: any, i: number) => {
+                const isActive = ctx.role === activeContext?.role && ctx.serviceId === activeContext?.serviceId;
+                return (
+                  <TouchableOpacity
+                    key={i}
+                    style={[styles.contextOption, isActive && styles.contextOptionActive]}
+                    activeOpacity={0.7}
+                    onPress={async () => {
+                      if (isActive) { setShowContextModal(false); return; }
+                      try {
+                        await switchContext({ role: ctx.role, serviceId: ctx.serviceId });
+                        setShowContextModal(false);
+                      } catch {}
+                    }}
+                  >
+                    <Text style={[styles.contextOptionRole, isActive && styles.contextOptionTextActive]}>
+                      {ctx.role}
+                    </Text>
+                    {ctx.serviceName ? (
+                      <Text style={[styles.contextOptionService, isActive && styles.contextOptionTextActive]}>
+                        {ctx.serviceName}
+                      </Text>
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -194,7 +240,7 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   contextCardBody: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -254,7 +300,7 @@ const styles = StyleSheet.create({
 
   section: { marginBottom: 16 },
   sectionHeader: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
@@ -263,7 +309,7 @@ const styles = StyleSheet.create({
   sectionLink: { ...typography.buttonSmall, color: NAVY, fontWeight: '600' },
 
   taskRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: OFF_WHITE,
@@ -273,11 +319,6 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 8,
   },
-  taskRowRight: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    flex: 1,
-  },
   taskIconWrap: {
     width: 40,
     height: 40,
@@ -285,20 +326,57 @@ const styles = StyleSheet.create({
     backgroundColor: NAVY,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12,
   },
   taskIcon: { fontSize: 16, color: '#ffffff' },
-  taskTextWrap: { flex: 1 },
-  taskTitle: { ...typography.body, color: CHARCOAL, fontWeight: '600', textAlign: 'right' },
-  taskMeta: { ...typography.caption, color: MUTED, marginTop: 2, textAlign: 'right' },
+  taskTextWrap: { flex: 1, marginHorizontal: 12 },
+  taskTitle: { ...typography.body, color: CHARCOAL, fontWeight: '600' },
+  taskMeta: { ...typography.caption, color: MUTED, marginTop: 2 },
   statusPill: {
     backgroundColor: '#fff3e0',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 5,
-    marginRight: 8,
   },
   statusPillText: { ...typography.caption, color: '#e65100', fontWeight: '700', fontSize: 11 },
   statusPillProgress: { backgroundColor: '#e8f5e9' },
   statusPillProgressText: { ...typography.caption, color: '#2e7d32', fontWeight: '700', fontSize: 11 },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: OFF_WHITE,
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    ...shadows.card,
+  },
+  modalTitle: {
+    ...typography.sectionHeading,
+    color: CHARCOAL,
+    fontWeight: '700',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalEmpty: { ...typography.body, color: MUTED, textAlign: 'center', paddingVertical: 20 },
+  contextOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 14,
+    marginBottom: 8,
+  },
+  contextOptionActive: { backgroundColor: NAVY, borderColor: NAVY },
+  contextOptionRole: { ...typography.body, color: CHARCOAL, fontWeight: '600' },
+  contextOptionService: { ...typography.caption, color: MUTED },
+  contextOptionTextActive: { color: '#ffffff' },
 });
