@@ -6,19 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Modal,
-  I18nManager,
 } from 'react-native';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
 import { useLocale } from '../../hooks/useLocale';
-import { useAuth } from '../../hooks/useAuth';
 import { dashboardApi } from '../../api/dashboard.api';
 import { typography, spacing, shadows } from '../../theme';
 import AppHeader from '../../components/AppHeader';
+import ContextCard from '../../components/ContextCard';
 
 const NAVY = '#192f5f';
-const NAVY_LIGHT = '#243a6e';
 const GOLD = '#d4a843';
 const CREAM = '#f7f4ed';
 const OFF_WHITE = '#fcfbf8';
@@ -26,17 +21,12 @@ const BORDER = '#eceae4';
 const CHARCOAL = '#1c1c1c';
 const MUTED = '#5f5f5d';
 
-const roleToLocaleKey = (role: string) =>
-  role.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
-
 export default function ServantDashboard({ navigation }: any) {
   const { t } = useLocale();
-  const { contexts, activeContext, switchContext } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [todaySessions, setTodaySessions] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showContextModal, setShowContextModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -69,22 +59,7 @@ export default function ServantDashboard({ navigation }: any) {
     <View style={styles.root}>
       <ScrollView style={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
         <AppHeader greetingText={t('home.welcomeBack')}>
-          <View style={styles.contextCard}>
-            <View style={styles.contextCardBody}>
-              <View style={styles.contextInfo}>
-                <Text style={styles.contextRole}>
-                  {t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}
-                </Text>
-                <Text style={styles.contextDetail} numberOfLines={1}>
-                  {activeContext?.displayLabel || t('home.classInfo')}
-                </Text>
-              </View>
-              <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => setShowContextModal(true)}>
-                <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
-                <Text style={styles.contextSwitchLabel}>{t('home.switch')}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ContextCard defaultRole="servant" />
         </AppHeader>
 
         <View style={styles.contentSection}>
@@ -180,45 +155,6 @@ export default function ServantDashboard({ navigation }: any) {
           <View style={{ height: 24 }} />
         </View>
       </ScrollView>
-
-      <Modal visible={showContextModal} transparent animationType="fade" onRequestClose={() => setShowContextModal(false)}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowContextModal(false)}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t('home.switch')}</Text>
-              {contexts.length === 0 ? (
-              <Text style={styles.modalEmpty}>{t('app.noData')}</Text>
-            ) : (
-              contexts.map((ctx: any, i: number) => {
-                const isActive = ctx.role === activeContext?.role &&
-                  JSON.stringify(ctx.scope || {}) === JSON.stringify(activeContext?.scope || {});
-                return (
-                  <TouchableOpacity
-                    key={i}
-                    style={[styles.contextOption, isActive && styles.contextOptionActive]}
-                    activeOpacity={0.7}
-                    onPress={async () => {
-                      if (isActive) { setShowContextModal(false); return; }
-                      try {
-                        await switchContext({ role: ctx.role, scope: ctx.scope });
-                        setShowContextModal(false);
-                      } catch {}
-                    }}
-                  >
-                    <Text style={[styles.contextOptionRole, isActive && styles.contextOptionTextActive]}>
-                      {t(`roles.${roleToLocaleKey(ctx.role)}`) || ctx.role}
-                    </Text>
-                    {ctx.displayLabel ? (
-                      <Text style={[styles.contextOptionService, isActive && styles.contextOptionTextActive]}>
-                        {ctx.displayLabel}
-                      </Text>
-                    ) : null}
-                  </TouchableOpacity>
-                );
-              })
-            )}
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
 }
@@ -239,32 +175,6 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: CREAM },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: NAVY },
   scroll: { flex: 1 },
-
-  contextCard: {
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-    padding: 14,
-  },
-  contextCardBody: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  contextInfo: { flex: 1, marginRight: 12 },
-  contextRole: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700' },
-  contextDetail: { ...typography.caption, color: 'rgba(255,255,255,0.6)', marginTop: 2 },
-  contextSwitchBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: GOLD,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  contextSwitchIcon: { fontSize: 14, color: CHARCOAL, marginRight: 4 },
-  contextSwitchLabel: { ...typography.buttonSmall, color: CHARCOAL, fontWeight: '700' },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },
 
@@ -348,43 +258,4 @@ const styles = StyleSheet.create({
   statusPillText: { ...typography.caption, color: '#e65100', fontWeight: '700', fontSize: 11 },
   statusPillProgress: { backgroundColor: '#e8f5e9' },
   statusPillProgressText: { ...typography.caption, color: '#2e7d32', fontWeight: '700', fontSize: 11 },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  modalContent: {
-    backgroundColor: OFF_WHITE,
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    maxWidth: 400,
-    ...shadows.card,
-  },
-  modalTitle: {
-    ...typography.sectionHeading,
-    color: CHARCOAL,
-    fontWeight: '700',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  modalEmpty: { ...typography.body, color: MUTED, textAlign: 'center', paddingVertical: 20 },
-  contextOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 14,
-    marginBottom: 8,
-  },
-  contextOptionActive: { backgroundColor: NAVY, borderColor: NAVY },
-  contextOptionRole: { ...typography.body, color: CHARCOAL, fontWeight: '600' },
-  contextOptionService: { ...typography.caption, color: MUTED },
-  contextOptionTextActive: { color: '#ffffff' },
 });

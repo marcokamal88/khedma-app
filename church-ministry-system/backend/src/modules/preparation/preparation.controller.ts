@@ -19,7 +19,7 @@ export class PreparationController {
     return this.prepService.create(churchId, body, user.memberId);
   }
 
-  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
+  @Roles('service_leader', 'assistant_service_leader', 'servant', 'class_leader', 'sector_leader', 'priest')
   @Get()
   async findAll(@Query() filters: any, @CurrentTenant() churchId: number) {
     if (filters.servantId) filters.servantId = +filters.servantId;
@@ -67,5 +67,21 @@ export class PreparationController {
   @Delete(':id')
   async remove(@Param('id') id: string, @CurrentTenant() churchId: number) {
     return this.prepService.remove(churchId, +id);
+  }
+
+  @Get(':id/comments')
+  async getComments(@Param('id') id: string, @CurrentTenant() churchId: number) {
+    return this.prepService.getComments(churchId, +id);
+  }
+
+  @Post(':id/comments')
+  async addComment(
+    @Param('id') id: string,
+    @Body() body: { body: string },
+    @CurrentTenant() churchId: number,
+    @Req() req: Request,
+  ) {
+    const user = req.user as any;
+    return this.prepService.addComment(churchId, +id, user.memberId, body.body);
   }
 }

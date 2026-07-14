@@ -2,13 +2,22 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { InjectModel } from '@nestjs/sequelize';
 import { Preparation } from './entities/preparation.entity';
 import { PreparationFile } from './entities/preparation-file.entity';
+import { PreparationComment } from './entities/preparation-comment.entity';
+import { ChurchMember } from '../users/entities/church-member.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PreparationService {
   constructor(
     @InjectModel(Preparation) private prepModel: typeof Preparation,
     @InjectModel(PreparationFile) private fileModel: typeof PreparationFile,
+    @InjectModel(PreparationComment) private commentModel: typeof PreparationComment,
   ) {}
+
+  private defaultIncludes = [
+    { model: PreparationFile },
+    { model: ChurchMember, as: 'servant', include: [{ model: User, attributes: ['id', 'fullName'] }] },
+  ];
 
   async create(churchId: number, data: Partial<Preparation>, servantId: number) {
     return this.prepModel.create({
@@ -30,7 +39,7 @@ export class PreparationService {
 
     return this.prepModel.findAll({
       where,
-      include: [{ model: PreparationFile }],
+      include: this.defaultIncludes,
       order: [['lessonDate', 'DESC']],
     });
   }
@@ -38,7 +47,7 @@ export class PreparationService {
   async findOne(churchId: number, id: number) {
     const prep = await this.prepModel.findOne({
       where: { id, churchId },
-      include: [{ model: PreparationFile }],
+      include: this.defaultIncludes,
     });
     if (!prep) throw new NotFoundException('Preparation not found');
     return prep;
@@ -94,5 +103,22 @@ export class PreparationService {
     const prep = await this.findOne(churchId, id);
     await this.prepModel.destroy({ where: { id } });
     return { success: true };
+  }
+
+  async getComments(churchId: number, preparationId: number) {
+    return this.commentModel.findAll({
+      where: { churchId, preparationId },
+      include: [{ model: User, as: 'author', attributes: ['id', 'fullName'] }],
+      order: [['createdAt', 'ASC']],
+    });
+  }
+
+  async addComment(churchId: number, preparationId: number, authorId: number, body: string) {
+    return this.commentModel.create({
+      churchId,
+      preparationId,
+      authorId,
+      body,
+    } as any);
   }
 }

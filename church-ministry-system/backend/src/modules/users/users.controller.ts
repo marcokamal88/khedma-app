@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Req,
+  Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -94,5 +94,36 @@ export class UsersController {
     @Req() req: Request,
   ) {
     return this.usersService.assignServant(body, churchId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('sector_leader', 'priest', 'service_leader')
+  @Get('servant-assignments')
+  async getServantAssignments(
+    @Query('serviceId') serviceId: string,
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.usersService.getServantAssignments(churchId, serviceId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('sector_leader', 'priest', 'service_leader')
+  @Patch('servant-assignments/:id')
+  async updateServantAssignment(
+    @Param('id') id: string,
+    @Body() body: { classId?: string; leaderRole?: string },
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.usersService.updateServantAssignment(churchId, id, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('sector_leader', 'priest', 'service_leader')
+  @Delete('servant-assignments/:id')
+  async removeServantAssignment(
+    @Param('id') id: string,
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.usersService.removeServantAssignment(churchId, id);
   }
 }

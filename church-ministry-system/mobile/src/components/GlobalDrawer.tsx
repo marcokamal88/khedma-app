@@ -13,6 +13,7 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useAuth } from '../hooks/useAuth';
+import { useLocale } from '../hooks/useLocale';
 import { typography, spacing } from '../theme';
 import { DrawerProvider } from '../contexts/DrawerContext';
 
@@ -129,6 +130,9 @@ export default function GlobalDrawer({ children, navigationRef, menuConfig }: Gl
   );
 }
 
+const roleToLocaleKey = (role: string) =>
+  role.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+
 function DrawerContent({
   closeDrawer,
   onNavigate,
@@ -139,6 +143,7 @@ function DrawerContent({
   menuConfig?: MenuGroup[];
 }) {
   const { logout, switchContext } = useAuth();
+  const { t } = useLocale();
   const user = useSelector((state: RootState) => state.auth.user);
   const activeContext = useSelector((state: RootState) => state.auth.activeContext);
 
@@ -160,7 +165,7 @@ function DrawerContent({
         <View style={styles.profileRow}>
           <View style={styles.profileTextWrap}>
             <Text style={styles.profileName}>{user?.fullName}</Text>
-            <Text style={styles.profileRole}>{activeContext?.role || 'خادم'}</Text>
+            <Text style={styles.profileRole}>{t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}</Text>
           </View>
           <View style={styles.profileAvatar}>
             <Text style={styles.profileAvatarText}>{initials}</Text>
@@ -221,13 +226,6 @@ function DrawerContent({
       </View>
     </SafeAreaView>
   );
-}
-
-function t(key: string): string {
-  const map: Record<string, string> = {
-    'home.classInfo': 'مدارس الأحد - الصف الثالث',
-  };
-  return map[key] || key;
 }
 
 const styles = StyleSheet.create({

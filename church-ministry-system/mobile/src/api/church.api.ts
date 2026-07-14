@@ -16,6 +16,7 @@ export const churchApi = {
     classId: string;
     leaderRole?: string;
   }) => apiClient.post('/servant-assignments', data),
+  getClasses: (serviceId: string) => apiClient.get(`/services/${serviceId}/classes`),
   searchMembers: (q: string) => apiClient.get('/members/search', { params: { q } }),
   registerMember: (data: {
     fullName: string;

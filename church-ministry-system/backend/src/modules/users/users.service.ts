@@ -289,4 +289,67 @@ export class UsersService {
 
     return assignment;
   }
+
+  async getServantAssignments(churchId: string, serviceId: string) {
+    const serviceYear = await this.serviceYearModel.findOne({
+      where: { churchId, isCurrent: true },
+    });
+    if (!serviceYear) throw new NotFoundException('No active service year');
+
+    const assignments = await this.servantAssignmentModel.findAll({
+      where: { churchId, serviceId, serviceYearId: serviceYear.id, isActive: true },
+      include: [
+        { model: ChurchMember, include: [{ model: User, attributes: ['id', 'fullName', 'email', 'phone', 'avatarUrl'] }] },
+        { model: Class, attributes: ['id', 'name'] },
+      ],
+    });
+
+    return assignments.map((a) => ({
+      id: a.id,
+      churchMemberId: a.churchMemberId,
+      fullName: (a as any).churchMember?.user?.fullName,
+      email: (a as any).churchMember?.user?.email,
+      phone: (a as any).churchMember?.user?.phone,
+      avatarUrl: (a as any).churchMember?.user?.avatarUrl,
+      classId: a.classId,
+      className: (a as any).class?.name || '',
+      leaderRole: a.leaderRole || 'servant',
+    }));
+  }
+
+  async updateServantAssignment(churchId: string, id: string, data: { classId?: string; leaderRole?: string }) {
+    const assignment = await this.servantAssignmentModel.findOne({
+      where: { id, churchId, isActive: true },
+    });
+    if (!assignment) throw new NotFoundException('Servant assignment not found');
+
+    const updateData: any = {};
+    if (data.classId !== undefined) updateData.classId = data.classId;
+    if (data.leaderRole !== undefined) updateData.leaderRole = data.leaderRole;
+
+    if (Object.keys(updateData).length > 0) {
+      await this.servantAssignmentModel.update(updateData, { where: { id } });
+    }
+
+    if (data.leaderRole === 'class_leader') {
+      await this.assignRole(String(assignment.churchMemberId), 'class_leader', churchId);
+    }
+
+    return this.servantAssignmentModel.findByPk(id, {
+      include: [
+        { model: ChurchMember, include: [{ model: User, attributes: ['id', 'fullName', 'email', 'phone', 'avatarUrl'] }] },
+        { model: Class, attributes: ['id', 'name'] },
+      ],
+    });
+  }
+
+  async removeServantAssignment(churchId: string, id: string) {
+    const assignment = await this.servantAssignmentModel.findOne({
+      where: { id, churchId, isActive: true },
+    });
+    if (!assignment) throw new NotFoundException('Servant assignment not found');
+
+    await this.servantAssignmentModel.update({ isActive: false } as any, { where: { id } });
+    return { success: true };
+  }
 }

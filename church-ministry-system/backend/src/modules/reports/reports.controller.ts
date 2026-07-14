@@ -9,7 +9,7 @@ import { CurrentTenant } from '../../core/tenant/tenant.decorator';
 export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
-  @Roles('servant', 'sector_leader', 'priest')
+  @Roles('service_leader', 'assistant_service_leader', 'servant', 'sector_leader', 'priest')
   @Get('attendance')
   async attendanceReport(
     @Query('serviceId') serviceId: string,
@@ -20,7 +20,7 @@ export class ReportsController {
     return this.reportsService.attendanceReport(churchId, { serviceId, from, to });
   }
 
-  @Roles('sector_leader', 'priest')
+  @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
   @Get('engagement')
   async engagementReport(
     @Query('serviceId') serviceId: string,
@@ -39,7 +39,7 @@ export class ReportsController {
     return this.reportsService.financialReport(churchId, { eventId });
   }
 
-  @Roles('sector_leader', 'priest')
+  @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
   @Get('taio')
   async taioReport(
     @Query('serviceYearId') serviceYearId: string,
@@ -48,7 +48,7 @@ export class ReportsController {
     return this.reportsService.taioReport(churchId, { serviceYearId });
   }
 
-  @Roles('sector_leader', 'priest')
+  @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
   @Get('servant-performance')
   async servantPerformanceReport(
     @Query('serviceId') serviceId: string,

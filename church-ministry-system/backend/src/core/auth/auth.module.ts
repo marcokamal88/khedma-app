@@ -15,6 +15,8 @@ import { Enrollment } from '../../modules/users/entities/enrollment.entity';
 import { MemberProfile } from '../../modules/users/entities/member-profile.entity';
 import { SectorAssignment } from '../../modules/users/entities/sector-assignment.entity';
 import { Sector } from '../../modules/church/entities/sector.entity';
+import { Service } from '../../modules/church/entities/service.entity';
+import { Class } from '../../modules/church/entities/class.entity';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { Sector } from '../../modules/church/entities/sector.entity';
       MemberProfile,
       SectorAssignment,
       Sector,
+      Service,
+      Class,
     ]),
   ],
   controllers: [AuthController],

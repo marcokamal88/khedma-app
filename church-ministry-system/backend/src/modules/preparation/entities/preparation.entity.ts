@@ -5,6 +5,8 @@ import { ServiceYear } from '../../service-year/entities/service-year.entity';
 import { Service } from '../../church/entities/service.entity';
 import { Class } from '../../church/entities/class.entity';
 import { PreparationFile } from './preparation-file.entity';
+import { PreparationComment } from './preparation-comment.entity';
+import { ChurchMember } from '../../users/entities/church-member.entity';
 
 @Table({ tableName: 'preparations', timestamps: true, paranoid: true })
 export class Preparation extends Model {
@@ -20,6 +22,7 @@ export class Preparation extends Model {
   @Column({ field: 'service_year_id', type: DataType.INTEGER, allowNull: false })
   serviceYearId: number;
 
+  @ForeignKey(() => ChurchMember)
   @Column({ field: 'servant_id', type: DataType.INTEGER, allowNull: false })
   servantId: number;
 
@@ -66,4 +69,10 @@ export class Preparation extends Model {
 
   @HasMany(() => PreparationFile)
   files: PreparationFile[];
+
+  @HasMany(() => PreparationComment)
+  comments: PreparationComment[];
+
+  @BelongsTo(() => ChurchMember)
+  servant: ChurchMember;
 }

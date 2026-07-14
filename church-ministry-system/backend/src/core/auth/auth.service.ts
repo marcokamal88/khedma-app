@@ -12,6 +12,8 @@ import { ServantAssignment } from '../../modules/users/entities/servant-assignme
 import { Enrollment } from '../../modules/users/entities/enrollment.entity';
 import { SectorAssignment } from '../../modules/users/entities/sector-assignment.entity';
 import { Sector } from '../../modules/church/entities/sector.entity';
+import { Service } from '../../modules/church/entities/service.entity';
+import { Class } from '../../modules/church/entities/class.entity';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { SwitchContextDto } from './dto/switch-context.dto';
@@ -75,6 +77,8 @@ export class AuthService {
     };
 
     const accessToken = this.jwtService.sign({ ...payload });
+
+    this.logger.log(`login | memberId: ${member.id} | roles: ${JSON.stringify(roles)} | defaultContext: ${JSON.stringify(defaultContext)}`);
 
     return {
       accessToken,
@@ -145,6 +149,8 @@ export class AuthService {
       roles,
       activeContext: matched!,
     };
+
+    this.logger.log(`switchContext result | matched: ${JSON.stringify(matched)} | dto: ${JSON.stringify(dto)}`);
 
     return {
       accessToken: this.jwtService.sign({ ...payload }),
@@ -234,6 +240,7 @@ export class AuthService {
   private async getAvailableContexts(memberId: number, churchId: number): Promise<ActiveContext[]> {
     const contexts: ActiveContext[] = [];
     const roles = await this.getMemberRoles(memberId);
+    this.logger.log(`getAvailableContexts | memberId: ${memberId} | roles: ${JSON.stringify(roles)}`);
 
     // Priest — from sector_assignments or church-wide
     if (roles.includes('priest')) {
@@ -286,14 +293,19 @@ export class AuthService {
         where: {
           churchMemberId: memberId,
           isActive: true,
-          classId: null,
-          leaderRole: { [Op.in]: leaderRoles },
+          [Op.or]: [
+            { leaderRole: { [Op.in]: leaderRoles } },
+            { leaderRole: null },
+          ],
         },
-        include: [{ association: 'service', attributes: ['name'] }],
+        include: [{ model: Service, attributes: ['name'] }],
       });
+      this.logger.log(`service_leader query | found ${assignments.length} assignments | memberId: ${memberId} | leaderRoles: ${JSON.stringify(leaderRoles)}`);
       for (const a of assignments) {
+        const serviceName = (a as any).service?.name;
+        this.logger.log(`assignment | id: ${a.id} | serviceId: ${a.serviceId} | leaderRole: ${a.leaderRole} | serviceName: ${serviceName}`);
         contexts.push({
-          role: a.leaderRole as string,
+          role: a.leaderRole || leaderRoles[0],
           churchId,
           scope: { serviceId: a.serviceId },
           displayLabel: (a as any).service?.name || '',
@@ -316,8 +328,8 @@ export class AuthService {
       const assignments = await this.servantAssignmentModel.findAll({
         where: whereClause,
         include: [
-          { association: 'service', attributes: ['name'] },
-          { association: 'class', attributes: ['name'] },
+          { model: Service, attributes: ['name'] },
+          { model: Class, attributes: ['name'] },
         ],
       });
       for (const a of assignments) {
@@ -335,7 +347,7 @@ export class AuthService {
     if (roles.includes('served_member')) {
       const enrollments = await this.enrollmentModel.findAll({
         where: { churchMemberId: memberId, isActive: true },
-        include: [{ association: 'service', attributes: ['name'] }],
+        include: [{ model: Service, attributes: ['name'] }],
       });
       for (const e of enrollments) {
         contexts.push({
@@ -359,14 +371,16 @@ export class AuthService {
 
     // Fallback if no contexts resolved
     if (contexts.length === 0 && roles.length > 0) {
+      this.logger.warn(`No contexts resolved | memberId: ${memberId} | roles: ${JSON.stringify(roles)} — using fallback`);
       contexts.push({
         role: roles[0],
         churchId,
         scope: {},
-        displayLabel: roles[0],
+        displayLabel: '',
       });
     }
 
+    this.logger.log(`getAvailableContexts result | ${contexts.length} contexts: ${JSON.stringify(contexts)}`);
     return contexts;
   }
 

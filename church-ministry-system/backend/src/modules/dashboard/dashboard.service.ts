@@ -13,6 +13,7 @@ import { Task } from '../tasks/entities/task.entity';
 import { TaskAssignment } from '../tasks/entities/task-assignment.entity';
 import { TaioTransaction } from '../taio/entities/taio-transaction.entity';
 import { ServiceYear } from '../service-year/entities/service-year.entity';
+import { Event } from '../events/entities/event.entity';
 
 @Injectable()
 export class DashboardService {
@@ -31,6 +32,7 @@ export class DashboardService {
     @InjectModel(ServiceYear) private serviceYearModel: typeof ServiceYear,
     @InjectModel(Service) private serviceModel: typeof Service,
     @InjectModel(Sector) private sectorModel: typeof Sector,
+    @InjectModel(Event) private eventModel: typeof Event,
   ) {}
 
   private async getCurrentServiceYear(churchId: number): Promise<ServiceYear | null> {
@@ -317,58 +319,29 @@ export class DashboardService {
   }
 
   private async computeServiceStats(churchId: number, filters: ScopeFilters) {
-    const serviceYear = await this.getCurrentServiceYear(churchId);
-    if (!serviceYear) {
-      return { totalClasses: 0, totalStudents: 0, averageAttendance: 0, openTasks: 0 };
+    if (!filters.serviceId) {
+      return { totalStudents: 0, totalServants: 0, upcomingEvents: 0 };
     }
 
-    const classWhere: any = { churchId, serviceId: filters.serviceId, isActive: true };
-    const classes = await this.enrollmentModel.findAll({
-      where: { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id, isActive: true } as any,
-      attributes: ['classId'],
-      group: ['classId'],
-    });
-    const totalClasses = classes.length;
+    const serviceYear = await this.getCurrentServiceYear(churchId);
+    if (!serviceYear) {
+      return { totalStudents: 0, totalServants: 0, upcomingEvents: 0 };
+    }
 
     const totalStudents = await this.enrollmentModel.count({
       where: { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id, isActive: true } as any,
     });
 
-    const sessions = await this.sessionModel.findAll({
-      where: { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id } as any,
-      attributes: ['id'],
+    const totalServants = await this.servantAssignmentModel.count({
+      where: { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id, isActive: true } as any,
     });
 
-    let averageAttendance = 0;
-    if (sessions.length > 0) {
-      const sessionIds = sessions.map((s: any) => s.id);
-      const records = await this.recordModel.findAll({
-        where: { churchId, attendanceSessionId: { [Op.in]: sessionIds } },
-        attributes: ['status', [this.sequelize.fn('COUNT', this.sequelize.col('id')), 'count']],
-        group: ['status'],
-        raw: true,
-      }) as any[];
-
-      const summary: any = { present: 0, absent: 0, excused: 0, late: 0 };
-      for (const r of records) summary[r.status] = parseInt(r.count) || 0;
-      const values = Object.values(summary) as number[];
-      const total = values.reduce((a: number, b: number) => a + b, 0);
-      averageAttendance = total > 0 ? Math.round((summary.present / total) * 100) : 0;
-    }
-
-    const tasks = await this.taskModel.findAll({
-      where: { churchId, serviceYearId: serviceYear.id, serviceId: filters.serviceId } as any,
-      attributes: ['id'],
+    const today = new Date().toISOString().split('T')[0];
+    const upcomingEvents = await this.eventModel.count({
+      where: { churchId, startDate: { [Op.gte]: today }, isActive: true } as any,
     });
-    let openTasks = 0;
-    if (tasks.length > 0) {
-      const taskIds = tasks.map((t: any) => t.id);
-      openTasks = await this.taskAssignmentModel.count({
-        where: { taskId: { [Op.in]: taskIds }, status: { [Op.in]: ['pending', 'in_progress'] } },
-      });
-    }
 
-    return { totalClasses, totalStudents, averageAttendance, openTasks };
+    return { totalStudents, totalServants, upcomingEvents };
   }
 
   private async computeSectorStats(churchId: number, filters: ScopeFilters) {
