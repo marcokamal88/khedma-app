@@ -109,6 +109,7 @@ export default function AttendanceScreen() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
+  const [editGender, setEditGender] = useState("");
   const [editAddress, setEditAddress] = useState("");
   const [editBirthDate, setEditBirthDate] = useState("");
   const [editNotes, setEditNotes] = useState("");
@@ -121,6 +122,7 @@ export default function AttendanceScreen() {
   >(null);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
+  const [newGender, setNewGender] = useState("");
   const [newAddress, setNewAddress] = useState("");
   const [newBirthDate, setNewBirthDate] = useState("");
   const [newNotes, setNewNotes] = useState("");
@@ -219,11 +221,13 @@ export default function AttendanceScreen() {
         address: newAddress.trim() || undefined,
         birthDate: newBirthDate.trim() || undefined,
         notes: newNotes.trim() || undefined,
-      });
+        gender: (newGender as any) || undefined,
+      } as any);
       Alert.alert(t("app.success"), t("attendance.addedSuccess"));
       setShowAddModal(false);
       setNewName("");
       setNewPhone("");
+      setNewGender("");
       setNewAddress("");
       setNewBirthDate("");
       setNewNotes("");
@@ -237,6 +241,7 @@ export default function AttendanceScreen() {
   }, [
     newName,
     newPhone,
+    newGender,
     newAddress,
     newBirthDate,
     newNotes,
@@ -308,13 +313,14 @@ export default function AttendanceScreen() {
     }
   }, [classAssignment, loadData, t]);
 
-  const openStudentModal = useCallback((student: Student) => {
+  const openStudentModal = useCallback((student: any) => {
     setEditingStudent(student);
     setEditName(student.fullName);
-    setEditPhone("");
-    setEditAddress("");
-    setEditBirthDate("");
-    setEditNotes("");
+    setEditPhone((student as any).phone || "");
+    setEditGender((student as any).gender || "");
+    setEditAddress((student as any).address || "");
+    setEditBirthDate((student as any).birthDate || "");
+    setEditNotes((student as any).notes || "");
     setShowStudentModal(true);
   }, []);
 
@@ -325,6 +331,7 @@ export default function AttendanceScreen() {
       await apiClient.patch(`/members/${editingStudent.id}`, {
         fullName: editName.trim() || undefined,
         phone: editPhone.trim() || undefined,
+        gender: editGender || undefined,
         address: editAddress.trim() || undefined,
         birthDate: editBirthDate.trim() || undefined,
         notes: editNotes.trim() || undefined,
@@ -341,6 +348,7 @@ export default function AttendanceScreen() {
     editingStudent,
     editName,
     editPhone,
+    editGender,
     editAddress,
     editBirthDate,
     editNotes,
@@ -778,7 +786,8 @@ export default function AttendanceScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.modalOverlay}
         >
-          <View style={styles.modalContent}>
+          <View style={styles.sheetWrapper}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => setShowAddModal(false)}
@@ -894,10 +903,7 @@ export default function AttendanceScreen() {
                 </ScrollView>
               </View>
             ) : (
-              <ScrollView
-                style={styles.modalBody}
-                keyboardShouldPersistTaps="handled"
-              >
+              <View style={{ gap: 0 }}>
                 <TextInput
                   style={styles.input}
                   placeholder={t("auth.fullName")}
@@ -913,6 +919,10 @@ export default function AttendanceScreen() {
                   onChangeText={setNewPhone}
                   keyboardType="phone-pad"
                 />
+                <View style={styles.genderRow}>
+                  <TouchableOpacity style={[styles.genderBtn, newGender === 'male' && styles.genderActive]} onPress={() => setNewGender('male')} activeOpacity={0.7}><Text style={[styles.genderText, newGender === 'male' && styles.genderTextActive]}>ذكر</Text></TouchableOpacity>
+                  <TouchableOpacity style={[styles.genderBtn, newGender === 'female' && styles.genderActive]} onPress={() => setNewGender('female')} activeOpacity={0.7}><Text style={[styles.genderText, newGender === 'female' && styles.genderTextActive]}>أنثى</Text></TouchableOpacity>
+                </View>
                 <TextInput
                   style={styles.input}
                   placeholder={t("attendance.addressPlaceholder")}
@@ -964,8 +974,9 @@ export default function AttendanceScreen() {
                     {enrolling ? t("app.loading") : t("attendance.register")}
                   </Text>
                 </TouchableOpacity>
-              </ScrollView>
+              </View>
             )}
+            </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -980,8 +991,9 @@ export default function AttendanceScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.modalOverlay}
         >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
+          <View style={styles.sheetWrapper}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+              <View style={styles.modalHeader}>
               <TouchableOpacity
                 onPress={() => setShowStudentModal(false)}
                 activeOpacity={0.7}
@@ -993,10 +1005,7 @@ export default function AttendanceScreen() {
               </Text>
               <View style={{ width: 30 }} />
             </View>
-            <ScrollView
-              style={styles.modalBody}
-              keyboardShouldPersistTaps="handled"
-            >
+            <View style={{ gap: 0 }}>
               <TextInput
                 style={styles.input}
                 placeholder={t("auth.fullName")}
@@ -1012,6 +1021,10 @@ export default function AttendanceScreen() {
                 onChangeText={setEditPhone}
                 keyboardType="phone-pad"
               />
+              <View style={styles.genderRow}>
+                <TouchableOpacity style={[styles.genderBtn, editGender === 'male' && styles.genderActive]} onPress={() => setEditGender('male')} activeOpacity={0.7}><Text style={[styles.genderText, editGender === 'male' && styles.genderTextActive]}>ذكر</Text></TouchableOpacity>
+                <TouchableOpacity style={[styles.genderBtn, editGender === 'female' && styles.genderActive]} onPress={() => setEditGender('female')} activeOpacity={0.7}><Text style={[styles.genderText, editGender === 'female' && styles.genderTextActive]}>أنثى</Text></TouchableOpacity>
+              </View>
               <TextInput
                 style={styles.input}
                 placeholder={t("attendance.addressPlaceholder")}
@@ -1055,6 +1068,7 @@ export default function AttendanceScreen() {
                   {savingStudent ? t("app.loading") : t("app.save")}
                 </Text>
               </TouchableOpacity>
+            </View>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -1603,12 +1617,23 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end",
   },
+  sheetWrapper: {
+    backgroundColor: "#ffffff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    height: "85%",
+    maxHeight: "85%",
+    width: "100%",
+    overflow: "hidden",
+  },
   modalContent: {
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: "80%",
     paddingBottom: 32,
+    flexShrink: 1,
+    overflow: "hidden",
   },
   modalHeader: {
     flexDirection: "row-reverse",
@@ -1726,6 +1751,11 @@ const styles = StyleSheet.create({
   },
   dateInputText: { fontSize: 16, color: CHARCOAL, textAlign: "right" },
   dateInputPlaceholder: { color: MUTED },
+  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  genderBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ffffff', borderWidth: 1, borderColor: BORDER, alignItems: 'center' },
+  genderActive: { backgroundColor: NAVY, borderColor: NAVY },
+  genderText: { ...typography.buttonSmall, color: MUTED },
+  genderTextActive: { color: '#ffffff' },
   seeAllBtn: {
     paddingVertical: 14,
     alignItems: "center",

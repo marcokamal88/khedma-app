@@ -67,6 +67,12 @@ export class ChurchController {
     return this.churchService.enrollMember(churchId, body);
   }
 
+  @Roles('priest', 'sector_leader', 'service_leader', 'assistant_service_leader')
+  @Delete('enrollments/:id')
+  async unenrollMember(@Param('id') id: string, @CurrentTenant() churchId: string, @Req() req: any) {
+    return this.churchService.unenrollMember(churchId, id, req.user);
+  }
+
   @Roles('priest', 'sector_leader')
   @Post('sectors')
   async createSector(@Body() body: any, @CurrentTenant() churchId: string) {

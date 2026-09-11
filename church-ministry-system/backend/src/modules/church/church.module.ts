@@ -10,9 +10,10 @@ import { TaioModule } from '../taio/taio.module';
 import { MemberRole } from '../users/entities/member-role.entity';
 import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 import { AttendanceSession } from '../attendance/entities/attendance-session.entity';
+import { MemberProfile } from '../users/entities/member-profile.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Sector, Service, StageGroup, Class, MemberRole, ServantAssignment, AttendanceSession]), TaioModule],
+  imports: [SequelizeModule.forFeature([Sector, Service, StageGroup, Class, MemberRole, ServantAssignment, AttendanceSession, MemberProfile]), TaioModule],
   controllers: [ChurchController],
   providers: [ChurchService],
   exports: [ChurchService],

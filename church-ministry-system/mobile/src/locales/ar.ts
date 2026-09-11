@@ -290,6 +290,11 @@ export const ar = {
     updatedSuccess: "تم تحديث الفصل بنجاح",
     deletedSuccess: "تم حذف الفصل بنجاح",
   },
+  studentsManagement: {
+    title: "إدارة المخدومين",
+    noStudents: "لا يوجد مخدومين",
+    viewStudents: "عرض المخدومين",
+  },
   events: {
     title: "الفعاليات",
     fee: "الرسوم: ",

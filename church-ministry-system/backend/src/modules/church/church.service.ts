@@ -12,6 +12,7 @@ import { User } from '../users/entities/user.entity';
 import { ChurchMember } from '../users/entities/church-member.entity';
 import { MemberRole } from '../users/entities/member-role.entity';
 import { Role } from '../users/entities/role.entity';
+import { MemberProfile } from '../users/entities/member-profile.entity';
 import { TaioService } from '../taio/taio.service';
 
 const SERVANT_ROLES = ['servant', 'class_leader', 'service_leader', 'assistant_service_leader', 'sector_leader', 'priest'];
@@ -27,6 +28,7 @@ export class ChurchService {
     @InjectModel(ServantAssignment) private servantAssignmentModel: typeof ServantAssignment,
     @InjectModel(AttendanceSession) private sessionModel: typeof AttendanceSession,
     @InjectModel(MemberRole) private memberRoleModel: typeof MemberRole,
+    @InjectModel(MemberProfile) private profileModel: typeof MemberProfile,
     private taioService: TaioService,
   ) {}
 
@@ -144,17 +146,32 @@ export class ChurchService {
     );
     const studentEnrollments = enrollments.filter((e) => !servantIds.has(e.churchMemberId));
 
+    const profiles = await this.profileModel.findAll({
+      where: { churchId, churchMemberId: studentEnrollments.map((e) => e.churchMemberId) } as any,
+      attributes: ['churchMemberId', 'address', 'birthDate', 'notes', 'gender', 'schoolGrade'],
+      raw: true,
+    } as any);
+    const profileMap = new Map<number, any>(profiles.map((p: any) => [Number(p.churchMemberId), p]));
     const balances = await this.taioService.getBalances(churchId, studentEnrollments.map((e) => String(e.churchMemberId)));
-    return studentEnrollments.map((e) => ({
-      enrollmentId: e.id,
-      id: e.churchMemberId,
-      userId: (e as any).churchMember?.userId,
-      fullName: (e as any).churchMember?.user?.fullName,
-      email: (e as any).churchMember?.user?.email,
-      phone: (e as any).churchMember?.user?.phone,
-      avatarUrl: (e as any).churchMember?.user?.avatarUrl,
-      taioBalance: balances[e.churchMemberId] || 0,
-    }));
+    return studentEnrollments.map((e) => {
+      const p: any = profileMap.get(Number(e.churchMemberId));
+      return {
+        enrollmentId: e.id,
+        classId: (e as any).classId,
+        id: e.churchMemberId,
+        userId: (e as any).churchMember?.userId,
+        fullName: (e as any).churchMember?.user?.fullName,
+        email: (e as any).churchMember?.user?.email,
+        phone: (e as any).churchMember?.user?.phone,
+        avatarUrl: (e as any).churchMember?.user?.avatarUrl,
+        address: p?.address || null,
+        birthDate: p?.birthDate || null,
+        notes: p?.notes || null,
+        gender: p?.gender || null,
+        schoolGrade: p?.schoolGrade ?? null,
+        taioBalance: balances[e.churchMemberId] || 0,
+      };
+    });
   }
 
   async createSector(churchId: string, data: Partial<Sector>) {
@@ -280,5 +297,16 @@ export class ChurchService {
       isActive: true,
     } as any);
     return enrollment;
+  }
+
+  async unenrollMember(churchId: string, id: string, user?: any) {
+    const enrollment: any = await this.enrollmentModel.findOne({ where: { id, churchId } as any });
+    if (!enrollment) throw new NotFoundException('Enrollment not found');
+    if (user && this.isServiceLeaderRole(user)) {
+      const resolved = await this.resolveServiceIdForLeader(user, churchId);
+      if (!resolved || Number(enrollment.serviceId) !== resolved) throw new ForbiddenException('Not allowed for this service');
+    }
+    await this.enrollmentModel.update({ isActive: false } as any, { where: { id } } as any);
+    return { success: true };
   }
 }

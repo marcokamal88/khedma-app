@@ -18,6 +18,7 @@ export default function ClassManagementScreen({ navigation }: any) {
   const { serviceId } = useActiveContext();
   const serviceIdStr = serviceId != null ? String(serviceId) : undefined;
   const [classes, setClasses] = useState<any[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [sheetVisible, setSheetVisible] = useState(false);
@@ -31,9 +32,20 @@ export default function ClassManagementScreen({ navigation }: any) {
     setLoading(true);
     try {
       const res = await churchApi.getClasses(serviceIdStr);
-      setClasses(res?.data || []);
+      const list = res?.data || [];
+      setClasses(list);
+      // fetch student counts per class for badge and capacity warn
+      try {
+        const results = await Promise.all(
+          list.map((c: any) => churchApi.getClassStudents(String(c.id)).then((r: any) => ({ id: String(c.id), count: (r?.data || []).length })).catch(() => ({ id: String(c.id), count: 0 }))),
+        );
+        const map: Record<string, number> = {};
+        results.forEach((r: any) => { map[r.id] = r.count; });
+        setCounts(map);
+      } catch { setCounts({}); }
     } catch {
       setClasses([]);
+      setCounts({});
     } finally {
       setLoading(false);
     }
@@ -123,22 +135,28 @@ export default function ClassManagementScreen({ navigation }: any) {
     ]);
   };
 
-  const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity onPress={() => openEdit(item)} activeOpacity={0.7}>
+  const renderItem = ({ item }: { item: any }) => {
+    const count = counts[String(item.id)] ?? 0;
+    return (
       <AppCard variant="bordered" style={styles.card}>
-        <View style={styles.cardRow}>
-          <View style={styles.iconWrap}>
-            <Text style={styles.iconText}>{'\u25A3'}</Text>
+        <TouchableOpacity onPress={() => openEdit(item)} activeOpacity={0.7} style={styles.cardMain}>
+          <View style={styles.cardRow}>
+            <View style={styles.iconWrap}>
+              <Text style={styles.iconText}>{'\u25A3'}</Text>
+            </View>
+            <View style={styles.cardInfo}>
+              <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+              <Text style={styles.capacity}>{count} مخدوم{item.capacity ? ` / ${item.capacity}` : ''}</Text>
+            </View>
+            <Text style={styles.chevron}>{'\u203A'}</Text>
           </View>
-          <View style={styles.cardInfo}>
-            <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-            {item.capacity ? <Text style={styles.capacity}>{t('classManagement.capacity')}: {item.capacity}</Text> : null}
-          </View>
-          <Text style={styles.chevron}>{'\u203A'}</Text>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.viewStudentsBtn} onPress={() => navigation.navigate('StudentsManagement', { classId: String(item.id) })} activeOpacity={0.7}>
+          <Text style={styles.viewStudentsText}>{t('studentsManagement.viewStudents') || 'عرض المخدومين'} ({count})</Text>
+        </TouchableOpacity>
       </AppCard>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   if (loading) {
     return <View style={styles.loadingContainer}><ActivityIndicator size="large" color={NAVY} /></View>;
@@ -204,7 +222,8 @@ const styles = StyleSheet.create({
   addBtnText: { fontSize: 24, color: '#ffffff', lineHeight: 26, fontWeight: '700' },
   waveContainer: { height: 30, backgroundColor: NAVY, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
   list: { padding: 16, gap: 12, paddingBottom: 24 },
-  card: { backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: colors.border, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
+  card: { backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: colors.border, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3, overflow: 'hidden' },
+  cardMain: { padding: 16 },
   cardRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   iconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: NAVY, alignItems: 'center', justifyContent: 'center', marginEnd: 12 },
   iconText: { fontSize: 16, color: '#ffffff' },
@@ -212,6 +231,8 @@ const styles = StyleSheet.create({
   name: { ...typography.cardTitle, color: NAVY, marginBottom: 2 },
   capacity: { ...typography.caption, color: MUTED },
   chevron: { fontSize: 24, color: MUTED, marginStart: 8 },
+  viewStudentsBtn: { borderTopWidth: 1, borderTopColor: colors.border, paddingVertical: 10, alignItems: 'center', backgroundColor: CREAM },
+  viewStudentsText: { ...typography.buttonSmall, color: NAVY, fontWeight: '600' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: CREAM },
   label: { ...typography.body, color: MUTED, marginBottom: 6, marginTop: 10 },
   input: { backgroundColor: CREAM, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, ...typography.body, color: NAVY, borderWidth: 1, borderColor: colors.border },

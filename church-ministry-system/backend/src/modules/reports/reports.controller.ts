@@ -1,4 +1,5 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Res, Req } from '@nestjs/common';
+import { Response, Request } from 'express';
 import { ReportsService } from './reports.service';
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -18,6 +19,27 @@ export class ReportsController {
     @CurrentTenant() churchId: string,
   ) {
     return this.reportsService.attendanceReport(churchId, { serviceId, from, to });
+  }
+
+  @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
+  @Get('attendance/excel')
+  async attendanceExcel(
+    @Query('serviceId') serviceId: string,
+    @Query('from') from: string,
+    @Query('to') to: string,
+    @CurrentTenant() churchId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const user = (req as any).user;
+    // derive serviceId for service leaders if not supplied
+    let sid = serviceId;
+    if (!sid && user?.activeContext?.scope?.serviceId) sid = String(user.activeContext.scope.serviceId);
+    const buf = await this.reportsService.attendanceExcel(churchId, { serviceId: sid, from, to });
+    const fname = `Attendance_${sid || 'all'}_${from || 'start'}_to_${to || 'now'}.xlsx`;
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fname)}"`);
+    res.send(buf);
   }
 
   @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')

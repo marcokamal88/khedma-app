@@ -98,6 +98,17 @@ export default function ServiceLeaderDashboard({ navigation }: any) {
             </View>
             <Text style={styles.actionChevron}>{'\u203A'}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => navigation.navigate('StudentsManagement')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.actionIcon}>{'\u263A'}</Text>
+            <View style={styles.actionTextWrap}>
+              <Text style={styles.actionTitle}>{t('studentsManagement.title') || 'إدارة المخدومين'}</Text>
+            </View>
+            <Text style={styles.actionChevron}>{'\u203A'}</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={{ height: 24 }} />

@@ -20,6 +20,7 @@ export const churchApi = {
   createClass: (data: { name: string; capacity?: number | null }) => apiClient.post('/classes', data),
   updateClass: (id: string, data: { name?: string; capacity?: number | null }) => apiClient.patch(`/classes/${id}`, data),
   deleteClass: (id: string) => apiClient.delete(`/classes/${id}`),
+  unenrollStudent: (enrollmentId: string) => apiClient.delete(`/enrollments/${enrollmentId}`),
   searchMembers: (q: string, serviceId?: string) =>
     apiClient.get('/members/search', { params: { q, ...(serviceId ? { serviceId } : {}) } }),
   registerMember: (data: {

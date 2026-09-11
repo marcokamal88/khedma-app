@@ -178,7 +178,7 @@ export default function PreparationsReviewScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.heading} numberOfLines={1}>{t('preparationReview.title')}</Text>
+        <Text style={styles.heading} >{t('preparationReview.title')}</Text>
       </View>
       <View style={styles.waveContainer} />
       <FlatList
@@ -384,7 +384,7 @@ export default function PreparationsReviewScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: CREAM },
   header: { backgroundColor: NAVY, paddingHorizontal: 20, paddingTop: 60, paddingBottom: 16, alignItems: 'center', justifyContent: 'center' },
-  heading: { ...typography.subHeading, color: '#ffffff', textAlign: 'center' },
+  heading: { ...typography.subHeading, color: '#ffffff', textAlign: 'center' , width: '100%' ,height: 30, lineHeight: 30, fontSize: 20, fontWeight: '700' },
   waveContainer: { height: 30, backgroundColor: NAVY, borderBottomLeftRadius: 24, borderBottomRightRadius: 24, marginBottom: 0 },
   list: { gap: 12, padding: 16, paddingBottom: 24 },
   card: { backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: colors.border, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },

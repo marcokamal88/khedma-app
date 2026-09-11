@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
   use(req: Request, _res: Response, next: NextFunction) {
-    const raw = req.headers['x-church-id'] as string;
+    const raw = (req.headers['x-church-id'] as string) || (req.query as any)['churchId'] || (req.query as any)['X-Church-ID'];
 
     if (!raw) {
       throw new UnauthorizedException('X-Church-ID header is required');

@@ -290,6 +290,11 @@ export const en = {
     updatedSuccess: 'Class updated successfully',
     deletedSuccess: 'Class deleted successfully',
   },
+  studentsManagement: {
+    title: 'Students Management',
+    noStudents: 'No students',
+    viewStudents: 'View Students',
+  },
   events: {
     title: 'Events',
     fee: 'Fee: ',
