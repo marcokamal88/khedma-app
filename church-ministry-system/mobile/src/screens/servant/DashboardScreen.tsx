@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useLocale } from '../../hooks/useLocale';
 import { dashboardApi } from '../../api/dashboard.api';
@@ -27,25 +28,37 @@ export default function ServantDashboard({ navigation }: any) {
   const [todaySessions, setTodaySessions] = useState<any[]>([]);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = useCallback(async () => {
+    try {
+      const [statsRes, todayRes, tasksRes] = await Promise.all([
+        dashboardApi.servantStats(),
+        dashboardApi.servantToday(),
+        dashboardApi.servantTasks(),
+      ]);
+      setStats(statsRes.data);
+      setTodaySessions(todayRes.data || []);
+      setTasks(tasksRes.data || []);
+    } catch {
+      setStats({ classSize: 0, attendanceRate: 0, openTasks: 0, totalPoints: 0 });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadData]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const [statsRes, todayRes, tasksRes] = await Promise.all([
-          dashboardApi.servantStats(),
-          dashboardApi.servantToday(),
-          dashboardApi.servantTasks(),
-        ]);
-        setStats(statsRes.data);
-        setTodaySessions(todayRes.data || []);
-        setTasks(tasksRes.data || []);
-      } catch {
-        setStats({ classSize: 0, attendanceRate: 0, openTasks: 0, totalPoints: 0 });
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    loadData();
+  }, [loadData]);
 
   if (loading) {
     return (
@@ -57,7 +70,7 @@ export default function ServantDashboard({ navigation }: any) {
 
   return (
     <View style={styles.root}>
-      <ScrollView style={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
         <AppHeader greetingText={t('home.welcomeBack')}>
           <ContextCard defaultRole="servant" />
         </AppHeader>

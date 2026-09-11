@@ -33,5 +33,9 @@ export class UpdateMemberDto {
 
   @IsOptional()
   @IsString()
+  gender?: string;
+
+  @IsOptional()
+  @IsString()
   notes?: string;
 }

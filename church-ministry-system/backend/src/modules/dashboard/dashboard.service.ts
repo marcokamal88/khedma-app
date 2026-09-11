@@ -14,6 +14,7 @@ import { TaskAssignment } from '../tasks/entities/task-assignment.entity';
 import { TaioTransaction } from '../taio/entities/taio-transaction.entity';
 import { ServiceYear } from '../service-year/entities/service-year.entity';
 import { Event } from '../events/entities/event.entity';
+import { MemberProfile } from '../users/entities/member-profile.entity';
 
 @Injectable()
 export class DashboardService {
@@ -33,6 +34,7 @@ export class DashboardService {
     @InjectModel(Service) private serviceModel: typeof Service,
     @InjectModel(Sector) private sectorModel: typeof Sector,
     @InjectModel(Event) private eventModel: typeof Event,
+    @InjectModel(MemberProfile) private profileModel: typeof MemberProfile,
   ) {}
 
   private async getCurrentServiceYear(churchId: number): Promise<ServiceYear | null> {
@@ -318,30 +320,79 @@ export class DashboardService {
     });
   }
 
+  private calcAge(birthDate: string): number | null {
+    if (!birthDate) return null;
+    const b = new Date(birthDate);
+    if (isNaN(b.getTime())) return null;
+    const today = new Date();
+    let age = today.getFullYear() - b.getFullYear();
+    const m = today.getMonth() - b.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < b.getDate())) age--;
+    return age < 0 ? null : age;
+  }
+
+  private buildGenderBreakdown(profiles: any[], total: number) {
+    let male = 0; let female = 0;
+    for (const p of profiles) {
+      if (p.gender === 'male') male++; else if (p.gender === 'female') female++;
+    }
+    const unknown = Math.max(0, total - male - female);
+    return { male, female, unknown };
+  }
+
+  private buildAgeBreakdown(profiles: any[]) {
+    const brackets: any = { '<12': 0, '12-14': 0, '15-17': 0, '18+': 0, unknown: 0 };
+    let sum = 0; let count = 0;
+    for (const p of profiles) {
+      const age = this.calcAge(p.birthDate);
+      if (age === null) { brackets.unknown++; continue; }
+      sum += age; count++;
+      if (age < 12) brackets['<12']++; else if (age <= 14) brackets['12-14']++; else if (age <= 17) brackets['15-17']++; else brackets['18+']++;
+    }
+    const bracketsWithTotalUnknown = { ...brackets };
+    // unknown already holds birth_date nulls; keep as is
+    return { avgAge: count ? Math.round(sum / count) : null, brackets: bracketsWithTotalUnknown };
+  }
+
   private async computeServiceStats(churchId: number, filters: ScopeFilters) {
     if (!filters.serviceId) {
-      return { totalStudents: 0, totalServants: 0, upcomingEvents: 0 };
+      return { totalStudents: 0, totalServants: 0, upcomingEvents: 0, studentsByGender: { male: 0, female: 0, unknown: 0 }, servantsByGender: { male: 0, female: 0, unknown: 0 }, studentsByAge: { avgAge: null, brackets: { '<12': 0, '12-14': 0, '15-17': 0, '18+': 0, unknown: 0 } }, servantsByAge: { avgAge: null, brackets: { '<12': 0, '12-14': 0, '15-17': 0, '18+': 0, unknown: 0 } } };
     }
 
     const serviceYear = await this.getCurrentServiceYear(churchId);
     if (!serviceYear) {
-      return { totalStudents: 0, totalServants: 0, upcomingEvents: 0 };
+      return { totalStudents: 0, totalServants: 0, upcomingEvents: 0, studentsByGender: { male: 0, female: 0, unknown: 0 }, servantsByGender: { male: 0, female: 0, unknown: 0 }, studentsByAge: { avgAge: null, brackets: { '<12': 0, '12-14': 0, '15-17': 0, '18+': 0, unknown: 0 } }, servantsByAge: { avgAge: null, brackets: { '<12': 0, '12-14': 0, '15-17': 0, '18+': 0, unknown: 0 } } };
     }
 
-    const totalStudents = await this.enrollmentModel.count({
-      where: { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id, isActive: true } as any,
-    });
+    const whereBase: any = { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id, isActive: true };
+    const [studentRows, servantRows] = await Promise.all([
+      this.enrollmentModel.findAll({ where: whereBase, attributes: ['churchMemberId'] }) as any,
+      this.servantAssignmentModel.findAll({ where: whereBase, attributes: ['churchMemberId'] }) as any,
+    ]);
+    const totalStudents = studentRows.length;
+    const totalServants = servantRows.length;
+    const studentIds = studentRows.map((r: any) => r.churchMemberId);
+    const servantIds = servantRows.map((r: any) => r.churchMemberId);
 
-    const totalServants = await this.servantAssignmentModel.count({
-      where: { churchId, serviceId: filters.serviceId, serviceYearId: serviceYear.id, isActive: true } as any,
-    });
+    const [studentProfiles, servantProfiles] = await Promise.all([
+      studentIds.length ? this.profileModel.findAll({ where: { churchId, churchMemberId: studentIds } as any, attributes: ['gender', 'birthDate'], raw: true }) as any : [],
+      servantIds.length ? this.profileModel.findAll({ where: { churchId, churchMemberId: servantIds } as any, attributes: ['gender', 'birthDate'], raw: true }) as any : [],
+    ]);
+
+    const studentsByGender = this.buildGenderBreakdown(studentProfiles, totalStudents);
+    const servantsByGender = this.buildGenderBreakdown(servantProfiles, totalServants);
+    const studentsByAge = this.buildAgeBreakdown(studentProfiles);
+    const servantsByAge = this.buildAgeBreakdown(servantProfiles);
+    // account for ids with no profile row (should be 0 after backfill) as unknown age
+    if (studentProfiles.length < totalStudents) studentsByAge.brackets.unknown += totalStudents - studentProfiles.length;
+    if (servantProfiles.length < totalServants) servantsByAge.brackets.unknown += totalServants - servantProfiles.length;
 
     const today = new Date().toISOString().split('T')[0];
     const upcomingEvents = await this.eventModel.count({
       where: { churchId, startDate: { [Op.gte]: today }, isActive: true } as any,
     });
 
-    return { totalStudents, totalServants, upcomingEvents };
+    return { totalStudents, totalServants, upcomingEvents, studentsByGender, servantsByGender, studentsByAge, servantsByAge };
   }
 
   private async computeSectorStats(churchId: number, filters: ScopeFilters) {

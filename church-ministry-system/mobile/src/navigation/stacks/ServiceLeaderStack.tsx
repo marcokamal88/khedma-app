@@ -6,6 +6,7 @@ import ServiceLeaderDashboard from "../../screens/service-leader/DashboardScreen
 import PreparationsReviewScreen from "../../screens/leader/PreparationsReviewScreen";
 import ReportsScreen from "../../screens/leader/ReportsScreen";
 import ServantManagementScreen from "../../screens/service-leader/ServantManagementScreen";
+import ClassManagementScreen from "../../screens/service-leader/ClassManagementScreen";
 import NotificationsScreen from "../../screens/shared/NotificationsScreen";
 import FollowUpStack from "./FollowUpStack";
 import AchievementsScreen from "../../screens/achievements/AchievementsScreen";
@@ -29,6 +30,7 @@ export default function ServiceLeaderStack() {
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
 
       <Tab.Screen name="ServantManagement" component={ServantManagementScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="ClassManagement" component={ClassManagementScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="Achievements" component={AchievementsScreen} options={{ title: t("achievements.title"), tabBarButton: () => null }} />
     </Tab.Navigator>

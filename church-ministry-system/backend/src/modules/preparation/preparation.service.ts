@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Preparation } from './entities/preparation.entity';
 import { PreparationFile } from './entities/preparation-file.entity';
 import { PreparationComment } from './entities/preparation-comment.entity';
 import { ChurchMember } from '../users/entities/church-member.entity';
 import { User } from '../users/entities/user.entity';
+import { ServiceYear } from '../service-year/entities/service-year.entity';
+import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 
 @Injectable()
 export class PreparationService {
@@ -12,6 +14,8 @@ export class PreparationService {
     @InjectModel(Preparation) private prepModel: typeof Preparation,
     @InjectModel(PreparationFile) private fileModel: typeof PreparationFile,
     @InjectModel(PreparationComment) private commentModel: typeof PreparationComment,
+    @InjectModel(ServiceYear) private serviceYearModel: typeof ServiceYear,
+    @InjectModel(ServantAssignment) private assignmentModel: typeof ServantAssignment,
   ) {}
 
   private defaultIncludes = [
@@ -20,8 +24,28 @@ export class PreparationService {
   ];
 
   async create(churchId: number, data: Partial<Preparation>, servantId: number) {
+    const resolved: any = { ...data };
+    if (!resolved.serviceYearId) {
+      const sy: any = await this.serviceYearModel.findOne({ where: { churchId, isCurrent: true } as any });
+      if (!sy) throw new BadRequestException('No active service year');
+      resolved.serviceYearId = sy.id;
+    }
+    if (!resolved.serviceId || !resolved.classId) {
+      const a: any = await this.assignmentModel.findOne({
+        where: { churchId, churchMemberId: servantId, isActive: true } as any,
+        attributes: ['serviceId', 'classId'],
+        order: [['id', 'ASC']],
+      });
+      if (a) {
+        if (!resolved.serviceId) resolved.serviceId = a.serviceId;
+        if (!resolved.classId) resolved.classId = a.classId;
+      }
+    }
+    if (!resolved.serviceId || !resolved.serviceYearId) {
+      throw new BadRequestException('Cannot resolve service for this servant');
+    }
     return this.prepModel.create({
-      ...data,
+      ...resolved,
       churchId,
       servantId,
       status: 'draft',
@@ -91,7 +115,10 @@ export class PreparationService {
     churchId: number,
     preparationId: number,
     fileData: Partial<PreparationFile>,
+    actorMemberId?: number,
   ) {
+    const prep = await this.findOne(churchId, preparationId);
+    // optional: only owner can upload unless priest/leader - keep permissive for now
     return this.fileModel.create({
       ...fileData,
       churchId,

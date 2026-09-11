@@ -1,6 +1,11 @@
 import {
-  Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Req,
+  Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Req, UseInterceptors, UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 import { PreparationService } from './preparation.service';
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -67,6 +72,47 @@ export class PreparationController {
   @Delete(':id')
   async remove(@Param('id') id: string, @CurrentTenant() churchId: number) {
     return this.prepService.remove(churchId, +id);
+  }
+
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest', 'service_leader', 'assistant_service_leader')
+  @Post(':id/files')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: (req: any, file: any, cb: any) => {
+        const id = req.params?.id || 'unknown';
+        const dir = join(process.cwd(), 'uploads', 'preparations', String(id));
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+      },
+      filename: (req: any, file: any, cb: any) => {
+        const ext = extname(file.originalname) || '';
+        cb(null, `${uuidv4()}${ext}`);
+      },
+    }),
+    limits: { fileSize: 15 * 1024 * 1024 },
+    fileFilter: (req: any, file: any, cb: any) => {
+      const allowed = ['image/jpeg','image/png','image/jpg','image/webp','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.presentationml.presentation','text/plain'];
+      if (file.mimetype.startsWith('image/') || allowed.includes(file.mimetype)) cb(null, true);
+      else cb(null, true);
+    },
+  }))
+  async uploadFile(@Param('id') id: string, @UploadedFile() file: Express.Multer.File, @CurrentTenant() churchId: number, @Req() req: Request) {
+    if (!file) throw new (await import('@nestjs/common')).BadRequestException('No file uploaded');
+    const mime = file.mimetype || '';
+    let fileType: string = 'other';
+    if (mime.startsWith('image/')) fileType = 'image';
+    else if (mime === 'application/pdf') fileType = 'document';
+    else if (mime.includes('presentation')) fileType = 'presentation';
+    else if (mime.includes('msword') || mime.includes('word')) fileType = 'document';
+    const fileUrl = `/uploads/preparations/${id}/${file.filename}`;
+    const user = (req as any).user;
+    return this.prepService.addFile(churchId, +id, { fileName: file.originalname, fileUrl, fileType, fileSizeBytes: file.size } as any, user?.memberId);
+  }
+
+  @Get(':id/files')
+  async getFiles(@Param('id') id: string, @CurrentTenant() churchId: number) {
+    const prep = await this.prepService.findOne(churchId, +id);
+    return (prep as any).files || [];
   }
 
   @Get(':id/comments')

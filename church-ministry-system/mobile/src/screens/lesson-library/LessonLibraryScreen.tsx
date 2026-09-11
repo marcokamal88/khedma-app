@@ -16,6 +16,7 @@ export default function LessonLibraryScreen() {
   const { t } = useLocale();
   const [lessons, setLessons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
@@ -40,6 +41,8 @@ export default function LessonLibraryScreen() {
   }, [search, category]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(1); setRefreshing(false); }, [loadData]);
 
   const renderItem = ({ item }: any) => (
     <AppCard variant="bordered" style={styles.card}>
@@ -98,6 +101,8 @@ export default function LessonLibraryScreen() {
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           ListEmptyComponent={
             <AppEmptyState icon="book" title={t('app.noData')} />
           }

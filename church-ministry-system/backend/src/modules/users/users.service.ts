@@ -50,10 +50,15 @@ export class UsersService {
       passwordHash,
     } as any);
 
-    await this.memberModel.create({
+    const member = await this.memberModel.create({
       userId: user.id,
       churchId,
       isActive: true,
+    } as any);
+
+    await this.profileModel.create({
+      churchId,
+      churchMemberId: member.id,
     } as any);
 
     return { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone };
@@ -124,6 +129,7 @@ export class UsersService {
     const profileFields: any = {};
     if (dto.address !== undefined) profileFields.address = dto.address;
     if (dto.birthDate !== undefined) profileFields.birthDate = dto.birthDate;
+    if ((dto as any).gender !== undefined) profileFields.gender = (dto as any).gender;
     if (dto.notes !== undefined) profileFields.notes = dto.notes;
     if (dto.phone !== undefined) {
       profileFields.phones = dto.phone ? [dto.phone] : null;
@@ -141,9 +147,24 @@ export class UsersService {
     return { success: true };
   }
 
-  async searchMembers(churchId: string, query: string) {
+  async searchMembers(churchId: string, query: string, serviceId?: string) {
+    const memberWhere: any = { churchId, isActive: true };
+
+    if (serviceId) {
+      const serviceYear = await this.serviceYearModel.findOne({
+        where: { churchId, isCurrent: true },
+      });
+      const serviceMemberIds = serviceYear
+        ? await this.getServiceMemberIds(churchId, Number(serviceId), serviceYear.id)
+        : [];
+      const leaderIds = await this.getServiceLeaderIds(churchId);
+      const allowedIds = serviceMemberIds.filter((id) => !leaderIds.includes(id));
+      if (allowedIds.length === 0) return [];
+      memberWhere.id = { [Op.in]: allowedIds };
+    }
+
     return this.memberModel.findAll({
-      where: { churchId, isActive: true },
+      where: memberWhere,
       include: [
         {
           model: User,
@@ -164,6 +185,42 @@ export class UsersService {
         avatarUrl: (m as any).user?.avatarUrl,
       })),
     );
+  }
+
+  private async getServiceLeaderIds(churchId: string): Promise<number[]> {
+    const memberRoles = await this.memberRoleModel.findAll({
+      where: { churchId },
+      include: [
+        {
+          model: Role,
+          where: { name: { [Op.in]: ['service_leader', 'assistant_service_leader'] } },
+          attributes: [],
+        },
+      ],
+      attributes: ['churchMemberId'],
+    });
+    return memberRoles.map((mr) => Number((mr as any).churchMemberId));
+  }
+
+  private async getServiceMemberIds(
+    churchId: string,
+    serviceId: number,
+    serviceYearId: number,
+  ): Promise<number[]> {
+    const [enrollments, assignments] = await Promise.all([
+      this.enrollmentModel.findAll({
+        where: { churchId, serviceId, serviceYearId, isActive: true } as any,
+        attributes: ['churchMemberId'],
+      }),
+      this.servantAssignmentModel.findAll({
+        where: { churchId, serviceId, serviceYearId, isActive: true } as any,
+        attributes: ['churchMemberId'],
+      }),
+    ]);
+    const ids = new Set<number>();
+    for (const e of enrollments) ids.add(Number((e as any).churchMemberId));
+    for (const a of assignments) ids.add(Number((a as any).churchMemberId));
+    return [...ids];
   }
 
   async registerMember(dto: CreateUserDto & {
@@ -275,6 +332,30 @@ export class UsersService {
     });
     if (!serviceYear) throw new NotFoundException('No active service year');
 
+    const targetMemberId = Number(data.churchMemberId);
+    const serviceMemberIds = await this.getServiceMemberIds(churchId, Number(data.serviceId), serviceYear.id);
+    const leaderIds = await this.getServiceLeaderIds(churchId);
+
+    if (!serviceMemberIds.includes(targetMemberId)) {
+      throw new BadRequestException('Member is not part of this service');
+    }
+    if (leaderIds.includes(targetMemberId)) {
+      throw new BadRequestException('Service leaders cannot be assigned as servants');
+    }
+
+    const existingEnrollment = await this.enrollmentModel.findOne({
+      where: {
+        churchId,
+        churchMemberId: data.churchMemberId,
+        serviceId: data.serviceId,
+        serviceYearId: serviceYear.id,
+        isActive: true,
+      } as any,
+    });
+    if (existingEnrollment) {
+      throw new BadRequestException('Member is already a student in this service');
+    }
+
     const [assignment] = await this.servantAssignmentModel.upsert({
       churchId,
       churchMemberId: data.churchMemberId,
@@ -290,31 +371,65 @@ export class UsersService {
     return assignment;
   }
 
-  async getServantAssignments(churchId: string, serviceId: string) {
+  async getServantAssignments(churchId: string, serviceId: string, currentMemberId?: number) {
     const serviceYear = await this.serviceYearModel.findOne({
       where: { churchId, isCurrent: true },
     });
     if (!serviceYear) throw new NotFoundException('No active service year');
 
-    const assignments = await this.servantAssignmentModel.findAll({
-      where: { churchId, serviceId, serviceYearId: serviceYear.id, isActive: true },
-      include: [
-        { model: ChurchMember, include: [{ model: User, attributes: ['id', 'fullName', 'email', 'phone', 'avatarUrl'] }] },
-        { model: Class, attributes: ['id', 'name'] },
-      ],
+    const allServiceMemberIds = await this.getServiceMemberIds(churchId, Number(serviceId), serviceYear.id);
+    const serviceMemberSet = new Set<number>(allServiceMemberIds);
+
+    const SERVANT_ROLES = ['servant', 'class_leader'];
+    const servantRoles = await this.roleModel.findAll({
+      where: { name: { [Op.in]: SERVANT_ROLES } } as any,
+      attributes: ['id'],
+    });
+    const servantRoleIds = servantRoles.map((r) => r.id);
+
+    const excludeIds = await this.getServiceLeaderIds(churchId);
+    if (currentMemberId) excludeIds.push(Number(currentMemberId));
+    const excludeSet = new Set<number>(excludeIds.map(Number));
+
+    const memberRoles = await this.memberRoleModel.findAll({
+      where: { churchId, roleId: servantRoleIds } as any,
+      attributes: ['churchMemberId'],
+      group: ['churchMemberId'],
     });
 
-    return assignments.map((a) => ({
-      id: a.id,
-      churchMemberId: a.churchMemberId,
-      fullName: (a as any).churchMember?.user?.fullName,
-      email: (a as any).churchMember?.user?.email,
-      phone: (a as any).churchMember?.user?.phone,
-      avatarUrl: (a as any).churchMember?.user?.avatarUrl,
-      classId: a.classId,
-      className: (a as any).class?.name || '',
-      leaderRole: a.leaderRole || 'servant',
-    }));
+    const memberIds = memberRoles
+      .map((mr) => Number((mr as any).churchMemberId))
+      .filter((id) => serviceMemberSet.has(id) && !excludeSet.has(id));
+    if (memberIds.length === 0) return [];
+
+    const [members, assignments] = await Promise.all([
+      this.memberModel.findAll({
+        where: { id: memberIds, churchId } as any,
+        include: [{ model: User, attributes: ['id', 'fullName', 'email', 'phone', 'avatarUrl'] }],
+      }),
+      this.servantAssignmentModel.findAll({
+        where: { churchId, serviceId, serviceYearId: serviceYear.id, isActive: true, churchMemberId: memberIds } as any,
+        include: [{ model: Class, attributes: ['id', 'name'] }],
+      }),
+    ]);
+
+    const assignmentMap = new Map<number, any>();
+    for (const a of assignments) assignmentMap.set(Number((a as any).churchMemberId), a);
+
+    return members.map((m) => {
+      const a = assignmentMap.get(Number(m.id));
+      return {
+        id: a ? a.id : null,
+        churchMemberId: m.id,
+        fullName: (m as any).user?.fullName,
+        email: (m as any).user?.email,
+        phone: (m as any).user?.phone,
+        avatarUrl: (m as any).user?.avatarUrl,
+        classId: a ? a.classId : null,
+        className: a ? ((a as any).class?.name || '') : '',
+        leaderRole: a ? (a.leaderRole || 'servant') : null,
+      };
+    });
   }
 
   async updateServantAssignment(churchId: string, id: string, data: { classId?: string; leaderRole?: string }) {

@@ -14,6 +14,7 @@ export default function ActivitiesListScreen({ navigation }: any) {
   const { t } = useLocale();
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -28,6 +29,8 @@ export default function ActivitiesListScreen({ navigation }: any) {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
@@ -58,6 +61,8 @@ export default function ActivitiesListScreen({ navigation }: any) {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="activity" title={t('app.noData')} />
         }

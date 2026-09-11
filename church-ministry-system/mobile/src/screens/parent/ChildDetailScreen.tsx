@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet, RefreshControl } from 'react-native';
 import { childrenApi } from '../../api/children.api';
 import { useLocale } from '../../hooks/useLocale';
 import { AppCard, AppAvatar, AppBadge } from '../../components/ui';
@@ -10,31 +10,43 @@ export default function ChildDetailScreen({ route }: any) {
   const { childId, childName } = route.params || {};
   const [data, setData] = useState<any>({ attendance: null, taio: null, tasks: [], preparations: [] });
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = useCallback(async () => {
+    try {
+      const [attRes, taioRes, taskRes, prepRes] = await Promise.allSettled([
+        childrenApi.getAttendance(childId),
+        childrenApi.getTaioBalance(childId),
+        childrenApi.getTasks(childId),
+        childrenApi.getPreparations(childId),
+      ]);
+      const extract = (res: any, fallback: any = []) =>
+        res?.value?.data?.data || res?.value?.data || fallback;
+      setData({
+        attendance: extract(attRes, null),
+        taio: extract(taioRes, { balance: 0 }),
+        tasks: extract(taskRes, []),
+        preparations: extract(prepRes, []),
+      });
+    } catch (err) {
+      console.warn('Failed to load child data', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [childId]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const [attRes, taioRes, taskRes, prepRes] = await Promise.allSettled([
-          childrenApi.getAttendance(childId),
-          childrenApi.getTaioBalance(childId),
-          childrenApi.getTasks(childId),
-          childrenApi.getPreparations(childId),
-        ]);
-        const extract = (res: any, fallback: any = []) =>
-          res?.value?.data?.data || res?.value?.data || fallback;
-        setData({
-          attendance: extract(attRes, null),
-          taio: extract(taioRes, { balance: 0 }),
-          tasks: extract(taskRes, []),
-          preparations: extract(prepRes, []),
-        });
-      } catch (err) {
-        console.warn('Failed to load child data', err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [childId]);
+    loadData();
+  }, [loadData]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadData]);
 
   if (loading) {
     return <View style={styles.center}><ActivityIndicator size="large" color={colors.charcoal} /></View>;
@@ -47,7 +59,7 @@ export default function ChildDetailScreen({ route }: any) {
     : 0;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
       <View style={styles.header}>
         <AppAvatar name={childName || ''} size={56} />
         <Text style={styles.heading}>{childName}</Text>

@@ -11,6 +11,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { churchApi } from "../../api/church.api";
 import { taioApi } from "../../api/taio.api";
@@ -61,6 +62,7 @@ interface ClassAssignment {
 export default function TaioAwardScreen() {
   const { t } = useLocale();
 
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [classAssignment, setClassAssignment] =
     useState<ClassAssignment | null>(null);
@@ -112,6 +114,15 @@ export default function TaioAwardScreen() {
 
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
   }, [loadData]);
 
   const openAwardModal = (student: Student) => {
@@ -185,8 +196,8 @@ export default function TaioAwardScreen() {
     <View style={styles.root}>
       <ScrollView
         style={styles.scroll}
-        bounces={false}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}
       >
         <AppHeader greetingText={t("award.title")}>
           <View style={styles.classInfoCard}>

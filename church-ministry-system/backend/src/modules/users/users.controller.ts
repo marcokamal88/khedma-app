@@ -46,8 +46,12 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('members/search')
-  async searchMembers(@Query('q') q: string, @CurrentTenant() churchId: string) {
-    return this.usersService.searchMembers(churchId, q || '');
+  async searchMembers(
+    @Query('q') q: string,
+    @Query('serviceId') serviceId: string,
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.usersService.searchMembers(churchId, q || '', serviceId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -102,8 +106,10 @@ export class UsersController {
   async getServantAssignments(
     @Query('serviceId') serviceId: string,
     @CurrentTenant() churchId: string,
+    @Req() req: Request,
   ) {
-    return this.usersService.getServantAssignments(churchId, serviceId);
+    const user = req.user as any;
+    return this.usersService.getServantAssignments(churchId, serviceId, user.memberId);
   }
 
   @UseGuards(JwtAuthGuard)

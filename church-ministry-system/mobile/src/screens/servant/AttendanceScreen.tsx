@@ -11,6 +11,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { attendanceApi } from "../../api/attendance.api";
 import { churchApi } from "../../api/church.api";
@@ -82,6 +83,7 @@ interface MyClassAssignment {
 export default function AttendanceScreen() {
   const { t } = useLocale();
 
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [classAssignment, setClassAssignment] =
     useState<MyClassAssignment | null>(null);
@@ -156,6 +158,15 @@ export default function AttendanceScreen() {
 
   useEffect(() => {
     loadData();
+  }, [loadData]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
   }, [loadData]);
 
   const searchMembers = useCallback(async () => {
@@ -567,8 +578,8 @@ export default function AttendanceScreen() {
     <View style={styles.root}>
       <ScrollView
         style={styles.scroll}
-        bounces={false}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}
       >
         <AppHeader greetingText={t("attendance.title")}>
           <View style={styles.classInfoCard}>

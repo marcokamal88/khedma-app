@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { colors, typography, spacing, borderRadius } from "../../theme";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "success";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "success" | "navy";
 
 interface AppButtonProps {
   title: string;
@@ -56,7 +56,8 @@ export function AppButton({
           color={
             variant === "primary" ||
             variant === "danger" ||
-            variant === "success"
+            variant === "success" ||
+            variant === "navy"
               ? colors.offWhite
               : colors.charcoal
           }
@@ -102,6 +103,9 @@ const styles = StyleSheet.create({
   success: {
     backgroundColor: colors.success,
   },
+  navy: {
+    backgroundColor: colors.navy,
+  },
   disabled: {
     opacity: 0.5,
   },
@@ -118,6 +122,9 @@ const styles = StyleSheet.create({
     color: colors.offWhite,
   },
   successText: {
+    color: colors.offWhite,
+  },
+  navyText: {
     color: colors.offWhite,
   },
   disabledText: {

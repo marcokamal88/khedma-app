@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { taioApi } from '../../api/taio.api';
 import apiClient from '../../api/client';
@@ -11,6 +11,7 @@ export default function StoreScreen() {
   const [items, setItems] = useState<any[]>([]);
   const [balance, setBalance] = useState(0);
   const [serviceYearId, setServiceYearId] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -22,15 +23,16 @@ export default function StoreScreen() {
     })();
   }, []);
 
-  useEffect(() => {
-    const load = async () => {
-      const itemsData: any = await taioApi.getStoreItems();
-      setItems(itemsData?.data || []);
-      const bal: any = await taioApi.getBalance();
-      setBalance(bal?.data?.balance || 0);
-    };
-    load();
+  const loadData = useCallback(async () => {
+    const itemsData: any = await taioApi.getStoreItems();
+    setItems(itemsData?.data || []);
+    const bal: any = await taioApi.getBalance();
+    setBalance(bal?.data?.balance || 0);
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
   const redeem = async (itemId: string) => {
     if (!serviceYearId) {
@@ -80,6 +82,8 @@ export default function StoreScreen() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="shopping-bag" title={t('store.empty') || 'No items'} />
         }

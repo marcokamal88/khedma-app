@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { taioApi } from '../../api/taio.api';
 import { useLocale } from '../../hooks/useLocale';
@@ -9,16 +9,18 @@ export default function TaioBalanceScreen() {
   const { t } = useLocale();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      const bal: any = await taioApi.getBalance();
-      setBalance(bal?.data?.balance || 0);
-      const txs: any = await taioApi.getTransactions();
-      setTransactions(txs?.data || []);
-    };
-    load();
+  const loadData = useCallback(async () => {
+    const bal: any = await taioApi.getBalance();
+    setBalance(bal?.data?.balance || 0);
+    const txs: any = await taioApi.getTransactions();
+    setTransactions(txs?.data || []);
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
   const renderTx = ({ item }: { item: any }) => (
     <AppCard variant="bordered" style={styles.txCard}>
@@ -44,6 +46,8 @@ export default function TaioBalanceScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderTx}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="credit-card" title={t('store.noTransactions') || 'No transactions'} />
         }

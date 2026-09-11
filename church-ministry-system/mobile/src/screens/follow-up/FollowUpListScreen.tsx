@@ -9,6 +9,7 @@ export default function FollowUpListScreen({ navigation }: any) {
   const { t } = useLocale();
   const [followUps, setFollowUps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -23,6 +24,8 @@ export default function FollowUpListScreen({ navigation }: any) {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
   const statusVariant = (s: string) => {
     if (s === 'active') return 'success' as const;
@@ -59,6 +62,8 @@ export default function FollowUpListScreen({ navigation }: any) {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="users" title={t('app.noData')} />
         }

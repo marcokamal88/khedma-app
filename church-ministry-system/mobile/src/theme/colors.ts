@@ -7,6 +7,10 @@ export const colors = {
   mutedGray: '#5f5f5d',
   ink: '#030303',
 
+  // Brand accents
+  navy: '#192f5f',
+  gold: '#d4a843',
+
   // Opacity-driven grays
   charcoal83: 'rgba(28,28,28,0.83)',
   charcoal82: 'rgba(28,28,28,0.82)',

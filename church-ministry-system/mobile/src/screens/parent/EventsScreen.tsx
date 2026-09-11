@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import { eventsApi } from '../../api/events.api';
 import { useLocale } from '../../hooks/useLocale';
 import { AppCard, AppButton, AppBadge, AppEmptyState } from '../../components/ui';
@@ -8,14 +8,16 @@ import { colors, typography, spacing } from '../../theme';
 export default function ParentEventsScreen() {
   const { t } = useLocale();
   const [events, setEvents] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      const data: any = await eventsApi.getAll();
-      setEvents(data?.data || []);
-    };
-    load();
+  const loadData = useCallback(async () => {
+    const data: any = await eventsApi.getAll();
+    setEvents(data?.data || []);
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
   const renderEvent = ({ item }: { item: any }) => (
     <AppCard variant="bordered" style={styles.card}>
@@ -38,6 +40,8 @@ export default function ParentEventsScreen() {
       keyExtractor={(item) => item.id}
       renderItem={renderEvent}
       contentContainerStyle={styles.list}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
       ListEmptyComponent={
         <AppEmptyState icon="calendar" title={t('events.empty') || 'No events'} />
       }

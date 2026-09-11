@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { ChurchService } from './church.service';
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -85,9 +85,21 @@ export class ChurchController {
     return this.churchService.createStageGroup(churchId, body);
   }
 
-  @Roles('priest', 'sector_leader')
+  @Roles('priest', 'sector_leader', 'service_leader', 'assistant_service_leader')
   @Post('classes')
-  async createClass(@Body() body: any, @CurrentTenant() churchId: string) {
-    return this.churchService.createClass(churchId, body);
+  async createClass(@Body() body: any, @CurrentTenant() churchId: string, @Req() req: any) {
+    return this.churchService.createClass(churchId, body, req.user);
+  }
+
+  @Roles('priest', 'sector_leader', 'service_leader', 'assistant_service_leader')
+  @Patch('classes/:id')
+  async updateClass(@Param('id') id: string, @Body() body: any, @CurrentTenant() churchId: string, @Req() req: any) {
+    return this.churchService.updateClass(churchId, id, body, req.user);
+  }
+
+  @Roles('priest', 'sector_leader', 'service_leader', 'assistant_service_leader')
+  @Delete('classes/:id')
+  async deleteClass(@Param('id') id: string, @CurrentTenant() churchId: string, @Req() req: any) {
+    return this.churchService.deleteClass(churchId, id, req.user);
   }
 }

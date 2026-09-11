@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FlatList, StyleSheet, I18nManager } from 'react-native';
 import { useLocale } from '../../hooks/useLocale';
 import { AppListItem, AppEmptyState } from '../../components/ui';
@@ -7,10 +7,15 @@ import { colors, spacing } from '../../theme';
 export default function NotificationsScreen() {
   const { t } = useLocale();
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
+  const loadData = useCallback(async () => {
     setNotifications([]);
   }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await new Promise((r) => setTimeout(r, 500)); await loadData(); setRefreshing(false); }, [loadData]);
 
   const markAsRead = async (id: string) => {
     // TODO: PATCH /notifications/:id/read
@@ -31,6 +36,8 @@ export default function NotificationsScreen() {
       keyExtractor={(item) => item.id}
       renderItem={renderNotification}
       contentContainerStyle={styles.list}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
       ListEmptyComponent={
         <AppEmptyState icon="bell" title={t('notifications.empty')} />
       }

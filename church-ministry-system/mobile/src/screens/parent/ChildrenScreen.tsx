@@ -16,6 +16,7 @@ export default function ChildrenScreen({ navigation }: any) {
   const { t } = useLocale();
   const [children, setChildren] = useState<ChildMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -31,6 +32,8 @@ export default function ChildrenScreen({ navigation }: any) {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await load(); setRefreshing(false); }, [load]);
 
   const renderChild = ({ item }: { item: ChildMember }) => {
     const memberId = item.churchMemberId || item.id;
@@ -62,6 +65,8 @@ export default function ChildrenScreen({ navigation }: any) {
         keyExtractor={(item) => item.id}
         renderItem={renderChild}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="users" title={t('parent.noChildren')} />
         }

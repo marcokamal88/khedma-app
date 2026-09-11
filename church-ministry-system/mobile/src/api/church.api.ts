@@ -17,7 +17,11 @@ export const churchApi = {
     leaderRole?: string;
   }) => apiClient.post('/servant-assignments', data),
   getClasses: (serviceId: string) => apiClient.get(`/services/${serviceId}/classes`),
-  searchMembers: (q: string) => apiClient.get('/members/search', { params: { q } }),
+  createClass: (data: { name: string; capacity?: number | null }) => apiClient.post('/classes', data),
+  updateClass: (id: string, data: { name?: string; capacity?: number | null }) => apiClient.patch(`/classes/${id}`, data),
+  deleteClass: (id: string) => apiClient.delete(`/classes/${id}`),
+  searchMembers: (q: string, serviceId?: string) =>
+    apiClient.get('/members/search', { params: { q, ...(serviceId ? { serviceId } : {}) } }),
   registerMember: (data: {
     fullName: string;
     email?: string;

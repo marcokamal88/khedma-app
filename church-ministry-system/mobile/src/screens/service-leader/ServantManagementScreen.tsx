@@ -7,21 +7,24 @@ import { useLocale } from '../../hooks/useLocale';
 import { useActiveContext } from '../../hooks/useActiveContext';
 import { servantAssignmentsApi } from '../../api/servant-assignments.api';
 import { churchApi } from '../../api/church.api';
-import { AppCard, AppBadge, AppButton, AppEmptyState } from '../../components/ui';
-import { colors, typography } from '../../theme';
+import { AppAvatar, AppCard, AppBadge, AppButton, AppEmptyState } from '../../components/ui';
+import { colors, typography, shadows } from '../../theme';
 
-const NAVY = '#192f5f';
-const CREAM = '#f7f4ed';
-const OFF_WHITE = '#fcfbf8';
-const MUTED = '#5f5f5d';
-const GREEN = '#2e7d32';
+const NAVY = colors.navy;
+const GOLD = colors.gold;
+const CREAM = colors.cream;
+const OFF_WHITE = colors.offWhite;
+const MUTED = colors.mutedGray;
+const GREEN = colors.success;
 
 export default function ServantManagementScreen({ navigation }: any) {
   const { t } = useLocale();
   const { serviceId } = useActiveContext();
+  const serviceIdStr = serviceId != null ? String(serviceId) : undefined;
   const [servants, setServants] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [selected, setSelected] = useState<any>(null);
   const [editClassId, setEditClassId] = useState<string>('');
   const [editRole, setEditRole] = useState<string>('servant');
@@ -36,12 +39,12 @@ export default function ServantManagementScreen({ navigation }: any) {
   const [assignRole, setAssignRole] = useState('servant');
 
   const loadData = useCallback(async () => {
-    if (!serviceId) return;
+    if (!serviceIdStr) return;
     setLoading(true);
     try {
       const [servantsRes, classesRes] = await Promise.all([
-        servantAssignmentsApi.getAll(serviceId),
-        churchApi.getClasses(serviceId),
+        servantAssignmentsApi.getAll(serviceIdStr),
+        churchApi.getClasses(serviceIdStr),
       ]);
       setServants(servantsRes?.data || []);
       setClasses(classesRes?.data || []);
@@ -51,7 +54,13 @@ export default function ServantManagementScreen({ navigation }: any) {
     } finally {
       setLoading(false);
     }
-  }, [serviceId]);
+  }, [serviceIdStr]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }, [loadData]);
 
   useEffect(() => {
     loadData();
@@ -61,6 +70,11 @@ export default function ServantManagementScreen({ navigation }: any) {
     setSelected(item);
     setEditClassId(String(item.classId || ''));
     setEditRole(item.leaderRole || 'servant');
+  };
+
+  const openAssignForMember = (item: any) => {
+    setSelectedMember({ id: item.churchMemberId, fullName: item.fullName, email: item.email, phone: item.phone, avatarUrl: item.avatarUrl });
+    setShowAssign(true);
   };
 
   const closeEdit = () => {
@@ -115,20 +129,20 @@ export default function ServantManagementScreen({ navigation }: any) {
       return;
     }
     try {
-      const res = await churchApi.searchMembers(q.trim());
+      const res = await churchApi.searchMembers(q.trim(), serviceIdStr);
       setSearchResults(res?.data || []);
     } catch {
       setSearchResults([]);
     }
-  }, []);
+  }, [serviceIdStr]);
 
   const handleAssign = async () => {
-    if (!selectedMember || !serviceId) return;
+    if (!selectedMember || !serviceIdStr) return;
     setSaving(true);
     try {
       await servantAssignmentsApi.create({
         churchMemberId: String(selectedMember.id),
-        serviceId,
+        serviceId: serviceIdStr,
         classId: assignClassId,
         leaderRole: assignRole,
       });
@@ -151,28 +165,39 @@ export default function ServantManagementScreen({ navigation }: any) {
     setAssignRole('servant');
   };
 
-  const renderServant = ({ item }: { item: any }) => (
-    <TouchableOpacity onPress={() => openEdit(item)} activeOpacity={0.7}>
-      <AppCard variant="bordered" style={styles.card}>
-        <View style={styles.cardRow}>
-          <View style={styles.cardInfo}>
-            <Text style={styles.name} numberOfLines={1}>{item.fullName}</Text>
-            <View style={styles.badges}>
-              {item.className ? (
-                <AppBadge label={item.className} variant="info" style={styles.badge} />
-              ) : null}
-              <AppBadge
-                label={item.leaderRole === 'class_leader' ? t('servantManagement.classLeader') : t('servantManagement.servant')}
-                variant={item.leaderRole === 'class_leader' ? 'warning' : 'neutral'}
-                style={styles.badge}
-              />
+  const renderServant = ({ item }: { item: any }) => {
+    const isAssigned = !!item.id;
+    const isClassLeader = item.leaderRole === 'class_leader';
+    return (
+      <TouchableOpacity
+        onPress={() => isAssigned ? openEdit(item) : openAssignForMember(item)}
+        activeOpacity={0.7}
+      >
+        <AppCard variant="bordered" style={styles.card}>
+          <View style={styles.cardRow}>
+            <AppAvatar name={item.fullName || ''} size={44} style={styles.avatar} />
+            <View style={styles.cardInfo}>
+              <Text style={styles.name} numberOfLines={1}>{item.fullName}</Text>
+              {isAssigned ? (
+                <View style={styles.cardMetaRow}>
+                  {item.className ? (
+                    <Text style={styles.className} numberOfLines={1}>{item.className}</Text>
+                  ) : null}
+                  <AppBadge
+                    label={isClassLeader ? t('servantManagement.classLeader') : t('servantManagement.servant')}
+                    style={isClassLeader ? styles.badgeGold : styles.badgeNavy}
+                  />
+                </View>
+              ) : (
+                <Text style={styles.notAssigned}>{t('servantManagement.notAssigned')}</Text>
+              )}
             </View>
+            {isAssigned && <Text style={styles.chevron}>{'\u203A'}</Text>}
           </View>
-          <Text style={styles.chevron}>{'\u203A'}</Text>
-        </View>
-      </AppCard>
-    </TouchableOpacity>
-  );
+        </AppCard>
+      </TouchableOpacity>
+    );
+  };
 
   if (loading) {
     return (
@@ -184,8 +209,16 @@ export default function ServantManagementScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <Text style={styles.heading}>{t('servantManagement.title')}</Text>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.headerBtn}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Text style={styles.headerBack}>{'\u2039'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.heading} numberOfLines={1}>{t('servantManagement.title')}</Text>
         <TouchableOpacity
           style={styles.addBtn}
           onPress={() => { resetAssign(); setShowAssign(true); }}
@@ -194,12 +227,15 @@ export default function ServantManagementScreen({ navigation }: any) {
           <Text style={styles.addBtnText}>+</Text>
         </TouchableOpacity>
       </View>
+      <View style={styles.waveContainer} />
 
       <FlatList
         data={servants}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => String(item.churchMemberId)}
         renderItem={renderServant}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="users" title={t('servantManagement.noServants')} />
         }
@@ -281,6 +317,7 @@ export default function ServantManagementScreen({ navigation }: any) {
                   title={t('app.save')}
                   onPress={handleUpdate}
                   loading={saving}
+                  variant="navy"
                   style={styles.saveBtn}
                 />
 
@@ -393,6 +430,7 @@ export default function ServantManagementScreen({ navigation }: any) {
                   onPress={handleAssign}
                   loading={saving}
                   disabled={!assignClassId}
+                  variant="navy"
                 />
               </>
             )}
@@ -404,19 +442,56 @@ export default function ServantManagementScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: CREAM, paddingHorizontal: 16, paddingTop: 16 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  heading: { ...typography.sectionHeading, color: NAVY },
-  addBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: NAVY, alignItems: 'center', justifyContent: 'center' },
-  addBtnText: { fontSize: 22, color: '#ffffff', lineHeight: 24 },
-  list: { gap: 12, paddingBottom: 24 },
-  card: {},
+  container: { flex: 1, backgroundColor: CREAM },
+  header: {
+    backgroundColor: NAVY,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerBack: { fontSize: 24, color: '#ffffff', lineHeight: 26 },
+  heading: { ...typography.subHeading, color: '#ffffff', flex: 1, textAlign: 'center', marginHorizontal: 12 },
+  addBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: GOLD, alignItems: 'center', justifyContent: 'center' },
+  addBtnText: { fontSize: 24, color: '#ffffff', lineHeight: 26, fontWeight: '700' },
+  waveContainer: {
+    height: 30,
+    backgroundColor: NAVY,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    marginBottom: 0,
+  },
+  list: { padding: 16, gap: 12, paddingBottom: 24 },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.card,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   cardRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  avatar: { backgroundColor: NAVY, marginEnd: 12 },
   cardInfo: { flex: 1 },
   name: { ...typography.cardTitle, color: NAVY, marginBottom: 4 },
-  badges: { flexDirection: 'row', gap: 6 },
-  badge: {},
-  chevron: { fontSize: 24, color: MUTED, marginLeft: 8 },
+  cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  className: { ...typography.caption, color: MUTED, flexShrink: 1 },
+  notAssigned: { ...typography.caption, color: MUTED, fontStyle: 'italic' },
+  badgeGold: { backgroundColor: GOLD },
+  badgeNavy: { backgroundColor: NAVY },
+  chevron: { fontSize: 24, color: MUTED, marginStart: 8 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: CREAM },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
@@ -444,7 +519,7 @@ const styles = StyleSheet.create({
   deactivateBtn: { marginTop: 12, alignItems: 'center', paddingVertical: 12 },
   deactivateBtnText: { ...typography.button, color: '#c62828' },
 
-  searchInput: { backgroundColor: CREAM, borderRadius: 12, padding: 12, ...typography.body, color: NAVY, marginBottom: 12 },
+  searchInput: { backgroundColor: CREAM, borderRadius: 28, paddingHorizontal: 16, paddingVertical: 12, ...typography.body, color: NAVY, marginBottom: 12 },
   searchResults: { backgroundColor: CREAM, borderRadius: 12, padding: 8, marginBottom: 12 },
   searchResultItem: { paddingVertical: 10, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#eceae4' },
   searchResultName: { ...typography.body, color: NAVY },

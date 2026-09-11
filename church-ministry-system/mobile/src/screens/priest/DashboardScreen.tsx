@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { useLocale } from '../../hooks/useLocale';
 import { useAuth } from '../../hooks/useAuth';
@@ -18,19 +18,31 @@ export default function PriestDashboard({ navigation }: any) {
   const { activeContext } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = useCallback(async () => {
+    try {
+      const res = await dashboardApi.priestStats();
+      setStats(res.data);
+    } catch {
+      setStats({ totalSectors: 0, totalStudents: 0, totalOpenTasks: 0 });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadData]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await dashboardApi.priestStats();
-        setStats(res.data);
-      } catch {
-        setStats({ totalSectors: 0, totalStudents: 0, totalOpenTasks: 0 });
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    loadData();
+  }, [loadData]);
 
   if (loading) {
     return (
@@ -42,7 +54,7 @@ export default function PriestDashboard({ navigation }: any) {
 
   return (
     <View style={styles.root}>
-      <ScrollView style={styles.scroll} bounces={false}>
+      <ScrollView style={styles.scroll} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
         <AppHeader greetingText={t('home.welcomeBack')}>
           <View style={styles.contextCard}>
             <View style={styles.contextRow}>

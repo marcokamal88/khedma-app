@@ -24,6 +24,7 @@ export default function AchievementsScreen() {
   const [myAchievementIds, setMyAchievementIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -45,6 +46,8 @@ export default function AchievementsScreen() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await load(); setRefreshing(false); }, [load]);
 
   const handleCheckAndAward = async () => {
     try {
@@ -96,6 +99,8 @@ export default function AchievementsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListEmptyComponent={
           <AppEmptyState icon="award" title={t('achievements.empty')} />
         }

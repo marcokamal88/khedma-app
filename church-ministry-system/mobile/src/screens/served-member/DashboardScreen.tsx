@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -27,23 +28,35 @@ export default function ServedMemberDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = useCallback(async () => {
+    try {
+      const [statsRes, tasksRes] = await Promise.all([
+        dashboardApi.memberStats(),
+        dashboardApi.memberTasks(),
+      ]);
+      setStats(statsRes.data);
+      setTasks(tasksRes.data || []);
+    } catch {
+      setStats({ myPoints: 0, openTasks: 0 });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadData]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const [statsRes, tasksRes] = await Promise.all([
-          dashboardApi.memberStats(),
-          dashboardApi.memberTasks(),
-        ]);
-        setStats(statsRes.data);
-        setTasks(tasksRes.data || []);
-      } catch {
-        setStats({ myPoints: 0, openTasks: 0 });
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    loadData();
+  }, [loadData]);
 
   const initials = user?.fullName
     ?.split(' ')
@@ -62,7 +75,7 @@ export default function ServedMemberDashboard() {
 
   return (
     <View style={styles.root}>
-      <ScrollView style={styles.scroll} bounces={false} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
         <View style={styles.headerSection}>
           <View style={styles.headerTop}>
             <TouchableOpacity style={styles.headerBtn} activeOpacity={0.7}>

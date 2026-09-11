@@ -14,6 +14,7 @@ export default function FollowUpDetailScreen({ route, navigation }: any) {
   const { id } = route.params;
   const [followUp, setFollowUp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -28,6 +29,8 @@ export default function FollowUpDetailScreen({ route, navigation }: any) {
   }, [id]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
   const handleStatusChange = async (status: string) => {
     try {
@@ -86,6 +89,8 @@ export default function FollowUpDetailScreen({ route, navigation }: any) {
           </AppCard>
         )}
         contentContainerStyle={styles.list}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ListHeaderComponent={() => (
           <AppButton
             title={`+ ${t('followUp.addActivity')}`}
