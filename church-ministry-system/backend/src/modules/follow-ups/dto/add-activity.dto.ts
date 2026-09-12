@@ -16,5 +16,14 @@ export class AddActivityDto {
   nextActionDate?: string;
 
   @IsNumber()
-  churchMemberId: number;
+  @IsOptional()
+  churchMemberId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  targetMemberId?: number;
+
+  @IsString()
+  @IsOptional()
+  loggedAt?: string;
 }

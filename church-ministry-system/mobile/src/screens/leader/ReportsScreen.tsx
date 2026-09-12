@@ -87,6 +87,31 @@ export default function ReportsScreen() {
     } finally { setDownloading(false); }
   }, [serviceId, from, to, t, report]);
 
+  const downloadTaioExcel = useCallback(async () => {
+    if (!serviceId) { Alert.alert('', t('reports.noService') || 'لا توجد خدمة'); return; }
+    setDownloading(true);
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      const churchId = (await AsyncStorage.getItem('church_id')) || '1';
+      const syRes: any = await apiClient.get('/service-years/current').catch(() => null);
+      const syId = syRes?.data?.id || syRes?.id || '';
+      const base = (apiClient.defaults.baseURL as string) || `http://${Platform.OS === 'android' ? '10.134.143.23' : 'localhost'}:3000/api/v1`;
+      const arb = report?.data?.serviceName || 'الخدمة';
+      const query = new URLSearchParams({ serviceId: String(serviceId), ...(syId ? { serviceYearId: String(syId) } : {}), ...(token ? { token } : {}), churchId: String(churchId) }).toString();
+      const url = `${base}/reports/taio/excel?${query}`;
+      try {
+        const FileSystem: any = require('expo-file-system');
+        const fileName = `طايو_${arb}_${syId || 'current'}.xlsx`;
+        const fileUri = (FileSystem.cacheDirectory || FileSystem.documentDirectory || '') + fileName;
+        const dl: any = await FileSystem.downloadAsync(url, fileUri, { headers: { Authorization: token ? `Bearer ${token}` : '', 'X-Church-ID': churchId } });
+        if (dl.status === 200) { await Linking.openURL(dl.uri); return; }
+      } catch {}
+      await Linking.openURL(url);
+    } catch (e: any) {
+      Alert.alert('', e?.message || t('app.error'));
+    } finally { setDownloading(false); }
+  }, [serviceId, t, report]);
+
   const renderReportContent = () => {
     if (!report) return null;
     const d = report.data;
@@ -114,18 +139,22 @@ export default function ReportsScreen() {
     }
     if (report.type === 'taio') {
       return (
-        <View style={styles.statsGrid}>
-          <Stat label="المشاركون" value={`${d.participants ?? 0}`} />
-          <Stat label="الممنوح" value={`${d.totalAwarded ?? 0}`} color={GOLD} />
-          <Stat label="المستبدل" value={`${d.totalRedeemed ?? 0}`} />
-          {(d.topParticipants || []).slice(0, 3).length > 0 && (
-            <View style={styles.fullRow}>
-              <Text style={styles.sectionLabel}>الأوائل</Text>
-              {d.topParticipants.slice(0, 3).map((p: any, i: number) => (
-                <Text key={i} style={styles.listItem}>#{i + 1} • {p.churchMemberId} — {p.totalPoints} نقطة</Text>
-              ))}
-            </View>
-          )}
+        <View>
+          <View style={styles.statsGrid}>
+            <Stat label="المشاركون" value={`${d.participants ?? 0}`} />
+            <Stat label="الممنوح" value={`${d.totalAwarded ?? 0}`} color={GOLD} />
+            <Stat label="المستبدل" value={`${d.totalRedeemed ?? 0}`} />
+            {(d.topParticipants || []).slice(0, 3).length > 0 && (
+              <View style={styles.fullRow}>
+                <Text style={styles.sectionLabel}>الأوائل</Text>
+                {d.topParticipants.slice(0, 3).map((p: any, i: number) => (
+                  <Text key={i} style={styles.listItem}>#{i + 1} • {p.churchMemberId} — {p.totalPoints} نقطة</Text>
+                ))}
+              </View>
+            )}
+          </View>
+          <AppButton title={downloading ? 'جاري التحميل...' : 'تحميل Excel (طايو مجمّع بالفصول)'} onPress={downloadTaioExcel} variant="navy" size="md" disabled={downloading} style={{ marginTop: 12 }} />
+          <Text style={styles.hint}>الأعمدة: الفصل | الاسم | النوع | إجمالي طايو — ورقة لكل فصل + ملخص.</Text>
         </View>
       );
     }

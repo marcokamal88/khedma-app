@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString, IsEnum } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsEnum, IsArray } from 'class-validator';
 
 export class CreateFollowUpDto {
   @IsNumber()
@@ -6,15 +6,32 @@ export class CreateFollowUpDto {
   serviceYearId?: number;
 
   @IsNumber()
-  servantId: number;
+  @IsOptional()
+  servantId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  responsibleMemberId?: number;
 
   @IsNumber()
   @IsOptional()
   servedMemberId?: number;
 
+  @IsArray()
+  @IsOptional()
+  memberIds?: number[];
+
   @IsNumber()
   @IsOptional()
   serviceId?: number;
+
+  @IsNumber()
+  @IsOptional()
+  classId?: number;
+
+  @IsEnum(['served_member', 'servant'])
+  @IsOptional()
+  targetType?: string;
 
   @IsString()
   @IsOptional()

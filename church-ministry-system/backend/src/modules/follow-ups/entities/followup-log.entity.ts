@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo, PrimaryKey, Auto
 import { FollowupFamily } from './followup-family.entity';
 import { ChurchMember } from '../../users/entities/church-member.entity';
 
-@Table({ tableName: 'followup_logs', timestamps: true })
+@Table({ tableName: 'followup_logs', timestamps: true, paranoid: true })
 export class FollowupLog extends Model {
   @PrimaryKey
   @AutoIncrement
@@ -17,8 +17,19 @@ export class FollowupLog extends Model {
   followupFamilyId: number;
 
   @ForeignKey(() => ChurchMember)
-  @Column({ type: DataType.INTEGER, allowNull: false })
-  churchMemberId: number;
+  @Column({ field: 'target_member_id', type: DataType.INTEGER, allowNull: false })
+  targetMemberId: number;
+
+  // Backward compat alias
+  get churchMemberId(): number { return (this as any).targetMemberId; }
+  set churchMemberId(v: number) { (this as any).targetMemberId = v; }
+
+  @ForeignKey(() => ChurchMember)
+  @Column({ field: 'created_by', type: DataType.INTEGER, allowNull: true })
+  createdBy: number;
+
+  @Column({ field: 'status_at_log', type: DataType.ENUM('active','paused','completed'), allowNull: true })
+  statusAtLog: string;
 
   @Column({ field: 'log_type', type: DataType.ENUM('call','visit','meeting','message','other'), allowNull: false })
   logType: string;
@@ -38,6 +49,12 @@ export class FollowupLog extends Model {
   @BelongsTo(() => FollowupFamily)
   followupFamily: FollowupFamily;
 
-  @BelongsTo(() => ChurchMember)
+  @BelongsTo(() => ChurchMember, 'targetMemberId')
+  target: ChurchMember;
+
+  @BelongsTo(() => ChurchMember, 'targetMemberId')
   churchMember: ChurchMember;
+
+  @BelongsTo(() => ChurchMember, 'createdBy')
+  creator: ChurchMember;
 }
