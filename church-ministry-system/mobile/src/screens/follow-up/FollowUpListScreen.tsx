@@ -53,9 +53,13 @@ export default function FollowUpListScreen({ navigation }: any) {
     const targetCount = item.assignments?.length ?? 0;
     const svcName = item.service?.name || item.class?.name || '';
     const isServantTarget = item.targetType === 'servant';
+    const isActiveThisWeek = mode === 'weekly' && Array.isArray(weekly?.activeGroupIds) && weekly.activeGroupIds.map(Number).includes(Number(item.id));
     return (
       <TouchableOpacity onPress={() => navigation.navigate('FollowUpDetail', { id: item.id })} activeOpacity={0.7}>
         <AppCard variant="bordered" style={styles.card}>
+          {isActiveThisWeek ? (
+            <View style={styles.newBadge}><Text style={styles.newBadgeText}>جديد هذا الأسبوع</Text></View>
+          ) : null}
           <View style={styles.cardHeader}>
             <View style={styles.iconWrap}>
               <Text style={styles.icon}>{isServantTarget ? '👔' : '👥'}</Text>
@@ -75,7 +79,19 @@ export default function FollowUpListScreen({ navigation }: any) {
     );
   };
 
+  const LOG_TYPE_LABELS: Record<string, string> = {
+    call: 'اتصال', visit: 'زيارة', meeting: 'مقابلة', message: 'رسالة', other: 'أخرى',
+  };
+
+  const weeksSince = (dateStr?: string | null) => {
+    if (!dateStr) return null;
+    const d = new Date(dateStr).getTime();
+    if (isNaN(d)) return null;
+    return Math.max(0, Math.floor((Date.now() - d) / (7 * 24 * 3600 * 1000)));
+  };
+
   function WeeklyHeader({ weekly, navigation, t }: { weekly: any; navigation: any; t: any }) {
+    const activity = weekly.recentActivity || [];
     return (
       <View style={styles.weeklyCard}>
         <Text style={styles.weeklyTitle}>متابعتي هذا الأسبوع</Text>
@@ -85,8 +101,36 @@ export default function FollowUpListScreen({ navigation }: any) {
           <View style={[styles.pill, { backgroundColor: '#fce4ec' }]}><Text style={styles.pillText}>متبقي: {(weekly.members || []).filter((m: any) => !m.doneThisWeek).length}</Text></View>
           <View style={[styles.pill, { backgroundColor: '#e3f2fd' }]}><Text style={styles.pillText}>الكل: {(weekly.members || []).length}</Text></View>
         </View>
+        <Text style={styles.feedTitle}>نشاط هذا الأسبوع</Text>
+        {activity.length === 0 ? (
+          <Text style={styles.mutedSmall}>لا يوجد نشاط مسجل هذا الأسبوع</Text>
+        ) : (
+          activity.map((a: any) => (
+            <TouchableOpacity
+              key={String(a.logId)}
+              style={styles.feedRow}
+              onPress={() => navigation.navigate('FollowUpDetail', { id: String(a.familyId) })}
+              activeOpacity={0.7}
+            >
+              <View style={styles.feedIconWrap}>
+                <Text style={styles.feedIcon}>✎</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.feedName} numberOfLines={1}>{a.targetName}{a.familyName ? ` • ${a.familyName}` : ''}</Text>
+                <Text style={styles.feedMeta} numberOfLines={1}>
+                  {LOG_TYPE_LABELS[a.logType] || a.logType} • {String(a.loggedAt || '').split('T')[0]}{a.createdByName ? ` • ${a.createdByName}` : ''}
+                </Text>
+                {!!a.notes && <Text style={styles.feedNotes} numberOfLines={1}>{a.notes}</Text>}
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+          ))
+        )}
+        <Text style={styles.feedTitle}>المخدومون</Text>
         {(weekly.members || []).map((m: any) => {
           const last = m.lastLog;
+          const ever = m.lastEverLog;
+          const everWeeks = !m.doneThisWeek ? weeksSince(ever?.loggedAt) : null;
           return (
             <View key={m.memberId} style={styles.memberRow}>
               <View style={styles.memberTopRow}>
@@ -98,7 +142,7 @@ export default function FollowUpListScreen({ navigation }: any) {
               <Text style={styles.memberMeta} numberOfLines={1} ellipsizeMode="tail">
                 {m.doneThisWeek
                   ? `آخر تواصل: ${last?.logType || ''} ${String(last?.loggedAt || '').split('T')[0]}`
-                  : last ? `آخر تواصل سابق: ${String(last?.loggedAt || '').split('T')[0]}` : 'لم يتم التواصل بعد'}
+                  : ever ? `آخر تواصل سابق: ${String(ever.loggedAt || '').split('T')[0]}${everWeeks != null && everWeeks > 0 ? ` (منذ ${everWeeks} ${everWeeks === 1 ? 'أسبوع' : everWeeks === 2 ? 'أسبوعين' : 'أسابيع'})` : ''}` : 'لم يتم التواصل بعد'}
               </Text>
               <View style={styles.memberActions}>
                 {(m.phones || []).length > 0 && (
@@ -204,6 +248,15 @@ const styles = StyleSheet.create({
   pill: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
   pillText: { ...typography.caption, color: NAVY, fontWeight: '600' },
   mutedSmall: { ...typography.caption, color: MUTED, marginTop: 6, textAlign: 'right' },
+  feedTitle: { ...typography.cardTitle, color: NAVY, marginTop: 10, marginBottom: 4, textAlign: 'right', fontSize: 15 },
+  feedRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border },
+  feedIconWrap: { width: 34, height: 34, borderRadius: 10, backgroundColor: '#e3f2fd', alignItems: 'center', justifyContent: 'center' },
+  feedIcon: { fontSize: 15, color: NAVY },
+  feedName: { ...typography.body, color: NAVY, fontWeight: '700', textAlign: 'right' },
+  feedMeta: { ...typography.caption, color: MUTED, textAlign: 'right', marginTop: 2 },
+  feedNotes: { ...typography.caption, color: MUTED, textAlign: 'right', marginTop: 2, fontStyle: 'italic' },
+  newBadge: { alignSelf: 'flex-start', backgroundColor: GOLD, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 8 },
+  newBadgeText: { ...typography.caption, color: '#ffffff', fontWeight: '700' },
   weeklyRange: { ...typography.caption, color: MUTED, textAlign: 'center', marginBottom: 8 },
   memberRow: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
   memberTopRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 8 },

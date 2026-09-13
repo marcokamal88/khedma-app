@@ -451,7 +451,7 @@ export class FollowUpsService {
     // families for this responsible in current service year (or all)
     const families: any[] = await this.familyModel.findAll({
       where: famWhere,
-      attributes: ['id', 'classId', 'serviceId'],
+      attributes: ['id', 'classId', 'serviceId', 'name'],
     });
     const familyIds = families.map((f: any) => f.id);
     if (familyIds.length === 0) return { weekStart: start.toISOString().split('T')[0], weekEnd: end.toISOString().split('T')[0], assigned: [], completed: [], missing: [] };
@@ -473,15 +473,16 @@ export class FollowUpsService {
         followupFamilyId: { [Op.in]: familyIds },
         loggedAt: { [Op.between]: [start, end] },
       } as any,
-      attributes: ['targetMemberId', 'followupFamilyId', 'loggedAt'],
+      attributes: ['id', 'targetMemberId', 'followupFamilyId', 'loggedAt', 'logType', 'notes', 'nextAction', 'createdBy'],
     });
     // only count logs where target was assigned during log week (already filtered via assignments above, but double-check)
-    const loggedIds = [...new Set(logs.filter((l: any) => {
-      const a = assignments.find((x: any) => Number(x.targetMemberId) === Number(l.targetMemberId) && Number(x.followupFamilyId) === Number(l.followupFamilyId));
+    const isAssignedAt = (targetId: number, familyId: number, at: Date) => {
+      const a = assignments.find((x: any) => Number(x.targetMemberId) === Number(targetId) && Number(x.followupFamilyId) === Number(familyId));
       if (!a) return false;
-      const la = new Date(l.loggedAt);
-      return la >= new Date(a.assignedAt) && (!a.unassignedAt || la < new Date(a.unassignedAt));
-    }).map((l: any) => Number(l.targetMemberId)))];
+      return at >= new Date(a.assignedAt) && (!a.unassignedAt || at < new Date(a.unassignedAt));
+    };
+    const weekLogs = logs.filter((l: any) => isAssignedAt(Number(l.targetMemberId), Number(l.followupFamilyId), new Date(l.loggedAt)));
+    const loggedIds = [...new Set(weekLogs.map((l: any) => Number(l.targetMemberId)))];
 
     const missing = assignedIds.filter((id) => !loggedIds.includes(id));
     // last log per assigned member within the week (for the worklist UI)
@@ -499,6 +500,49 @@ export class FollowUpsService {
       const tid = Number(a.targetMemberId);
       if (!familyByMember.has(tid)) familyByMember.set(tid, Number(a.followupFamilyId));
     }
+    const familyById = new Map<number, any>(families.map((f: any) => [Number(f.id), f]));
+    const memberNameOf = async (tid: number) => {
+      const m: any = await this.memberWithUser(tid);
+      return m?.user?.fullName || `عضو ${tid}`;
+    };
+    // Groups with at least one valid follow-up record this week (activity feed).
+    const activeGroupIds = [...new Set(weekLogs.map((l: any) => Number(l.followupFamilyId)))];
+    // This week's activity feed, newest first (capped for payload size).
+    const feedLogs = [...weekLogs].sort((a: any, b: any) => new Date(b.loggedAt).getTime() - new Date(a.loggedAt).getTime()).slice(0, 50);
+    const creatorIds = [...new Set(feedLogs.map((l: any) => Number((l as any).createdBy)).filter(Boolean))];
+    const creatorRows: any[] = creatorIds.length
+      ? await this.memberModel.findAll({ where: { id: { [Op.in]: creatorIds } } as any, include: [{ model: User, attributes: ['fullName'] }] })
+      : [];
+    const creatorNameById = new Map<number, string>(creatorRows.map((r: any) => [Number(r.id), r?.user?.fullName || `خادم ${r.id}`]));
+    const recentActivity = await Promise.all(
+      feedLogs.map(async (l: any) => ({
+        logId: Number(l.id),
+        logType: (l as any).logType,
+        loggedAt: (l as any).loggedAt,
+        notes: (l as any).notes,
+        nextAction: (l as any).nextAction || null,
+        targetMemberId: Number(l.targetMemberId),
+        targetName: await memberNameOf(Number(l.targetMemberId)),
+        familyId: Number(l.followupFamilyId),
+        familyName: (familyById.get(Number(l.followupFamilyId)) as any)?.name || null,
+        createdByName: (l as any).createdBy ? (creatorNameById.get(Number((l as any).createdBy)) || null) : null,
+      })),
+    );
+    // Most recent contact EVER per assigned member (any week) — lastLog above
+    // stays "this week's log or null"; lastEverLog fills the UI's "previous
+    // contact" line for members missing this week.
+    const allLogs: any[] = await this.logModel.findAll({
+      where: { followupFamilyId: { [Op.in]: familyIds } } as any,
+      attributes: ['targetMemberId', 'followupFamilyId', 'loggedAt', 'logType'],
+      order: [['loggedAt', 'DESC']],
+    });
+    const lastEverByMember = new Map<number, any>();
+    for (const l of allLogs as any[]) {
+      const tid = Number(l.targetMemberId);
+      if (!lastEverByMember.has(tid)) {
+        lastEverByMember.set(tid, { logType: l.logType, loggedAt: l.loggedAt });
+      }
+    }
     const enriched = await Promise.all(
       assignedIds.map(async (tid) => {
         const m: any = await this.memberWithUser(tid);
@@ -509,6 +553,7 @@ export class FollowUpsService {
           phones: m?.phones || [],
           doneThisWeek: loggedIds.includes(tid),
           lastLog: last,
+          lastEverLog: lastEverByMember.get(tid) || null,
           familyId: familyByMember.get(tid) || null,
         };
       }),
@@ -521,6 +566,8 @@ export class FollowUpsService {
       missing,
       members: enriched,
       families: families.map((f: any) => ({ id: f.id, classId: f.classId, serviceId: f.serviceId })),
+      activeGroupIds,
+      recentActivity,
     };
   }
 
