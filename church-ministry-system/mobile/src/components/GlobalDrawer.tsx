@@ -142,17 +142,10 @@ function DrawerContent({
   onNavigate: (screen: string) => void;
   menuConfig?: MenuGroup[];
 }) {
-  const { logout, switchContext } = useAuth();
+  const { logout } = useAuth();
   const { t } = useLocale();
   const user = useSelector((state: RootState) => state.auth.user);
   const activeContext = useSelector((state: RootState) => state.auth.activeContext);
-
-  const initials = user?.fullName
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
 
   const groups = menuConfig || SERVANT_MENU;
 
@@ -167,23 +160,18 @@ function DrawerContent({
             <Text style={styles.profileName}>{user?.fullName}</Text>
             <Text style={styles.profileRole}>{t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}</Text>
           </View>
-          <View style={styles.profileAvatar}>
-            <Text style={styles.profileAvatarText}>{initials}</Text>
-          </View>
         </View>
       </View>
 
       <View style={styles.contextCard}>
-        <View style={styles.contextCardBody}>
-          <View style={styles.contextInfo}>
-            <Text style={styles.contextLabel}>السابق الحالي</Text>
-            <Text style={styles.contextValue}>{t('home.classInfo')}</Text>
-          </View>
-          <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => switchContext({ role: '' })}>
-            <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
-            <Text style={styles.contextSwitchText}>تبديل</Text>
-          </TouchableOpacity>
+        <View style={styles.contextInfo}>
+          <Text style={styles.contextLabel}>السياق الحالي</Text>
+          <Text style={styles.contextValue}>{t('home.classInfo')}</Text>
         </View>
+        <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => onNavigate('ContextSwitcher')}>
+          <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
+          <Text style={styles.contextSwitchText}>تبديل</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -213,14 +201,13 @@ function DrawerContent({
         <View style={styles.toggleRow}>
           <View style={styles.toggleBtn}>
             <Text style={styles.toggleIcon}>{'\uD83C\uDF10'}</Text>
-            <Text style={styles.toggleLabel}>English</Text>
+            <Text style={styles.toggleLabel} numberOfLines={1}>English</Text>
           </View>
           <View style={[styles.toggleBtn, styles.toggleBtnActive]}>
-            <Text style={styles.toggleLabelActive}>عربي</Text>
+            <Text style={styles.toggleLabelActive} numberOfLines={1}>عربي</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.7}>
-          <Text style={styles.logoutIcon}>{'\u2190'}</Text>
           <Text style={styles.logoutLabel}>تسجيل الخروج</Text>
         </TouchableOpacity>
       </View>
@@ -237,7 +224,10 @@ const styles = StyleSheet.create({
   drawer: {
     position: 'absolute',
     top: 0,
-    right: 0,
+    // Logical edge: physical right while the app forces RTL (I18nManager).
+    // Do NOT change back to `right: 0` — under RTL swap it renders on the
+    // physical left. Slide animation (+width → 0) already matches this side.
+    start: 0,
     bottom: 0,
     width: DRAWER_WIDTH,
     backgroundColor: NAVY,
@@ -252,7 +242,8 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   closeBtn: {
-    alignSelf: 'flex-start',
+    // Outer edge of a right-side drawer (physical left under forced RTL).
+    alignSelf: 'flex-end',
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -264,23 +255,12 @@ const styles = StyleSheet.create({
   closeIcon: { fontSize: 16, color: '#ffffff' },
 
   profileRow: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  profileAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.25)',
-  },
-  profileAvatarText: { ...typography.subHeading, color: '#ffffff', fontWeight: '700' },
-  profileTextWrap: { flex: 1, marginRight: 14 },
-  profileName: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700' },
-  profileRole: { ...typography.caption, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
+  profileTextWrap: { flex: 1 },
+  profileName: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700', textAlign: 'right' },
+  profileRole: { ...typography.caption, color: 'rgba(255,255,255,0.5)', marginTop: 2, textAlign: 'right' },
 
   contextCard: {
     marginHorizontal: 20,
@@ -291,23 +271,20 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.12)',
     padding: 14,
   },
-  contextCardBody: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  contextInfo: { flex: 1, marginRight: 10 },
-  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2 },
-  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600' },
+  contextInfo: { marginBottom: 10 },
+  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'right' },
+  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'right' },
   contextSwitchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: GOLD,
     borderRadius: 18,
     paddingHorizontal: 14,
-    paddingVertical: 7,
+    paddingVertical: 9,
+    gap: 6,
   },
-  contextSwitchIcon: { fontSize: 13, color: CHARCOAL, marginRight: 4 },
+  contextSwitchIcon: { fontSize: 13, color: CHARCOAL },
   contextSwitchText: { ...typography.buttonSmall, color: CHARCOAL, fontWeight: '700' },
 
   menuScroll: { flex: 1 },
@@ -324,9 +301,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   menuItem: {
-    flexDirection: 'row-reverse',
+    // Physical RTL row (icon at the right, beside the right-aligned label).
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingVertical: 13,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.05)',
@@ -336,6 +313,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     width: 28,
     textAlign: 'center',
+    marginLeft: 10,
   },
   menuLabel: { ...typography.body, color: '#ffffff', flex: 1, textAlign: 'right' },
 
@@ -368,14 +346,12 @@ const styles = StyleSheet.create({
   toggleLabelActive: { ...typography.buttonSmall, color: '#ffffff', fontWeight: '600' },
 
   logoutBtn: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: CRIMSON,
     borderRadius: 14,
     paddingVertical: 14,
-    gap: 8,
   },
-  logoutIcon: { fontSize: 16, color: '#ffffff' },
   logoutLabel: { ...typography.button, color: '#ffffff', fontWeight: '600' },
 });

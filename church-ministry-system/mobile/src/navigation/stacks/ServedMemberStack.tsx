@@ -7,6 +7,7 @@ import TasksScreen from "../../screens/served-member/TasksScreen";
 import TaioBalanceScreen from "../../screens/served-member/TaioBalanceScreen";
 import NotificationsScreen from "../../screens/shared/NotificationsScreen";
 import StoreScreen from "../../screens/shared/StoreScreen";
+import ContextSwitcherScreen from "../../screens/auth/ContextSwitcherScreen";
 import CustomTabBar from "../CustomTabBar";
 
 const Tab = createBottomTabNavigator();
@@ -27,6 +28,7 @@ export default function ServedMemberStack() {
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
 
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="ContextSwitcher" component={ContextSwitcherScreen} options={{ title: t('auth.switchContext'), tabBarButton: () => null }} />
     </Tab.Navigator>
   );
 }

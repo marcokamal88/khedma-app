@@ -7,6 +7,7 @@ import ReportsScreen from "../../screens/leader/ReportsScreen";
 import NotificationsScreen from "../../screens/shared/NotificationsScreen";
 import FollowUpStack from "./FollowUpStack";
 import AchievementsScreen from "../../screens/achievements/AchievementsScreen";
+import ContextSwitcherScreen from "../../screens/auth/ContextSwitcherScreen";
 import CustomTabBar from "../CustomTabBar";
 
 const Tab = createBottomTabNavigator();
@@ -27,6 +28,7 @@ export default function SectorLeaderStack() {
 
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="Achievements" component={AchievementsScreen} options={{ title: t("achievements.title"), tabBarButton: () => null }} />
+      <Tab.Screen name="ContextSwitcher" component={ContextSwitcherScreen} options={{ title: t('auth.switchContext'), tabBarButton: () => null }} />
     </Tab.Navigator>
   );
 }

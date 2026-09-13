@@ -12,6 +12,7 @@ import FollowUpStack from "./FollowUpStack";
 import LessonLibraryScreen from "../../screens/lesson-library/LessonLibraryScreen";
 import AchievementsScreen from "../../screens/achievements/AchievementsScreen";
 import TaskDetailScreen from "../../screens/servant/TaskDetailScreen";
+import ContextSwitcherScreen from "../../screens/auth/ContextSwitcherScreen";
 import CustomTabBar from "../CustomTabBar";
 
 const Tab = createBottomTabNavigator();
@@ -39,6 +40,7 @@ export default function ServantStack() {
       <Tab.Screen name="Library" component={LessonLibraryScreen} options={{ title: t("tabs.library"), tabBarButton: () => null }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="TaskDetail" component={TaskDetailScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="ContextSwitcher" component={ContextSwitcherScreen} options={{ title: t('auth.switchContext'), tabBarButton: () => null }} />
     </Tab.Navigator>
   );
 }
