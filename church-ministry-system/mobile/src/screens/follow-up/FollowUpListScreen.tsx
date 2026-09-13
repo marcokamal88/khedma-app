@@ -100,16 +100,24 @@ export default function FollowUpListScreen({ navigation }: any) {
   };
 
   function WeeklyHeader({ weekly, navigation, t }: { weekly: any; navigation: any; t: any }) {
+    const [expanded, setExpanded] = useState(false);
     const activity = weekly.recentActivity || [];
     return (
       <View style={styles.weeklyCard}>
-        <Text style={styles.weeklyTitle}>متابعتي هذا الأسبوع</Text>
-        <Text style={[styles.weeklyRange, { writingDirection: 'ltr' }]}>{weekly.weekStart} → {weekly.weekEnd}</Text>
-        <View style={styles.weeklyRow}>
-          <View style={[styles.pill, { backgroundColor: '#e8f5e9' }]}><Text style={styles.pillText}>تم: {(weekly.members || []).filter((m: any) => m.doneThisWeek).length}</Text></View>
-          <View style={[styles.pill, { backgroundColor: '#fce4ec' }]}><Text style={styles.pillText}>متبقي: {(weekly.members || []).filter((m: any) => !m.doneThisWeek).length}</Text></View>
-          <View style={[styles.pill, { backgroundColor: '#e3f2fd' }]}><Text style={styles.pillText}>الكل: {(weekly.members || []).length}</Text></View>
-        </View>
+        <TouchableOpacity onPress={() => setExpanded((v) => !v)} activeOpacity={0.7}>
+          <View style={styles.weeklyTitleRow}>
+            <Text style={styles.weeklyTitle}>متابعتي هذا الأسبوع</Text>
+            <Text style={styles.weeklyChevron}>{expanded ? '⌄' : '›'}</Text>
+          </View>
+          <Text style={[styles.weeklyRange, { writingDirection: 'ltr' }]}>{weekly.weekStart} → {weekly.weekEnd}</Text>
+          <View style={styles.weeklyRow}>
+            <View style={[styles.pill, { backgroundColor: '#e8f5e9' }]}><Text style={styles.pillText}>تم: {(weekly.members || []).filter((m: any) => m.doneThisWeek).length}</Text></View>
+            <View style={[styles.pill, { backgroundColor: '#fce4ec' }]}><Text style={styles.pillText}>متبقي: {(weekly.members || []).filter((m: any) => !m.doneThisWeek).length}</Text></View>
+            <View style={[styles.pill, { backgroundColor: '#e3f2fd' }]}><Text style={styles.pillText}>الكل: {(weekly.members || []).length}</Text></View>
+          </View>
+        </TouchableOpacity>
+        {expanded ? (
+        <>
         <Text style={styles.feedTitle}>نشاط هذا الأسبوع</Text>
         {activity.length === 0 ? (
           <Text style={styles.mutedSmall}>لا يوجد نشاط مسجل هذا الأسبوع</Text>
@@ -176,10 +184,12 @@ export default function FollowUpListScreen({ navigation }: any) {
                     <Text style={styles.logBtnText}>+ تسجيل</Text>
                   </TouchableOpacity>
                 ) : null}
+                </View>
               </View>
-            </View>
-          );
-        })}
+            );
+          })}
+        </>
+        ) : null}
       </View>
     );
   }
@@ -270,7 +280,9 @@ const styles = StyleSheet.create({
   manageBtn: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 10, backgroundColor: GOLD, alignItems: 'center' },
   manageText: { ...typography.buttonSmall, color: '#ffffff', fontWeight: '700' },
   weeklyCard: { marginHorizontal: 16, marginTop: 12, backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 14, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
-  weeklyTitle: { ...typography.cardTitle, color: NAVY, marginBottom: 8, textAlign: 'right' },
+  weeklyTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  weeklyTitle: { ...typography.cardTitle, color: NAVY, marginBottom: 8, textAlign: 'right', flex: 1 },
+  weeklyChevron: { fontSize: 22, color: NAVY, fontWeight: '700', marginLeft: 8 },
   weeklyRow: { flexDirection: 'row-reverse', gap: 8, marginBottom: 6 },
   pill: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20 },
   pillText: { ...typography.caption, color: NAVY, fontWeight: '600' },
