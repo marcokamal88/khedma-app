@@ -7,6 +7,7 @@ import AddActivityScreen from '../../screens/follow-up/AddActivityScreen';
 import CreateFollowUpScreen from '../../screens/follow-up/CreateFollowUpScreen';
 import ManageGroupsScreen from '../../screens/follow-up/ManageGroupsScreen';
 import MonitoringScreen from '../../screens/follow-up/MonitoringScreen';
+import AttentionListScreen from '../../screens/follow-up/AttentionListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function FollowUpStack() {
       <Stack.Screen name="CreateFollowUp" component={CreateFollowUpScreen} options={{ title: t('followUp.new') }} />
       <Stack.Screen name="ManageGroups" component={ManageGroupsScreen} options={{ title: 'إدارة المجموعات' }} />
       <Stack.Screen name="Monitoring" component={MonitoringScreen} options={{ title: 'متابعة الافتقاد' }} />
+      <Stack.Screen name="AttentionList" component={AttentionListScreen} options={{ title: 'يحتاجون متابعة' }} />
     </Stack.Navigator>
   );
 }

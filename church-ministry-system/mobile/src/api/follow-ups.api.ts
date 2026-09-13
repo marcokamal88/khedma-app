@@ -25,7 +25,8 @@ export const followUpsApi = {
     apiClient.get(`/follow-ups/${id}/monitoring`),
   weekly: (params?: { week?: string }) =>
     apiClient.get('/follow-ups/weekly', { params }),
-  reportsServant: (params?: { servantId?: string; week?: string }) =>
+  attention: (params?: { serviceId?: string; classId?: string; weeks?: number }) =>
+    apiClient.get('/follow-ups/attention', { params }),  reportsServant: (params?: { servantId?: string; week?: string }) =>
     apiClient.get('/reports/follow-ups/servant', { params }),
   reportsClass: (params: { classId: string; week?: string }) =>
     apiClient.get('/reports/follow-ups/class', { params }),

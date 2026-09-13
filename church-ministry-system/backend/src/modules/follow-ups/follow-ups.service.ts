@@ -671,6 +671,7 @@ export class FollowUpsService {
     const responsibleByFamily = new Map<number, number>(fams.map((f: any) => [Number(f.id), Number(f.responsibleMemberId)]));
     const lastFollowup = new Map<number, string>();
     const responsibleByMember = new Map<number, number>();
+    const familyByMember = new Map<number, number>();
     if (famIds.length) {
       const assigns: any[] = await this.assignmentModel.findAll({
         where: { followupFamilyId: { [Op.in]: famIds } } as any,
@@ -683,6 +684,7 @@ export class FollowUpsService {
           const rid = responsibleByFamily.get(Number(a.followupFamilyId));
           if (rid) responsibleByMember.set(tid, rid);
         }
+        if (!familyByMember.has(tid)) familyByMember.set(tid, Number(a.followupFamilyId));
       }
       const logs: any[] = await this.logModel.findAll({
         where: { followupFamilyId: { [Op.in]: famIds } } as any,
@@ -712,6 +714,7 @@ export class FollowUpsService {
       flagged.push({
         memberId: tid,
         classId: classByMember.get(tid) || null,
+        familyId: familyByMember.get(tid) || null,
         lastAttendanceDate: att,
         weeksSinceAttendance: weeksSince(att),
         lastFollowupDate: fol,

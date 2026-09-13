@@ -17,6 +17,7 @@ export default function FollowUpListScreen({ navigation }: any) {
   const [mode, setMode] = useState<'weekly' | 'all'>('weekly');
   const [followUps, setFollowUps] = useState<any[]>([]);
   const [weekly, setWeekly] = useState<any>(null);
+  const [attentionCount, setAttentionCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -33,6 +34,14 @@ export default function FollowUpListScreen({ navigation }: any) {
         const res: any = await followUpsApi.getAll(isServiceLeader || isSectorLeader ? { serviceId } as any : {});
         setFollowUps(Array.isArray(res) ? res : res?.data || []);
         setWeekly(null);
+      }
+      // attention warning count (role-scoped by backend); silent on failure
+      try {
+        const att: any = await followUpsApi.attention();
+        const payload = att?.data || att;
+        setAttentionCount(Number(payload?.counts?.total) || 0);
+      } catch {
+        setAttentionCount(null);
       }
     } catch (err) {
       console.error('Failed to load follow-ups:', err);
@@ -209,9 +218,27 @@ export default function FollowUpListScreen({ navigation }: any) {
         refreshing={refreshing}
         onRefresh={onRefresh}
         ListHeaderComponent={
-          mode === 'weekly' && weekly ? (
-            <WeeklyHeader weekly={weekly} navigation={navigation} t={t} />
-          ) : null
+          <>
+            {attentionCount != null && attentionCount > 0 ? (
+              <TouchableOpacity
+                style={styles.attentionCard}
+                onPress={() => navigation.navigate('AttentionList')}
+                activeOpacity={0.8}
+              >
+                <View style={styles.attentionIconWrap}>
+                  <Text style={styles.attentionIcon}>⚠</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.attentionTitle}>{attentionCount} {attentionCount === 1 ? 'مخدوم يحتاج متابعة' : attentionCount === 2 ? 'مخدومان يحتاجان متابعة' : 'مخدومين يحتاجون متابعة'}</Text>
+                  <Text style={styles.attentionSubtitle}>لم يحضروا أو لم تتم متابعتهم منذ أسبوعين أو أكثر — اضغط للعرض</Text>
+                </View>
+                <Text style={styles.chevron}>›</Text>
+              </TouchableOpacity>
+            ) : null}
+            {mode === 'weekly' && weekly ? (
+              <WeeklyHeader weekly={weekly} navigation={navigation} t={t} />
+            ) : null}
+          </>
         }
         ListEmptyComponent={<AppEmptyState icon="users" title={t('app.noData')} />}
       />
@@ -257,6 +284,11 @@ const styles = StyleSheet.create({
   feedNotes: { ...typography.caption, color: MUTED, textAlign: 'right', marginTop: 2, fontStyle: 'italic' },
   newBadge: { alignSelf: 'flex-start', backgroundColor: GOLD, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 8 },
   newBadgeText: { ...typography.caption, color: '#ffffff', fontWeight: '700' },
+  attentionCard: { flexDirection: 'row-reverse', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 12, backgroundColor: '#fdf2f2', borderRadius: 16, borderWidth: 1, borderColor: '#c62828', padding: 14, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
+  attentionIconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#c62828', alignItems: 'center', justifyContent: 'center' },
+  attentionIcon: { fontSize: 20, color: '#ffffff' },
+  attentionTitle: { ...typography.cardTitle, color: '#c62828', textAlign: 'right' },
+  attentionSubtitle: { ...typography.caption, color: MUTED, textAlign: 'right', marginTop: 2 },
   weeklyRange: { ...typography.caption, color: MUTED, textAlign: 'center', marginBottom: 8 },
   memberRow: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border },
   memberTopRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
