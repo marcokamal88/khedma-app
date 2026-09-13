@@ -44,6 +44,21 @@ export class FollowUpsController {
   }
 
   @Roles('servant', 'class_leader', 'service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
+  @Get('attention')
+  async attention(
+    @Query('serviceId') serviceId: string,
+    @Query('classId') classId: string,
+    @Query('weeks') weeks: string,
+    @CurrentTenant() churchId: string,
+    @Req() req: Request,
+  ) {
+    const user = req.user as any;
+    // servants see their own classes; leaders may narrow by service/class.
+    // Placed before ':id' so 'attention' is never swallowed as an id.
+    return this.followUpsService.getAttention(churchId, String(user.memberId), user.roles || [], { serviceId, classId, weeks });
+  }
+
+  @Roles('servant', 'class_leader', 'service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
   @Get(':id')
   async findOne(@Param('id') id: string, @CurrentTenant() churchId: string) {
     return this.followUpsService.findOne(churchId, id);

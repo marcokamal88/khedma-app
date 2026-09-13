@@ -17,6 +17,8 @@ import { ChurchMember } from '../users/entities/church-member.entity';
 import { User } from '../users/entities/user.entity';
 import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 import { MemberProfile } from '../users/entities/member-profile.entity';
+import { AttendanceSession } from '../attendance/entities/attendance-session.entity';
+import { AttendanceRecord } from '../attendance/entities/attendance-record.entity';
 
 @Injectable()
 export class FollowUpsService {
@@ -35,6 +37,8 @@ export class FollowUpsService {
     @InjectModel(User) private userModel: typeof User,
     @InjectModel(ServantAssignment) private servantAssignmentModel: typeof ServantAssignment,
     @InjectModel(MemberProfile) private profileModel: typeof MemberProfile,
+    @InjectModel(AttendanceSession) private attendanceSessionModel: typeof AttendanceSession,
+    @InjectModel(AttendanceRecord) private attendanceRecordModel: typeof AttendanceRecord,
     private sequelize: Sequelize,
   ) {}
 
@@ -568,6 +572,195 @@ export class FollowUpsService {
       families: families.map((f: any) => ({ id: f.id, classId: f.classId, serviceId: f.serviceId })),
       activeGroupIds,
       recentActivity,
+    };
+  }
+
+  /**
+   * Attention list: members not attended or not followed up for `weeks` or more.
+   *
+   * Population is role-scoped: servants (and class leaders) see their own
+   * classes' enrollments; leaders see the requested service/class scope (or
+   * their own service for service leaders, whole church otherwise).
+   * "Attended" = latest present/late attendance record in the current service
+   * year; "followed up" = latest follow-up log in the current service year.
+   * A member is flagged when either date is missing or older than the cutoff.
+   */
+  async getAttention(
+    churchId: string,
+    requesterMemberId: string,
+    roles: string[],
+    filters: { serviceId?: string; classId?: string; weeks?: string },
+  ) {
+    const weeks = Math.min(12, Math.max(1, Number(filters.weeks) || 2));
+    const churchIdNum = Number(churchId);
+    const sy = await this.getCurrentServiceYear(churchId);
+    const syId = sy ? Number((sy as any).id) : null;
+    const cutoff = new Date();
+    cutoff.setHours(0, 0, 0, 0);
+    cutoff.setDate(cutoff.getDate() - weeks * 7);
+    const empty = { weeks, cutoff: cutoff.toISOString().split('T')[0], counts: { notAttended: 0, notFollowedUp: 0, total: 0 }, items: [] as any[] };
+    if (!syId) return empty;
+
+    const isLeader = (roles || []).some((r) => ['service_leader', 'assistant_service_leader', 'sector_leader', 'priest'].includes(r));
+    let classIds: number[] = [];
+    let serviceIds: number[] = [];
+    if (filters.classId) classIds = [Number(filters.classId)];
+    else if (filters.serviceId) serviceIds = [Number(filters.serviceId)];
+    else if (!isLeader) {
+      // servant scope: own active class assignments this year
+      const mine: any[] = await this.servantAssignmentModel.findAll({
+        where: { churchId: churchIdNum, churchMemberId: Number(requesterMemberId), serviceYearId: syId, isActive: true } as any,
+        attributes: ['classId', 'serviceId'],
+      });
+      classIds = [...new Set(mine.map((a: any) => Number(a.classId)).filter(Boolean))];
+      serviceIds = [...new Set(mine.map((a: any) => Number(a.serviceId)).filter(Boolean))];
+    } else {
+      // service leaders default to their own services; others see the church
+      const mine: any[] = await this.servantAssignmentModel.findAll({
+        where: { churchId: churchIdNum, churchMemberId: Number(requesterMemberId), serviceYearId: syId, isActive: true, leaderRole: { [Op.in]: ['service_leader', 'assistant_service_leader'] } } as any,
+        attributes: ['serviceId'],
+      });
+      serviceIds = [...new Set(mine.map((a: any) => Number(a.serviceId)).filter(Boolean))];
+    }
+
+    // population: active enrollments in scope this year
+    const enrollWhere: any = { churchId: churchIdNum, serviceYearId: syId, isActive: true };
+    if (classIds.length) enrollWhere.classId = { [Op.in]: classIds };
+    else if (serviceIds.length) enrollWhere.serviceId = { [Op.in]: serviceIds };
+    const enrollments: any[] = await this.enrollmentModel.findAll({
+      where: enrollWhere,
+      attributes: ['churchMemberId', 'classId'],
+    });
+    const memberIds = [...new Set(enrollments.map((e: any) => Number(e.churchMemberId)))];
+    if (!memberIds.length) return empty;
+    const classByMember = new Map<number, number>();
+    for (const e of enrollments as any[]) {
+      if (!classByMember.has(Number(e.churchMemberId)) && e.classId) {
+        classByMember.set(Number(e.churchMemberId), Number(e.classId));
+      }
+    }
+
+    // latest attended session date per member (present/late only)
+    const sessions: any[] = await this.attendanceSessionModel.findAll({
+      where: { churchId: churchIdNum, serviceYearId: syId, ...(classIds.length ? { classId: { [Op.in]: classIds } } : {}), ...(serviceIds.length && !classIds.length ? { serviceId: { [Op.in]: serviceIds } } : {}) } as any,
+      attributes: ['id', 'sessionDate'],
+    });
+    const sessionDateById = new Map<number, string>(sessions.map((s: any) => [Number(s.id), String(s.sessionDate)]));
+    const sessionIds = [...sessionDateById.keys()];
+    const lastAttendance = new Map<number, string>();
+    if (sessionIds.length) {
+      const records: any[] = await this.attendanceRecordModel.findAll({
+        where: { attendanceSessionId: { [Op.in]: sessionIds }, churchMemberId: { [Op.in]: memberIds }, status: { [Op.in]: ['present', 'late'] } } as any,
+        attributes: ['churchMemberId', 'attendanceSessionId'],
+        raw: true,
+      });
+      for (const r of records as any[]) {
+        const d = sessionDateById.get(Number(r.attendanceSessionId));
+        if (!d) continue;
+        const tid = Number(r.churchMemberId);
+        if (!lastAttendance.has(tid) || d > (lastAttendance.get(tid) as string)) lastAttendance.set(tid, d);
+      }
+    }
+
+    // latest follow-up log per member (current-year families)
+    const fams: any[] = await this.familyModel.findAll({
+      where: { churchId: churchIdNum, serviceYearId: syId, ...(classIds.length ? { classId: { [Op.in]: classIds } } : {}), ...(serviceIds.length && !classIds.length ? { serviceId: { [Op.in]: serviceIds } } : {}) } as any,
+      attributes: ['id', 'responsibleMemberId'],
+    });
+    const famIds = fams.map((f: any) => Number(f.id));
+    const responsibleByFamily = new Map<number, number>(fams.map((f: any) => [Number(f.id), Number(f.responsibleMemberId)]));
+    const lastFollowup = new Map<number, string>();
+    const responsibleByMember = new Map<number, number>();
+    if (famIds.length) {
+      const assigns: any[] = await this.assignmentModel.findAll({
+        where: { followupFamilyId: { [Op.in]: famIds } } as any,
+        attributes: ['targetMemberId', 'followupFamilyId'],
+        paranoid: false,
+      });
+      for (const a of assigns as any[]) {
+        const tid = Number(a.targetMemberId);
+        if (!responsibleByMember.has(tid)) {
+          const rid = responsibleByFamily.get(Number(a.followupFamilyId));
+          if (rid) responsibleByMember.set(tid, rid);
+        }
+      }
+      const logs: any[] = await this.logModel.findAll({
+        where: { followupFamilyId: { [Op.in]: famIds } } as any,
+        attributes: ['targetMemberId', 'loggedAt'],
+        order: [['loggedAt', 'DESC']],
+      });
+      for (const l of logs as any[]) {
+        const tid = Number(l.targetMemberId);
+        if (!lastFollowup.has(tid) && memberIds.includes(tid)) {
+          lastFollowup.set(tid, new Date(l.loggedAt).toISOString().split('T')[0]);
+        }
+      }
+    }
+
+    const dayMs = 24 * 3600 * 1000;
+    const weeksSince = (dateStr?: string | null) => {
+      if (!dateStr) return null;
+      return Math.floor((Date.now() - new Date(dateStr).getTime()) / (7 * dayMs));
+    };
+    const flagged: any[] = [];
+    for (const tid of memberIds) {
+      const att = lastAttendance.get(tid) || null;
+      const fol = lastFollowup.get(tid) || null;
+      const attStale = !att || new Date(att) < cutoff;
+      const folStale = !fol || new Date(fol) < cutoff;
+      if (!attStale && !folStale) continue;
+      flagged.push({
+        memberId: tid,
+        classId: classByMember.get(tid) || null,
+        lastAttendanceDate: att,
+        weeksSinceAttendance: weeksSince(att),
+        lastFollowupDate: fol,
+        weeksSinceFollowup: weeksSince(fol),
+        responsibleMemberId: responsibleByMember.get(tid) || null,
+        reasons: [...(attStale ? ['attendance'] : []), ...(folStale ? ['followup'] : [])],
+      });
+    }
+    // worst first: missing entirely, then longest silence
+    flagged.sort((a: any, b: any) => {
+      const worst = (x: any) => Math.max(x.weeksSinceAttendance ?? 999, x.weeksSinceFollowup ?? 999);
+      return worst(b) - worst(a);
+    });
+
+    // enrich flagged only (capped)
+    const classRows: any[] = await this.classModel.findAll({
+      where: { id: { [Op.in]: [...new Set(flagged.map((f: any) => f.classId).filter(Boolean))] } } as any,
+      attributes: ['id', 'name'],
+    }).catch(() => []);
+    const classNameById = new Map<number, string>(classRows.map((c: any) => [Number(c.id), c.name]));
+    const servantIds = [...new Set(flagged.map((f: any) => f.responsibleMemberId).filter(Boolean))];
+    const servantRows: any[] = servantIds.length
+      ? await this.memberModel.findAll({ where: { id: { [Op.in]: servantIds } } as any, include: [{ model: User, attributes: ['fullName'] }] })
+      : [];
+    const servantNameById = new Map<number, string>();
+    for (const r of servantRows as any[]) {
+      if (r?.user?.fullName) servantNameById.set(Number(r.id), r.user.fullName);
+    }
+    const items = await Promise.all(
+      flagged.slice(0, 200).map(async (f: any) => {
+        const m: any = await this.memberWithUser(Number(f.memberId));
+        return {
+          ...f,
+          fullName: m?.user?.fullName || `عضو ${f.memberId}`,
+          phones: m?.phones || [],
+          className: (f.classId && classNameById.get(Number(f.classId))) || null,
+          servantName: (f.responsibleMemberId && servantNameById.get(Number(f.responsibleMemberId))) || null,
+        };
+      }),
+    );
+    return {
+      weeks,
+      cutoff: cutoff.toISOString().split('T')[0],
+      counts: {
+        notAttended: flagged.filter((f: any) => f.reasons.includes('attendance')).length,
+        notFollowedUp: flagged.filter((f: any) => f.reasons.includes('followup')).length,
+        total: flagged.length,
+      },
+      items,
     };
   }
 
