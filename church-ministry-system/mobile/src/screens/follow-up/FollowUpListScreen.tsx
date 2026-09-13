@@ -107,7 +107,7 @@ export default function FollowUpListScreen({ navigation }: any) {
         <TouchableOpacity onPress={() => setExpanded((v) => !v)} activeOpacity={0.7}>
           <View style={styles.weeklyTitleRow}>
             <Text style={styles.weeklyTitle}>متابعتي هذا الأسبوع</Text>
-            <Text style={styles.weeklyChevron}>{expanded ? '⌄' : '›'}</Text>
+            <Text style={styles.weeklyChevron}>{expanded ? '⌄' : '^'}</Text>
           </View>
           <Text style={[styles.weeklyRange, { writingDirection: 'ltr' }]}>{weekly.weekStart} → {weekly.weekEnd}</Text>
           <View style={styles.weeklyRow}>
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   tabTextActive: { color: '#ffffff' },
   manageBtn: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 10, backgroundColor: GOLD, alignItems: 'center' },
   manageText: { ...typography.buttonSmall, color: '#ffffff', fontWeight: '700' },
-  weeklyCard: { marginHorizontal: 16, marginTop: 12, backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 14, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
+  weeklyCard: { marginTop: 12, backgroundColor: '#ffffff', borderRadius: 16, borderWidth: 1, borderColor: colors.border, padding: 14, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
   weeklyTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
   weeklyTitle: { ...typography.cardTitle, color: NAVY, marginBottom: 8, textAlign: 'right', flex: 1 },
   weeklyChevron: { fontSize: 22, color: NAVY, fontWeight: '700', marginLeft: 8 },
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   feedNotes: { ...typography.caption, color: MUTED, textAlign: 'right', marginTop: 2, fontStyle: 'italic' },
   newBadge: { alignSelf: 'flex-start', backgroundColor: GOLD, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 8 },
   newBadgeText: { ...typography.caption, color: '#ffffff', fontWeight: '700' },
-  attentionCard: { flexDirection: 'row-reverse', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 12, backgroundColor: '#fdf2f2', borderRadius: 16, borderWidth: 1, borderColor: '#c62828', padding: 14, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
+  attentionCard: { flexDirection: 'row-reverse', alignItems: 'center', gap: 12, marginTop: 12, backgroundColor: '#fdf2f2', borderRadius: 16, borderWidth: 1, borderColor: '#c62828', padding: 14, ...shadows.card, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
   attentionIconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#c62828', alignItems: 'center', justifyContent: 'center' },
   attentionIcon: { fontSize: 20, color: '#ffffff' },
   attentionTitle: { ...typography.cardTitle, color: '#c62828', textAlign: 'right' },
