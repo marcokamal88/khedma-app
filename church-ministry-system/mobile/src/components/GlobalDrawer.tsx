@@ -189,8 +189,8 @@ function DrawerContent({
                 activeOpacity={0.7}
                 onPress={() => onNavigate(item.key)}
               >
-                <Text style={styles.menuIcon}>{item.icon}</Text>
                 <Text style={styles.menuLabel}>{item.label}</Text>
+                <Text style={styles.menuIcon}>{item.icon}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -255,16 +255,22 @@ const styles = StyleSheet.create({
   closeIcon: { fontSize: 16, color: '#ffffff' },
 
   profileRow: {
+    // Right-anchored by packing (not flex): packs the text block at the
+    // row start = physical right under RTL. `direction` pins this even if
+    // the global RTL flag ever changes.
     flexDirection: 'row',
+    direction: 'rtl',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  profileTextWrap: { flex: 1 },
+  profileTextWrap: {},
   profileName: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700', textAlign: 'right' },
   profileRole: { ...typography.caption, color: 'rgba(255,255,255,0.5)', marginTop: 2, textAlign: 'right' },
 
   contextCard: {
     marginHorizontal: 20,
     marginBottom: 8,
+    direction: 'rtl',
     backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 14,
     borderWidth: 1,
@@ -301,9 +307,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   menuItem: {
-    // Physical RTL row (icon at the right, beside the right-aligned label).
+    // Label first = rightmost under RTL; icon sits immediately left of it.
+    // No flex anywhere, so label/icon are always adjacent — a gap between
+    // them is structurally impossible (flex:1 + textAlign proved unreliable).
     flexDirection: 'row',
+    direction: 'rtl',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    gap: 12,
     paddingVertical: 13,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.05)',
@@ -311,11 +322,9 @@ const styles = StyleSheet.create({
   menuIcon: {
     fontSize: 18,
     color: 'rgba(255,255,255,0.7)',
-    width: 28,
     textAlign: 'center',
-    marginLeft: 10,
   },
-  menuLabel: { ...typography.body, color: '#ffffff', flex: 1, textAlign: 'right' },
+  menuLabel: { ...typography.body, color: '#ffffff', textAlign: 'right' },
 
   footer: {
     paddingHorizontal: 20,
