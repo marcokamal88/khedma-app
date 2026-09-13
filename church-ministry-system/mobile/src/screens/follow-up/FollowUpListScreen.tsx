@@ -75,6 +75,62 @@ export default function FollowUpListScreen({ navigation }: any) {
     );
   };
 
+  function WeeklyHeader({ weekly, navigation, t }: { weekly: any; navigation: any; t: any }) {
+    return (
+      <View style={styles.weeklyCard}>
+        <Text style={styles.weeklyTitle}>متابعتي هذا الأسبوع</Text>
+        <Text style={[styles.weeklyRange, { writingDirection: 'ltr' }]}>{weekly.weekStart} → {weekly.weekEnd}</Text>
+        <View style={styles.weeklyRow}>
+          <View style={[styles.pill, { backgroundColor: '#e8f5e9' }]}><Text style={styles.pillText}>تم: {(weekly.members || []).filter((m: any) => m.doneThisWeek).length}</Text></View>
+          <View style={[styles.pill, { backgroundColor: '#fce4ec' }]}><Text style={styles.pillText}>متبقي: {(weekly.members || []).filter((m: any) => !m.doneThisWeek).length}</Text></View>
+          <View style={[styles.pill, { backgroundColor: '#e3f2fd' }]}><Text style={styles.pillText}>الكل: {(weekly.members || []).length}</Text></View>
+        </View>
+        {(weekly.members || []).map((m: any) => {
+          const last = m.lastLog;
+          return (
+            <View key={m.memberId} style={styles.memberRow}>
+              <View style={styles.memberTopRow}>
+                <Text style={styles.memberName} numberOfLines={1} ellipsizeMode="tail">{m.fullName}</Text>
+                {m.doneThisWeek ? (
+                  <View style={[styles.pill, { backgroundColor: '#e8f5e9' }]}><Text style={styles.pillText}>تم ✓</Text></View>
+                ) : null}
+              </View>
+              <Text style={styles.memberMeta} numberOfLines={1} ellipsizeMode="tail">
+                {m.doneThisWeek
+                  ? `آخر تواصل: ${last?.logType || ''} ${String(last?.loggedAt || '').split('T')[0]}`
+                  : last ? `آخر تواصل سابق: ${String(last?.loggedAt || '').split('T')[0]}` : 'لم يتم التواصل بعد'}
+              </Text>
+              <View style={styles.memberActions}>
+                {(m.phones || []).length > 0 && (
+                  <TouchableOpacity
+                    style={styles.callBtn}
+                    onPress={() => {
+                      const nums: string[] = m.phones || [];
+                      if (nums.length === 1) Linking.openURL(`tel:${nums[0]}`);
+                      else Alert.alert('اتصال', 'اختر الرقم', nums.map((n: string) => ({ text: n, onPress: () => Linking.openURL(`tel:${n}`) })).concat([{ text: 'إلغاء', style: 'cancel' } as any]));
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.callBtnText}>📞 {(m.phones || [])[0]}</Text>
+                  </TouchableOpacity>
+                )}
+                {!m.doneThisWeek && m.familyId ? (
+                  <TouchableOpacity
+                    style={styles.logBtn}
+                    onPress={() => navigation.navigate('AddActivity', { followUpId: String(m.familyId), targetMemberId: Number(m.memberId) })}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.logBtnText}>+ تسجيل</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
+          );
+        })}
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -101,60 +157,6 @@ export default function FollowUpListScreen({ navigation }: any) {
         )}
       </View>
 
-      {mode === 'weekly' && weekly && (
-        <View style={styles.weeklyCard}>
-          <Text style={styles.weeklyTitle}>متابعتي هذا الأسبوع</Text>
-          <Text style={[styles.weeklyRange, { writingDirection: 'ltr' }]}>{weekly.weekStart} → {weekly.weekEnd}</Text>
-          <View style={styles.weeklyRow}>
-            <View style={[styles.pill, { backgroundColor: '#e8f5e9' }]}><Text style={styles.pillText}>تم: {(weekly.members || []).filter((m: any) => m.doneThisWeek).length}</Text></View>
-            <View style={[styles.pill, { backgroundColor: '#fce4ec' }]}><Text style={styles.pillText}>متبقي: {(weekly.members || []).filter((m: any) => !m.doneThisWeek).length}</Text></View>
-            <View style={[styles.pill, { backgroundColor: '#e3f2fd' }]}><Text style={styles.pillText}>الكل: {(weekly.members || []).length}</Text></View>
-          </View>
-          {(weekly.members || []).map((m: any) => {
-            const last = m.lastLog;
-            return (
-              <View key={m.memberId} style={styles.memberRow}>
-                <View style={styles.memberTopRow}>
-                  <Text style={styles.memberName} numberOfLines={1} ellipsizeMode="tail">{m.fullName}</Text>
-                  {m.doneThisWeek ? (
-                    <View style={[styles.pill, { backgroundColor: '#e8f5e9' }]}><Text style={styles.pillText}>تم ✓</Text></View>
-                  ) : null}
-                </View>
-                <Text style={styles.memberMeta} numberOfLines={1} ellipsizeMode="tail">
-                  {m.doneThisWeek
-                    ? `آخر تواصل: ${last?.logType || ''} ${String(last?.loggedAt || '').split('T')[0]}`
-                    : last ? `آخر تواصل سابق: ${String(last?.loggedAt || '').split('T')[0]}` : 'لم يتم التواصل بعد'}
-                </Text>
-                <View style={styles.memberActions}>
-                  {(m.phones || []).length > 0 && (
-                    <TouchableOpacity
-                      style={styles.callBtn}
-                      onPress={() => {
-                        const nums: string[] = m.phones || [];
-                        if (nums.length === 1) Linking.openURL(`tel:${nums[0]}`);
-                        else Alert.alert('اتصال', 'اختر الرقم', nums.map((n: string) => ({ text: n, onPress: () => Linking.openURL(`tel:${n}`) })).concat([{ text: 'إلغاء', style: 'cancel' } as any]));
-                      }}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.callBtnText}>📞 {(m.phones || [])[0]}</Text>
-                    </TouchableOpacity>
-                  )}
-                  {!m.doneThisWeek && m.familyId ? (
-                    <TouchableOpacity
-                      style={styles.logBtn}
-                      onPress={() => navigation.navigate('AddActivity', { followUpId: String(m.familyId), targetMemberId: Number(m.memberId) })}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.logBtnText}>+ تسجيل</Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-              </View>
-            );
-          })}
-        </View>
-      )}
-
       <FlatList
         data={followUps}
         keyExtractor={(item) => String(item.id)}
@@ -162,6 +164,11 @@ export default function FollowUpListScreen({ navigation }: any) {
         contentContainerStyle={styles.list}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        ListHeaderComponent={
+          mode === 'weekly' && weekly ? (
+            <WeeklyHeader weekly={weekly} navigation={navigation} t={t} />
+          ) : null
+        }
         ListEmptyComponent={<AppEmptyState icon="users" title={t('app.noData')} />}
       />
       {(() => {
