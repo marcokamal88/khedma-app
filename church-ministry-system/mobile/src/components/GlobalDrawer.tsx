@@ -198,7 +198,7 @@ function DrawerContent({
       </ScrollView>
 
       <View style={styles.footer}>
-        <View style={styles.toggleRow}>
+        {/* <View style={styles.toggleRow}>
           <View style={styles.toggleBtn}>
             <Text style={styles.toggleIcon}>{'\uD83C\uDF10'}</Text>
             <Text style={styles.toggleLabel} numberOfLines={1}>English</Text>
@@ -206,7 +206,7 @@ function DrawerContent({
           <View style={[styles.toggleBtn, styles.toggleBtnActive]}>
             <Text style={styles.toggleLabelActive} numberOfLines={1}>عربي</Text>
           </View>
-        </View>
+        </View> */}
         <TouchableOpacity style={styles.logoutBtn} onPress={logout} activeOpacity={0.7}>
           <Text style={styles.logoutLabel}>تسجيل الخروج</Text>
         </TouchableOpacity>
@@ -278,8 +278,8 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   contextInfo: { marginBottom: 10 },
-  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'right' },
-  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'right' },
+  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'left' },
+  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'left' },
   contextSwitchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     // them is structurally impossible (flex:1 + textAlign proved unreliable).
     flexDirection: 'row',
     direction: 'rtl',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     gap: 12,
     paddingVertical: 13,
