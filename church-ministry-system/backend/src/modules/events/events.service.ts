@@ -4,6 +4,7 @@ import { Event } from './entities/event.entity';
 import { EventRegistration } from './entities/event-registration.entity';
 import { PaymentInstallment } from './entities/payment-installment.entity';
 import { Sequelize } from 'sequelize-typescript';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class EventsService {
@@ -11,8 +12,15 @@ export class EventsService {
     @InjectModel(Event) private eventModel: typeof Event,
     @InjectModel(EventRegistration) private regModel: typeof EventRegistration,
     @InjectModel(PaymentInstallment) private paymentModel: typeof PaymentInstallment,
+    private notifService: NotificationsService,
     private sequelize: Sequelize,
   ) {}
+
+  /** In-app notification that never fails the calling operation. */
+  private notify(n: { churchId: string; churchMemberId: string; title: string; body: string; type: string; sourceType?: string; sourceId?: string }) {
+    if (!n.churchMemberId) return;
+    this.notifService.send(n).catch(() => {});
+  }
 
   async create(churchId: string, data: Partial<Event>, createdBy: string) {
     return this.eventModel.create({ ...data, churchId, createdBy } as any);
@@ -49,7 +57,7 @@ export class EventsService {
     });
     if (existing) throw new BadRequestException('Already registered');
 
-    return this.regModel.create({
+    const created = await this.regModel.create({
       churchId,
       eventId,
       churchMemberId: memberId,
@@ -57,6 +65,16 @@ export class EventsService {
       paidAmount: 0,
       status: 'registered',
     } as any);
+    this.notify({
+      churchId,
+      churchMemberId: String(memberId),
+      title: 'تم التسجيل في فعالية',
+      body: `تم تسجيلك في: ${(event as any).name || ''}`.trim(),
+      type: 'event',
+      sourceType: 'event',
+      sourceId: String(eventId),
+    });
+    return created;
   }
 
   async cancelRegistration(churchId: string, eventId: string, memberId: string) {
@@ -109,6 +127,15 @@ export class EventsService {
       );
 
       await transaction.commit();
+      this.notify({
+        churchId,
+        churchMemberId: String((reg as any).churchMemberId),
+        title: 'تم تسجيل دفعة مالية',
+        body: `تم تسجيل دفعة بمبلغ ${data.amount}`,
+        type: 'payment',
+        sourceType: 'payment',
+        sourceId: String(registrationId),
+      });
       return installment;
     } catch (error) {
       await transaction.rollback();

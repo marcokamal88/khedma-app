@@ -2,13 +2,24 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Task } from './entities/task.entity';
 import { TaskAssignment } from './entities/task-assignment.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task) private taskModel: typeof Task,
     @InjectModel(TaskAssignment) private assignmentModel: typeof TaskAssignment,
+    private notifService: NotificationsService,
   ) {}
+
+  /**
+   * In-app notification that never fails the calling operation.
+   * Push delivery (Phase B) rides on the same stored rows.
+   */
+  private notify(n: { churchId: string; churchMemberId: string; title: string; body: string; type: string; sourceType?: string; sourceId?: string }) {
+    if (!n.churchMemberId) return;
+    this.notifService.send(n).catch(() => {});
+  }
 
   async create(churchId: string, data: Partial<Task>, assignedBy: string) {
     return this.taskModel.create({
@@ -71,6 +82,15 @@ export class TasksService {
           status: 'pending',
         } as any);
         assignments.push(assignment);
+        this.notify({
+          churchId,
+          churchMemberId: String(memberId),
+          title: 'مهمة جديدة',
+          body: `تم إسناد مهمة إليك: ${(task as any).title || ''}`.trim(),
+          type: 'task',
+          sourceType: 'task',
+          sourceId: String(taskId),
+        });
       }
     }
 
@@ -96,7 +116,21 @@ export class TasksService {
       completedAt: new Date(),
     } as any, { where: { id: assignment.id } });
 
-    return this.assignmentModel.findOne({ where: { id: assignment.id } });
+    const done = await this.assignmentModel.findOne({ where: { id: assignment.id } });
+    // tell the assigner (skip self-noise when assigner completes own task)
+    const task: any = await this.taskModel.findOne({ where: { id: taskId }, attributes: ['id', 'title', 'assignedBy'] });
+    if (task && Number(task.assignedBy) !== Number(memberId)) {
+      this.notify({
+        churchId,
+        churchMemberId: String(task.assignedBy),
+        title: 'تم إنجاز مهمة',
+        body: `أنجز الخادم المهمة: ${task.title || ''}`.trim(),
+        type: 'task',
+        sourceType: 'task',
+        sourceId: String(taskId),
+      });
+    }
+    return done;
   }
 
   async verifyTask(churchId: string, taskId: string, memberId: string, verifierId: string) {
@@ -111,6 +145,16 @@ export class TasksService {
       completedAt: new Date(),
     } as any, { where: { id: assignment.id } });
 
-    return this.assignmentModel.findOne({ where: { id: assignment.id } });
+    const verified = await this.assignmentModel.findOne({ where: { id: assignment.id } });
+    this.notify({
+      churchId,
+      churchMemberId: String(memberId),
+      title: 'تم اعتماد مهمتك',
+      body: 'راجع القائد المهمة المنجزة واعتمدها',
+      type: 'task',
+      sourceType: 'task',
+      sourceId: String(taskId),
+    });
+    return verified;
   }
 }

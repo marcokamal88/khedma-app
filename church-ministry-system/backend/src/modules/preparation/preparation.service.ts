@@ -7,6 +7,7 @@ import { ChurchMember } from '../users/entities/church-member.entity';
 import { User } from '../users/entities/user.entity';
 import { ServiceYear } from '../service-year/entities/service-year.entity';
 import { ServantAssignment } from '../users/entities/servant-assignment.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PreparationService {
@@ -16,7 +17,14 @@ export class PreparationService {
     @InjectModel(PreparationComment) private commentModel: typeof PreparationComment,
     @InjectModel(ServiceYear) private serviceYearModel: typeof ServiceYear,
     @InjectModel(ServantAssignment) private assignmentModel: typeof ServantAssignment,
+    private notifService: NotificationsService,
   ) {}
+
+  /** In-app notification that never fails the calling operation. */
+  private notify(n: { churchId: string; churchMemberId: string; title: string; body: string; type: string; sourceType?: string; sourceId?: string }) {
+    if (!n.churchMemberId) return;
+    this.notifService.send(n).catch(() => {});
+  }
 
   private defaultIncludes = [
     { model: PreparationFile },
@@ -108,7 +116,22 @@ export class PreparationService {
       reviewNotes: data.reviewNotes,
       reviewedAt: new Date(),
     } as any, { where: { id } });
-    return this.findOne(churchId, id);
+    const reviewed = await this.findOne(churchId, id);
+    // tell the servant (skip self-review noise); 'general' until the
+    // notifications ENUM gains a preparation value (needs a migration).
+    if (Number((prep as any).servantId) !== Number(reviewerId)) {
+      const approved = String(data.status).toLowerCase() === 'approved';
+      this.notify({
+        churchId: String(churchId),
+        churchMemberId: String((prep as any).servantId),
+        title: approved ? 'تم اعتماد التحضير' : 'تم رفض التحضير',
+        body: `${(prep as any).title || ''}${data.reviewNotes ? ` — ملاحظة المراجع: ${data.reviewNotes}` : ''}`.trim(),
+        type: 'general',
+        sourceType: 'preparation',
+        sourceId: String(id),
+      });
+    }
+    return reviewed;
   }
 
   async addFile(

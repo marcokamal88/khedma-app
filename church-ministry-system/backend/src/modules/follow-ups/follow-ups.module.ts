@@ -17,9 +17,10 @@ import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 import { MemberProfile } from '../users/entities/member-profile.entity';
 import { AttendanceSession } from '../attendance/entities/attendance-session.entity';
 import { AttendanceRecord } from '../attendance/entities/attendance-record.entity';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([FollowupFamily, FollowupAssignment, FollowupLog, ServiceYear, Class, Service, Enrollment, MemberRole, Role, ChurchMember, User, ServantAssignment, MemberProfile, AttendanceSession, AttendanceRecord])],
+  imports: [SequelizeModule.forFeature([FollowupFamily, FollowupAssignment, FollowupLog, ServiceYear, Class, Service, Enrollment, MemberRole, Role, ChurchMember, User, ServantAssignment, MemberProfile, AttendanceSession, AttendanceRecord]), NotificationsModule],
   controllers: [FollowUpsController],
   providers: [FollowUpsService],
   exports: [FollowUpsService],

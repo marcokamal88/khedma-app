@@ -17,6 +17,7 @@ import { ChurchMember } from '../users/entities/church-member.entity';
 import { User } from '../users/entities/user.entity';
 import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 import { MemberProfile } from '../users/entities/member-profile.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 import { AttendanceSession } from '../attendance/entities/attendance-session.entity';
 import { AttendanceRecord } from '../attendance/entities/attendance-record.entity';
 
@@ -39,8 +40,15 @@ export class FollowUpsService {
     @InjectModel(MemberProfile) private profileModel: typeof MemberProfile,
     @InjectModel(AttendanceSession) private attendanceSessionModel: typeof AttendanceSession,
     @InjectModel(AttendanceRecord) private attendanceRecordModel: typeof AttendanceRecord,
+    private notifService: NotificationsService,
     private sequelize: Sequelize,
   ) {}
+
+  /** In-app notification that never fails the calling operation. */
+  private notify(n: { churchId: string; churchMemberId: string; title: string; body: string; type: string; sourceType?: string; sourceId?: string }) {
+    if (!n.churchMemberId) return;
+    this.notifService.send(n).catch(() => {});
+  }
 
   private async getMemberRoleNames(churchId: number, memberId: number): Promise<string[]> {
     const rows: any[] = await this.memberRoleModel.findAll({
@@ -218,7 +226,21 @@ export class FollowUpsService {
       } as any);
     }
 
-    return this.findOne(String(churchId), String(family.id));
+    return this.findOne(String(churchId), String(family.id)).then((created: any) => {
+      // tell the responsible servant when a leader creates for them (skip self-noise)
+      if (Number(responsibleId) !== Number(userId)) {
+        this.notify({
+          churchId: String(churchId),
+          churchMemberId: String(responsibleId),
+          title: 'مجموعة افتقاد جديدة',
+          body: `تم إسناد مجموعة افتقاد إليك${created?.name ? `: ${created.name}` : ''}`,
+          type: 'general',
+          sourceType: 'followup',
+          sourceId: String(family.id),
+        });
+      }
+      return created;
+    });
   }
 
   async findAll(churchId: string, filters: { servantId?: string; serviceId?: string; classId?: string; status?: string; targetType?: string; scope?: string } & any, requester?: any) {
@@ -378,6 +400,15 @@ export class FollowUpsService {
         } as any);
         results.push(created);
       }
+      this.notify({
+        churchId: String(churchId),
+        churchMemberId: String(mid),
+        title: 'انضممت إلى مجموعة افتقاد',
+        body: `تمت إضافتك إلى مجموعة${family.name ? `: ${family.name}` : ''}`,
+        type: 'general',
+        sourceType: 'followup',
+        sourceId: String(family.id),
+      });
     }
     return results;
   }
