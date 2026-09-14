@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import { RootState } from "../store";
+import { setUnreadCount } from "../store/notifications.slice";
+import { notificationsApi } from "../api/notifications.api";
 import { typography } from "../theme";
 
 const NAVY = "#192f5f";
@@ -13,13 +16,40 @@ interface AppHeaderProps {
 
 export default function AppHeader({ greetingText, children }: AppHeaderProps) {
   const user = useSelector((state: RootState) => state.auth.user);
+  const unreadCount = useSelector((state: RootState) => state.notifications.unreadCount);
+  const dispatch = useDispatch();
+  const navigation = useNavigation<any>();
+
+  // Lightweight badge count; the inbox screen owns the full list state.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res: any = await notificationsApi.unreadCount();
+        const count = res?.data?.unreadCount ?? res?.unreadCount ?? 0;
+        if (!cancelled) dispatch(setUnreadCount(Number(count) || 0));
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [dispatch]);
 
   return (
     <>
       <View style={styles.headerSection}>
         <View style={styles.headerTop}>
-          <TouchableOpacity style={styles.headerBtn} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.headerBtn}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate("Notifications")}
+          >
             <Text style={styles.bellIcon}>{"\uD83D\uDD14"}</Text>
+            {unreadCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {unreadCount > 99 ? "99+" : String(unreadCount)}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
           <View style={styles.headerTextWrap}>
             <Text style={styles.greeting} numberOfLines={1}>{greetingText}</Text>
@@ -57,6 +87,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   bellIcon: { fontSize: 20, color: "#ffffff" },
+  badge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: "#c62828",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 5,
+  },
+  badgeText: { fontSize: 11, color: "#ffffff", fontWeight: "700" },
   headerTextWrap: { flex: 1, marginLeft: 12 },
   greeting: {
     ...typography.body,

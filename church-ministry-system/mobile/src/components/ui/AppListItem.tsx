@@ -22,6 +22,8 @@ interface AppListItemProps {
   onPress?: () => void;
   children?: ReactNode;
   style?: StyleProp<ViewStyle>;
+  /** Highlights unread rows (e.g. notification inbox). Visual only. */
+  unread?: boolean;
 }
 
 export function AppListItem({
@@ -32,9 +34,11 @@ export function AppListItem({
   onPress,
   children,
   style,
+  unread,
 }: AppListItemProps) {
   const content = (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, unread && styles.unreadContainer, style]}>
+      {unread && <View style={styles.unreadDot} />}
       {leftIcon && (
         <View style={styles.leftIcon}>
           <Text style={styles.leftIconText}>{LEFT_ICONS[leftIcon] || LEFT_ICONS.default}</Text>
@@ -71,6 +75,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.cream,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  unreadContainer: {
+    backgroundColor: '#eef3fb',
+    borderBottomColor: colors.navy,
+  },
+  unreadDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.navy,
+    marginEnd: spacing.sm,
   },
   leftIcon: {
     width: 36,
