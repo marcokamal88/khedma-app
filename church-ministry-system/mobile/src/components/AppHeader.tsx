@@ -12,9 +12,10 @@ const NAVY = "#192f5f";
 interface AppHeaderProps {
   greetingText: string;
   children?: React.ReactNode;
+  rightElement?: React.ReactNode;
 }
 
-export default function AppHeader({ greetingText, children }: AppHeaderProps) {
+export default function AppHeader({ greetingText, children, rightElement }: AppHeaderProps) {
   const user = useSelector((state: RootState) => state.auth.user);
   const unreadCount = useSelector((state: RootState) => state.notifications.unreadCount);
   const dispatch = useDispatch();
@@ -55,9 +56,14 @@ export default function AppHeader({ greetingText, children }: AppHeaderProps) {
             <Text style={styles.greeting} numberOfLines={1}>{greetingText}</Text>
             <Text style={styles.userName} numberOfLines={1}>{user?.fullName}</Text>
           </View>
+</View>
+      {children}
+      {rightElement && (
+        <View style={styles.rightElementWrapper}>
+          {rightElement}
         </View>
-        {children}
-      </View>
+      )}
+    </View>
       <View style={styles.waveContainer}>
         <Text style={styles.waveDummy}>{""}</Text>
       </View>
@@ -121,4 +127,5 @@ const styles = StyleSheet.create({
     marginBottom: -8,
   },
   waveDummy: { height: 0 },
+  rightElementWrapper: { marginTop: 8, alignItems: 'flex-start' },
 });
