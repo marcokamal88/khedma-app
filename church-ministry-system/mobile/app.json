@@ -19,7 +19,25 @@
         "backgroundColor": "#4A90D9"
       },
       "package": "com.church.ministry",
-      "permissions": ["DETECT_SCREEN_CAPTURE"]
-    }
+      "permissions": ["DETECT_SCREEN_CAPTURE", "RECEIVE_BOOT_COMPLETED", "VIBRATE"],
+      "googleServicesFile": "./google-services.json"
+    },
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#4A90D9",
+      "iosDisplayInForeground": true,
+      "androidMode": "default",
+      "androidCollapsedTitle": "Khedma App"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#4A90D9",
+          "sounds": ["./assets/notification-sound.wav"]
+        }
+      ]
+    ]
   }
 }

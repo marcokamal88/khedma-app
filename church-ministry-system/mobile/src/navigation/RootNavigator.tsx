@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer, createNavigationContainerRef } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import AuthStack from "./AuthStack";
 import AppNavigator from "./AppNavigator";
 import GlobalDrawer from "../components/GlobalDrawer";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 
 export default function RootNavigator() {
   const { token, needsContextSelection } = useSelector((state: RootState) => state.auth);
   const navigationRef = createNavigationContainerRef();
+  usePushNotifications();
 
   const renderNavigator = () => {
     if (!token) {

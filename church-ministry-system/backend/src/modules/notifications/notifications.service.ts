@@ -3,39 +3,16 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Notification } from './entities/notification.entity';
 import { FcmToken } from './entities/fcm-token.entity';
 
+const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
-  private fcmAvailable = false;
 
   constructor(
     @InjectModel(Notification) private notifModel: typeof Notification,
     @InjectModel(FcmToken) private fcmTokenModel: typeof FcmToken,
-  ) {
-    this.initFcm();
-  }
-
-  private initFcm() {
-    try {
-      const admin = require('firebase-admin');
-      if (admin.apps.length === 0) {
-        const serviceAccount = process.env.FCM_SERVICE_ACCOUNT;
-        if (serviceAccount) {
-          admin.initializeApp({
-            credential: admin.credential.cert(JSON.parse(serviceAccount)),
-          });
-          this.fcmAvailable = true;
-          this.logger.log('Firebase initialized');
-        } else {
-          this.logger.warn('FCM_SERVICE_ACCOUNT not set — push disabled');
-        }
-      } else {
-        this.fcmAvailable = true;
-      }
-    } catch {
-      this.logger.warn('firebase-admin not installed — push disabled');
-    }
-  }
+  ) {}
 
   async registerDevice(churchId: string, memberId: string, token: string, deviceType: string) {
     const [record] = await this.fcmTokenModel.findOrCreate({
@@ -66,14 +43,12 @@ export class NotificationsService {
   }) {
     const notif = await this.notifModel.create(notification as any);
 
-    if (this.fcmAvailable) {
-      await this.sendPush(notification.churchId, notification.churchMemberId, notification.title, notification.body);
-    }
+    await this.sendExpoPush(notification.churchId, notification.churchMemberId, notification.title, notification.body, notification);
 
     return notif;
   }
 
-  private async sendPush(churchId: string, memberId: string, title: string, body: string) {
+  private async sendExpoPush(churchId: string, memberId: string, title: string, body: string, data?: any) {
     try {
       const tokens = await this.fcmTokenModel.findAll({
         where: { churchMemberId: memberId, isActive: true },
@@ -81,15 +56,53 @@ export class NotificationsService {
 
       if (tokens.length === 0) return;
 
-      const admin = require('firebase-admin');
-      const results = await admin.messaging().sendEachForMulticast({
-        tokens: tokens.map((t) => t.token),
-        notification: { title, body },
-      });
+      const messages = tokens.map((t) => ({
+        to: t.token,
+        title,
+        body,
+        data: data ? { ...data, notificationId: data.sourceId } : undefined,
+        priority: 'high' as const,
+        channelId: 'default',
+      }));
 
-      this.logger.log(`Push sent: ${results.successCount} success, ${results.failureCount} failed`);
+      const chunks: typeof messages[] = [];
+      for (let i = 0; i < messages.length; i += 100) {
+        chunks.push(messages.slice(i, i + 100));
+      }
+
+      for (const chunk of chunks) {
+        const response = await fetch(EXPO_PUSH_URL, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(chunk),
+        });
+
+        const result = await response.json();
+
+        if (result.data) {
+          for (let i = 0; i < result.data.length; i++) {
+            const receipt = result.data[i];
+            const token = chunk[i].to;
+            if (receipt.status === 'error') {
+              this.logger.warn(`Expo push error for token ${token}: ${receipt.message} (${receipt.details?.error})`);
+              if (receipt.details?.error === 'DeviceNotRegistered' || receipt.details?.error === 'InvalidCredentials') {
+                await this.fcmTokenModel.update(
+                  { isActive: false } as any,
+                  { where: { token } },
+                );
+                this.logger.log(`Deactivated dead token: ${token}`);
+              }
+            }
+          }
+        }
+        this.logger.log(`Expo push sent: ${chunk.length} messages`);
+      }
     } catch (err) {
-      this.logger.warn(`Push send failed: ${err.message}`);
+      this.logger.warn(`Expo push send failed: ${err.message}`);
     }
   }
 

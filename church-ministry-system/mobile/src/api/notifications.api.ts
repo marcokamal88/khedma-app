@@ -10,4 +10,6 @@ export const notificationsApi = {
   unreadCount: () => apiClient.get('/notifications/unread-count'),
   markAsRead: (id: string) => apiClient.patch(`/notifications/${id}/read`),
   markAllAsRead: () => apiClient.patch('/notifications/read-all'),
+  registerDevice: (churchId: string, memberId: string, token: string, deviceType: string) =>
+    apiClient.post('/notifications/register-device', { churchId, memberId, token, deviceType }),
 };

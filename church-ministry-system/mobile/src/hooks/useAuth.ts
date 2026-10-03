@@ -4,6 +4,7 @@ import { RootState, AppDispatch } from '../store';
 import { setCredentials, switchContext, logout, setLoading } from '../store/auth.slice';
 import { authApi } from '../api/auth.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { registerForPushNotificationsAsync } from '../services/pushNotifications';
 
 export const useAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -28,6 +29,12 @@ export const useAuth = () => {
       
       dispatch(setCredentials(payload));
       console.log(`[useAuth] login() SUCCESS | navigating to app`);
+
+      // Register for push notifications after successful login
+      if (payload.memberId && payload.activeContext?.churchId) {
+        registerForPushNotificationsAsync(payload.memberId, String(payload.activeContext.churchId));
+      }
+
       return payload;
     } catch (err: any) {
       console.error(`[useAuth] login() FAILED | error:`, err?.message || err);
@@ -68,6 +75,12 @@ export const useAuth = () => {
       const payload = response.data || response;
       await AsyncStorage.setItem('access_token', payload.accessToken);
       dispatch(switchContext(payload));
+      
+      // Re-register push token when context changes (churchId may change)
+      if (payload.activeContext?.churchId && payload.memberId) {
+        registerForPushNotificationsAsync(payload.memberId, String(payload.activeContext.churchId));
+      }
+      
       return payload;
     } finally {
       dispatch(setLoading(false));
