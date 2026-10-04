@@ -22,6 +22,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ReportsModule } from './modules/reports/reports.module';
 import { FollowUpsModule } from './modules/follow-ups/follow-ups.module';
 import { LessonLibraryModule } from './modules/lesson-library/lesson-library.module';
+import { HealthModule } from './modules/health/health.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
@@ -64,6 +65,7 @@ import { ScopeGuard } from './shared/guards/scope.guard';
     ActivitiesModule,
     AchievementsModule,
     DashboardModule,
+    HealthModule,
     UtilsModule,
     AuditModule,
   ],
