@@ -1,6 +1,7 @@
 import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { Public } from '../../shared/decorators/public.decorator';
 
 @Controller('health')
 export class HealthController {
@@ -8,6 +9,7 @@ export class HealthController {
     @InjectConnection() private readonly sequelize: Sequelize,
   ) {}
 
+  @Public()
   @Get()
   @HttpCode(HttpStatus.OK)
   check() {
@@ -20,6 +22,7 @@ export class HealthController {
     };
   }
 
+  @Public()
   @Get('db')
   @HttpCode(HttpStatus.OK)
   async checkDatabase() {
