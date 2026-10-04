@@ -9,7 +9,9 @@
     "splash": {
       "backgroundColor": "#4A90D9"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.church.ministry"
@@ -19,11 +21,14 @@
         "backgroundColor": "#4A90D9"
       },
       "package": "com.church.ministry",
-      "permissions": ["DETECT_SCREEN_CAPTURE", "RECEIVE_BOOT_COMPLETED", "VIBRATE"],
-      "googleServicesFile": "./google-services.json"
+      "permissions": [
+        "DETECT_SCREEN_CAPTURE",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
     },
     "notification": {
-      "icon": "./assets/notification-icon.png",
+      "icon": "./assets/icon.png",
       "color": "#4A90D9",
       "iosDisplayInForeground": true,
       "androidMode": "default",
@@ -33,11 +38,15 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
-          "color": "#4A90D9",
-          "sounds": ["./assets/notification-sound.wav"]
+          "icon": "./assets/icon.png",
+          "color": "#4A90D9"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "be3fa267-7895-4da3-a574-59b96c860117"
+      }
+    }
   }
 }

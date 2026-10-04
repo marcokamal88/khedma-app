@@ -7,10 +7,13 @@ import AppNavigator from "./AppNavigator";
 import GlobalDrawer from "../components/GlobalDrawer";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 
-export default function RootNavigator() {
-  const { token, needsContextSelection } = useSelector((state: RootState) => state.auth);
-  const navigationRef = createNavigationContainerRef();
+function PushNotificationsSetup() {
   usePushNotifications();
+  return null;
+}
+
+function InnerNavigator({ token, needsContextSelection }: { token: string | null; needsContextSelection: boolean }) {
+  const navigationRef = createNavigationContainerRef();
 
   const renderNavigator = () => {
     if (!token) {
@@ -30,7 +33,14 @@ export default function RootNavigator() {
 
   return (
     <NavigationContainer ref={navigationRef}>
+      <PushNotificationsSetup />
       {renderNavigator()}
     </NavigationContainer>
   );
+}
+
+export default function RootNavigator() {
+  const { token, needsContextSelection } = useSelector((state: RootState) => state.auth);
+
+  return <InnerNavigator token={token} needsContextSelection={needsContextSelection} />;
 }
