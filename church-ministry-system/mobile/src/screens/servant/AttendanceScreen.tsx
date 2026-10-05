@@ -12,7 +12,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
+  Share,
 } from "react-native";
+import * as FileSystem from "expo-file-system";
 import { attendanceApi } from "../../api/attendance.api";
 import { churchApi } from "../../api/church.api";
 import apiClient from "../../api/client";
@@ -23,7 +25,7 @@ import AppHeader from "../../components/AppHeader";
 
 const NAVY = "#192f5f";
 const GOLD = "#d4a843";
-const CREAM = "#f7f4ed";
+const CREAM = "rgb(247, 244, 237)";
 const OFF_WHITE = "#fcfbf8";
 const BORDER = "#eceae4";
 const CHARCOAL = "#1c1c1c";
@@ -120,6 +122,8 @@ export default function AttendanceScreen() {
   const [calendarTarget, setCalendarTarget] = useState<
     "newBirthDate" | "editBirthDate" | null
   >(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingSession, setDeletingSession] = useState<Session | null>(null);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newGender, setNewGender] = useState("");
@@ -157,6 +161,56 @@ export default function AttendanceScreen() {
       setLoading(false);
     }
   }, []);
+
+  const getAttendancePercentage = useCallback(
+    (memberId: string) => {
+      if (sessions.length === 0) return 0;
+      let attended = 0;
+      for (const s of sessions) {
+        const rec = s.records?.find(
+          (r: any) => String(r.churchMemberId) === String(memberId),
+        );
+        if (rec && (rec.status === "present" || rec.status === "late")) {
+          attended++;
+        }
+      }
+      return Math.round((attended / sessions.length) * 100);
+    },
+    [sessions],
+  );
+
+  const exportAttendanceExcel = useCallback(async () => {
+    if (!classAssignment) return;
+    try {
+      Alert.alert(t("app.loading"), t("attendance.exporting"));
+      const classId = String(classAssignment.class.id);
+      const res = await attendanceApi.exportClassAttendance({
+        classId,
+        from: undefined,
+        to: undefined,
+      });
+
+      // Convert blob to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(res.data);
+      });
+
+      // Extract base64 content (remove data:...;base64, prefix)
+      const base64Content = base64.split(",")[1];
+      const fileUri = `${FileSystem.documentDirectory}Attendance_${classAssignment.class.id}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      await FileSystem.writeAsStringAsync(fileUri, base64Content, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      await Share.share({ url: fileUri, title: "Attendance Report" });
+      Alert.alert(t("app.success"), t("attendance.exportSuccess"));
+    } catch (err: any) {
+      console.error("Export error:", err);
+      Alert.alert(t("app.error"), err?.message || t("app.retry"));
+    }
+  }, [classAssignment, t]);
 
   useEffect(() => {
     loadData();
@@ -313,6 +367,25 @@ export default function AttendanceScreen() {
     }
   }, [classAssignment, loadData, t]);
 
+  const deleteSession = useCallback(async () => {
+    if (!deletingSession) return;
+    try {
+      await attendanceApi.deleteSession(String(deletingSession.id));
+      Alert.alert(t("app.success"), t("attendance.sessionDeleted"));
+      loadData();
+    } catch (err: any) {
+      Alert.alert(t("app.error"), err?.message || t("app.retry"));
+    } finally {
+      setShowDeleteConfirm(false);
+      setDeletingSession(null);
+    }
+  }, [deletingSession, loadData, t]);
+
+  const confirmDeleteSession = useCallback((session: Session) => {
+    setDeletingSession(session);
+    setShowDeleteConfirm(true);
+  }, []);
+
   const openStudentModal = useCallback((student: any) => {
     setEditingStudent(student);
     setEditName(student.fullName);
@@ -406,7 +479,12 @@ export default function AttendanceScreen() {
       case "absent":
         return { icon: "\u2718", bg: RED, color: "#ffffff", fontSize: 16 };
       case "excused":
-        return { icon: "\u2714", bg: "#1565c0", color: "#ffffff", fontSize: 16 };
+        return {
+          icon: "\u2714",
+          bg: "#1565c0",
+          color: "#ffffff",
+          fontSize: 16,
+        };
       default:
         return { icon: "\u2718", bg: "#e0e0e0", color: MUTED, fontSize: 16 };
     }
@@ -533,11 +611,14 @@ export default function AttendanceScreen() {
                           <Text
                             style={[
                               styles.statusBtnIcon,
-                              
+
                               isActive && { color: sColor },
                               { fontSize: sSize },
-                              
-                              s === "late" && { transform: [{ scale: 1.2 }],marginTop :-8 },
+
+                              s === "late" && {
+                                transform: [{ scale: 1.2 }],
+                                marginTop: -8,
+                              },
                             ]}
                           >
                             {sIcon}
@@ -587,7 +668,14 @@ export default function AttendanceScreen() {
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#192f5f"]}
+            tintColor="#192f5f"
+          />
+        }
       >
         <AppHeader greetingText={t("attendance.title")}>
           <View style={styles.classInfoCard}>
@@ -665,6 +753,14 @@ export default function AttendanceScreen() {
                   <Text style={styles.addBtnText}>+</Text>
                 </TouchableOpacity>
                 <Text style={styles.sectionCount}>{students.length}</Text>
+                <TouchableOpacity
+                  style={styles.exportBtn}
+                  onPress={exportAttendanceExcel}
+                  activeOpacity={0.7}
+                  disabled={sessions.length === 0}
+                >
+                  <Text style={styles.exportBtnText}>📥</Text>
+                </TouchableOpacity>
               </View>
             </View>
             {students.length === 0 ? (
@@ -696,6 +792,25 @@ export default function AttendanceScreen() {
                         </Text>
                         <Text style={styles.taioBadgeLabel}>
                           {t("taio.points")}
+                        </Text>
+                      </View>
+                      <View style={styles.attendancePercentBadge}>
+                        <Text
+                          style={[
+                            styles.attendancePercentText,
+                            getAttendancePercentage(student.id) >= 80 &&
+                              styles.attendancePercentGood,
+                            getAttendancePercentage(student.id) >= 60 &&
+                              getAttendancePercentage(student.id) < 80 &&
+                              styles.attendancePercentWarn,
+                            getAttendancePercentage(student.id) < 60 &&
+                              getAttendancePercentage(student.id) > 0 &&
+                              styles.attendancePercentBad,
+                          ]}
+                        >
+                          {sessions.length > 0
+                            ? `${getAttendancePercentage(student.id)}%`
+                            : "—"}
                         </Text>
                       </View>
                     </View>
@@ -730,32 +845,48 @@ export default function AttendanceScreen() {
             ) : (
               <>
                 {sessions.slice(0, 5).map((session) => (
-                <TouchableOpacity
-                  key={session.id}
-                  style={styles.sessionRow}
-                  onPress={() => openSession(session)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.sessionRowRight}>
-                    <View style={styles.sessionIconWrap}>
-                      <Text style={styles.sessionIcon}>{"\u2637"}</Text>
+                  <TouchableOpacity
+                    key={session.id}
+                    style={styles.sessionRow}
+                    onPress={() => openSession(session)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.sessionRowRight}>
+                      <View style={styles.sessionIconWrap}>
+                        <Text style={styles.sessionIcon}>{"\u2637"}</Text>
+                      </View>
+                      <View style={styles.sessionTextWrap}>
+                        <Text style={styles.sessionTitle} numberOfLines={1}>
+                          {session.sessionDate}
+                        </Text>
+                        <Text style={styles.sessionMeta} numberOfLines={1}>
+                          {t("attendance.records")}
+                          {session.records?.length || 0}
+                        </Text>
+                      </View>
                     </View>
-                    <View style={styles.sessionTextWrap}>
-                      <Text style={styles.sessionTitle} numberOfLines={1}>
-                        {session.sessionDate}
-                      </Text>
-                      <Text style={styles.sessionMeta} numberOfLines={1}>
-                        {t("attendance.records")}
-                        {session.records?.length || 0}
-                      </Text>
+                    <View style={styles.sessionRowActions}>
+                      <View style={styles.attendedPill}>
+                        <Text style={styles.attendedPillText}>
+                          {session.records?.filter(
+                            (r) => r.status === "present",
+                          ).length || 0}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.deleteBtn}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          confirmDeleteSession(session);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.deleteBtnIcon}>
+                          {"\uD83D\uDDD1"}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
-                  </View>
-                  <View style={styles.attendedPill}>
-                    <Text style={styles.attendedPillText}>
-                      {session.records?.filter(r => r.status === 'present').length || 0}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
                 ))}
                 {sessions.length > 5 && (
                   <TouchableOpacity
@@ -787,195 +918,236 @@ export default function AttendanceScreen() {
           style={styles.modalOverlay}
         >
           <View style={styles.sheetWrapper}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-            <View style={styles.modalHeader}>
-              <TouchableOpacity
-                onPress={() => setShowAddModal(false)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.modalClose}>{"\u2715"}</Text>
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>
-                {t("attendance.addStudent")}
-              </Text>
-              <View style={{ width: 30 }} />
-            </View>
-
-            <View style={styles.modeTabs}>
-              <TouchableOpacity
-                style={[
-                  styles.modeTab,
-                  addMode === "search" && styles.modeTabActive,
-                ]}
-                onPress={() => setAddMode("search")}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.modeTabText,
-                    addMode === "search" && styles.modeTabTextActive,
-                  ]}
-                >
-                  {t("attendance.search")}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.modeTab,
-                  addMode === "register" && styles.modeTabActive,
-                ]}
-                onPress={() => setAddMode("register")}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.modeTabText,
-                    addMode === "register" && styles.modeTabTextActive,
-                  ]}
-                >
-                  {t("attendance.register")}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {addMode === "search" ? (
-              <View style={styles.modalBody}>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t("attendance.searchPlaceholder")}
-                  placeholderTextColor={MUTED}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  onSubmitEditing={searchMembers}
-                  returnKeyType="search"
-                />
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{
+                paddingHorizontal: 20,
+                paddingTop: 16,
+                paddingBottom: 32,
+              }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.modalHeader}>
                 <TouchableOpacity
-                  style={styles.searchBtn}
-                  onPress={searchMembers}
-                  disabled={searching}
+                  onPress={() => setShowAddModal(false)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.searchBtnText}>
-                    {searching ? t("app.loading") : t("attendance.search")}
-                  </Text>
+                  <Text style={styles.modalClose}>{"\u2715"}</Text>
                 </TouchableOpacity>
-
-                <ScrollView
-                  style={styles.searchResultsList}
-                  keyboardShouldPersistTaps="handled"
-                >
-                  {searchResults.map((member: any) => (
-                    <TouchableOpacity
-                      key={member.id}
-                      style={styles.searchResultRow}
-                      onPress={() => enrollMember(member.id)}
-                      disabled={enrolling}
-                      activeOpacity={0.7}
-                    >
-                      <View style={styles.searchResultAvatar}>
-                        <Text style={styles.searchResultAvatarText}>
-                          {member.fullName
-                            ?.split(" ")
-                            .map((n: string) => n[0])
-                            .join("")
-                            .toUpperCase()
-                            .slice(0, 2) || "?"}
-                        </Text>
-                      </View>
-                      <View style={styles.searchResultInfo}>
-                        <Text style={styles.searchResultName}>
-                          {member.fullName}
-                        </Text>
-                        <Text style={styles.searchResultMeta}>
-                          {member.email || member.phone}
-                        </Text>
-                      </View>
-                      <Text style={styles.enrollIcon}>
-                        {enrolling ? "..." : "+"}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                  {searchResults.length === 0 &&
-                    searchQuery.trim() &&
-                    !searching && (
-                      <Text style={styles.noResults}>{t("app.noData")}</Text>
-                    )}
-                </ScrollView>
+                <Text style={styles.modalTitle}>
+                  {t("attendance.addStudent")}
+                </Text>
+                <View style={{ width: 30 }} />
               </View>
-            ) : (
-              <View style={{ gap: 0 }}>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t("auth.fullName")}
-                  placeholderTextColor={MUTED}
-                  value={newName}
-                  onChangeText={setNewName}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder={t("auth.phonePlaceholder")}
-                  placeholderTextColor={MUTED}
-                  value={newPhone}
-                  onChangeText={setNewPhone}
-                  keyboardType="phone-pad"
-                />
-                <View style={styles.genderRow}>
-                  <TouchableOpacity style={[styles.genderBtn, newGender === 'male' && styles.genderActive]} onPress={() => setNewGender('male')} activeOpacity={0.7}><Text style={[styles.genderText, newGender === 'male' && styles.genderTextActive]}>ذكر</Text></TouchableOpacity>
-                  <TouchableOpacity style={[styles.genderBtn, newGender === 'female' && styles.genderActive]} onPress={() => setNewGender('female')} activeOpacity={0.7}><Text style={[styles.genderText, newGender === 'female' && styles.genderTextActive]}>أنثى</Text></TouchableOpacity>
-                </View>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t("attendance.addressPlaceholder")}
-                  placeholderTextColor={MUTED}
-                  value={newAddress}
-                  onChangeText={setNewAddress}
-                />
+
+              <View style={styles.modeTabs}>
                 <TouchableOpacity
-                  style={styles.dateInput}
-                  onPress={() => {
-                    setCalendarTarget("newBirthDate");
-                    setShowCalendar(true);
-                  }}
+                  style={[
+                    styles.modeTab,
+                    addMode === "search" && styles.modeTabActive,
+                  ]}
+                  onPress={() => setAddMode("search")}
                   activeOpacity={0.7}
                 >
                   <Text
                     style={[
-                      styles.dateInputText,
-                      !newBirthDate && styles.dateInputPlaceholder,
+                      styles.modeTabText,
+                      addMode === "search" && styles.modeTabTextActive,
                     ]}
                   >
-                    {newBirthDate || t("attendance.birthDatePlaceholder")}
+                    {t("attendance.search")}
                   </Text>
                 </TouchableOpacity>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder={t("attendance.notesPlaceholder")}
-                  placeholderTextColor={MUTED}
-                  value={newNotes}
-                  onChangeText={setNewNotes}
-                  multiline
-                  numberOfLines={3}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder={t("attendance.passwordPlaceholder")}
-                  placeholderTextColor={MUTED}
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                  secureTextEntry
-                />
                 <TouchableOpacity
-                  style={styles.searchBtn}
-                  onPress={registerStudent}
-                  disabled={enrolling}
+                  style={[
+                    styles.modeTab,
+                    addMode === "register" && styles.modeTabActive,
+                  ]}
+                  onPress={() => setAddMode("register")}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.searchBtnText}>
-                    {enrolling ? t("app.loading") : t("attendance.register")}
+                  <Text
+                    style={[
+                      styles.modeTabText,
+                      addMode === "register" && styles.modeTabTextActive,
+                    ]}
+                  >
+                    {t("attendance.register")}
                   </Text>
                 </TouchableOpacity>
               </View>
-            )}
+
+              {addMode === "search" ? (
+                <View style={styles.modalBody}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("attendance.searchPlaceholder")}
+                    placeholderTextColor={MUTED}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={searchMembers}
+                    returnKeyType="search"
+                  />
+                  <TouchableOpacity
+                    style={styles.searchBtn}
+                    onPress={searchMembers}
+                    disabled={searching}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.searchBtnText}>
+                      {searching ? t("app.loading") : t("attendance.search")}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <ScrollView
+                    style={styles.searchResultsList}
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    {searchResults.map((member: any) => (
+                      <TouchableOpacity
+                        key={member.id}
+                        style={styles.searchResultRow}
+                        onPress={() => enrollMember(member.id)}
+                        disabled={enrolling}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.searchResultAvatar}>
+                          <Text style={styles.searchResultAvatarText}>
+                            {member.fullName
+                              ?.split(" ")
+                              .map((n: string) => n[0])
+                              .join("")
+                              .toUpperCase()
+                              .slice(0, 2) || "?"}
+                          </Text>
+                        </View>
+                        <View style={styles.searchResultInfo}>
+                          <Text style={styles.searchResultName}>
+                            {member.fullName}
+                          </Text>
+                          <Text style={styles.searchResultMeta}>
+                            {member.email || member.phone}
+                          </Text>
+                        </View>
+                        <Text style={styles.enrollIcon}>
+                          {enrolling ? "..." : "+"}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                    {searchResults.length === 0 &&
+                      searchQuery.trim() &&
+                      !searching && (
+                        <Text style={styles.noResults}>{t("app.noData")}</Text>
+                      )}
+                  </ScrollView>
+                </View>
+              ) : (
+                <View style={{ gap: 0 }}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("auth.fullName")}
+                    placeholderTextColor={MUTED}
+                    value={newName}
+                    onChangeText={setNewName}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("auth.phonePlaceholder")}
+                    placeholderTextColor={MUTED}
+                    value={newPhone}
+                    onChangeText={setNewPhone}
+                    keyboardType="phone-pad"
+                  />
+                  <View style={styles.genderRow}>
+                    <TouchableOpacity
+                      style={[
+                        styles.genderBtn,
+                        newGender === "male" && styles.genderActive,
+                      ]}
+                      onPress={() => setNewGender("male")}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.genderText,
+                          newGender === "male" && styles.genderTextActive,
+                        ]}
+                      >
+                        ذكر
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.genderBtn,
+                        newGender === "female" && styles.genderActive,
+                      ]}
+                      onPress={() => setNewGender("female")}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.genderText,
+                          newGender === "female" && styles.genderTextActive,
+                        ]}
+                      >
+                        أنثى
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("attendance.addressPlaceholder")}
+                    placeholderTextColor={MUTED}
+                    value={newAddress}
+                    onChangeText={setNewAddress}
+                  />
+                  <TouchableOpacity
+                    style={styles.dateInput}
+                    onPress={() => {
+                      setCalendarTarget("newBirthDate");
+                      setShowCalendar(true);
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.dateInputText,
+                        !newBirthDate && styles.dateInputPlaceholder,
+                      ]}
+                    >
+                      {newBirthDate || t("attendance.birthDatePlaceholder")}
+                    </Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder={t("attendance.notesPlaceholder")}
+                    placeholderTextColor={MUTED}
+                    value={newNotes}
+                    onChangeText={setNewNotes}
+                    multiline
+                    numberOfLines={3}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("attendance.passwordPlaceholder")}
+                    placeholderTextColor={MUTED}
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    secureTextEntry
+                  />
+                  <TouchableOpacity
+                    style={styles.searchBtn}
+                    onPress={registerStudent}
+                    disabled={enrolling}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.searchBtnText}>
+                      {enrolling ? t("app.loading") : t("attendance.register")}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -992,83 +1164,124 @@ export default function AttendanceScreen() {
           style={styles.modalOverlay}
         >
           <View style={styles.sheetWrapper}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 32 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{
+                paddingHorizontal: 20,
+                paddingTop: 16,
+                paddingBottom: 32,
+              }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.modalHeader}>
-              <TouchableOpacity
-                onPress={() => setShowStudentModal(false)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.modalClose}>{"\u2715"}</Text>
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>
-                {t("attendance.editStudent")}
-              </Text>
-              <View style={{ width: 30 }} />
-            </View>
-            <View style={{ gap: 0 }}>
-              <TextInput
-                style={styles.input}
-                placeholder={t("auth.fullName")}
-                placeholderTextColor={MUTED}
-                value={editName}
-                onChangeText={setEditName}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder={t("auth.phonePlaceholder")}
-                placeholderTextColor={MUTED}
-                value={editPhone}
-                onChangeText={setEditPhone}
-                keyboardType="phone-pad"
-              />
-              <View style={styles.genderRow}>
-                <TouchableOpacity style={[styles.genderBtn, editGender === 'male' && styles.genderActive]} onPress={() => setEditGender('male')} activeOpacity={0.7}><Text style={[styles.genderText, editGender === 'male' && styles.genderTextActive]}>ذكر</Text></TouchableOpacity>
-                <TouchableOpacity style={[styles.genderBtn, editGender === 'female' && styles.genderActive]} onPress={() => setEditGender('female')} activeOpacity={0.7}><Text style={[styles.genderText, editGender === 'female' && styles.genderTextActive]}>أنثى</Text></TouchableOpacity>
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder={t("attendance.addressPlaceholder")}
-                placeholderTextColor={MUTED}
-                value={editAddress}
-                onChangeText={setEditAddress}
-              />
-              <TouchableOpacity
-                style={styles.dateInput}
-                onPress={() => {
-                  setCalendarTarget("editBirthDate");
-                  setShowCalendar(true);
-                }}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.dateInputText,
-                    !editBirthDate && styles.dateInputPlaceholder,
-                  ]}
+                <TouchableOpacity
+                  onPress={() => setShowStudentModal(false)}
+                  activeOpacity={0.7}
                 >
-                  {editBirthDate || t("attendance.birthDatePlaceholder")}
+                  <Text style={styles.modalClose}>{"\u2715"}</Text>
+                </TouchableOpacity>
+                <Text style={styles.modalTitle}>
+                  {t("attendance.editStudent")}
                 </Text>
-              </TouchableOpacity>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder={t("attendance.notesPlaceholder")}
-                placeholderTextColor={MUTED}
-                value={editNotes}
-                onChangeText={setEditNotes}
-                multiline
-                numberOfLines={3}
-              />
-              <TouchableOpacity
-                style={styles.searchBtn}
-                onPress={saveStudent}
-                disabled={savingStudent}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.searchBtnText}>
-                  {savingStudent ? t("app.loading") : t("app.save")}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                <View style={{ width: 30 }} />
+              </View>
+              <View style={{ gap: 0 }}>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("auth.fullName")}
+                  placeholderTextColor={MUTED}
+                  value={editName}
+                  onChangeText={setEditName}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("auth.phonePlaceholder")}
+                  placeholderTextColor={MUTED}
+                  value={editPhone}
+                  onChangeText={setEditPhone}
+                  keyboardType="phone-pad"
+                />
+                <View style={styles.genderRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.genderBtn,
+                      editGender === "male" && styles.genderActive,
+                    ]}
+                    onPress={() => setEditGender("male")}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.genderText,
+                        editGender === "male" && styles.genderTextActive,
+                      ]}
+                    >
+                      ذكر
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.genderBtn,
+                      editGender === "female" && styles.genderActive,
+                    ]}
+                    onPress={() => setEditGender("female")}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.genderText,
+                        editGender === "female" && styles.genderTextActive,
+                      ]}
+                    >
+                      أنثى
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("attendance.addressPlaceholder")}
+                  placeholderTextColor={MUTED}
+                  value={editAddress}
+                  onChangeText={setEditAddress}
+                />
+                <TouchableOpacity
+                  style={styles.dateInput}
+                  onPress={() => {
+                    setCalendarTarget("editBirthDate");
+                    setShowCalendar(true);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.dateInputText,
+                      !editBirthDate && styles.dateInputPlaceholder,
+                    ]}
+                  >
+                    {editBirthDate || t("attendance.birthDatePlaceholder")}
+                  </Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder={t("attendance.notesPlaceholder")}
+                  placeholderTextColor={MUTED}
+                  value={editNotes}
+                  onChangeText={setEditNotes}
+                  multiline
+                  numberOfLines={3}
+                />
+                <TouchableOpacity
+                  style={styles.searchBtn}
+                  onPress={saveStudent}
+                  disabled={savingStudent}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.searchBtnText}>
+                    {savingStudent ? t("app.loading") : t("app.save")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -1126,6 +1339,25 @@ export default function AttendanceScreen() {
                       </Text>
                       <Text style={styles.taioBadgeLabel}>
                         {t("taio.points")}
+                      </Text>
+                    </View>
+                    <View style={styles.attendancePercentBadge}>
+                      <Text
+                        style={[
+                          styles.attendancePercentText,
+                          getAttendancePercentage(student.id) >= 80 &&
+                            styles.attendancePercentGood,
+                          getAttendancePercentage(student.id) >= 60 &&
+                            getAttendancePercentage(student.id) < 80 &&
+                            styles.attendancePercentWarn,
+                          getAttendancePercentage(student.id) < 60 &&
+                            getAttendancePercentage(student.id) > 0 &&
+                            styles.attendancePercentBad,
+                        ]}
+                      >
+                        {sessions.length > 0
+                          ? `${getAttendancePercentage(student.id)}%`
+                          : "—"}
                       </Text>
                     </View>
                   </View>
@@ -1188,14 +1420,75 @@ export default function AttendanceScreen() {
                       </Text>
                     </View>
                   </View>
-                  <View style={styles.attendedPill}>
-                    <Text style={styles.attendedPillText}>
-                      {session.records?.filter(r => r.status === 'present').length || 0}
-                    </Text>
+                  <View style={styles.sessionRowActions}>
+                    <View style={styles.attendedPill}>
+                      <Text style={styles.attendedPillText}>
+                        {session.records?.filter((r) => r.status === "present")
+                          .length || 0}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteBtn}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        confirmDeleteSession(session);
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.deleteBtnIcon}>{"\uD83D\uDDD1"}</Text>
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               ))}
             </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={showDeleteConfirm}
+        transparent
+        animationType="slide"
+        onRequestClose={() => {
+          setShowDeleteConfirm(false);
+          setDeletingSession(null);
+        }}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.deleteConfirmModal}>
+            <Text style={styles.deleteConfirmTitle}>
+              {t("attendance.deleteConfirmTitle")}
+            </Text>
+            <Text style={styles.deleteConfirmMessage}>
+              {t("attendance.deleteConfirmMessage")}{" "}
+              {deletingSession?.sessionDate}
+            </Text>
+            <View style={styles.deleteConfirmButtons}>
+              <TouchableOpacity
+                style={styles.deleteConfirmCancelBtn}
+                onPress={() => {
+                  setShowDeleteConfirm(false);
+                  setDeletingSession(null);
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteConfirmCancelText}>
+                  {t("app.cancel")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteConfirmDeleteBtn}
+                onPress={deleteSession}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.deleteConfirmDeleteText}>
+                  {t("app.delete")}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -1751,11 +2044,19 @@ const styles = StyleSheet.create({
   },
   dateInputText: { fontSize: 16, color: CHARCOAL, textAlign: "right" },
   dateInputPlaceholder: { color: MUTED },
-  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-  genderBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ffffff', borderWidth: 1, borderColor: BORDER, alignItems: 'center' },
+  genderRow: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  genderBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: BORDER,
+    alignItems: "center",
+  },
   genderActive: { backgroundColor: NAVY, borderColor: NAVY },
   genderText: { ...typography.buttonSmall, color: MUTED },
-  genderTextActive: { color: '#ffffff' },
+  genderTextActive: { color: "#ffffff" },
   seeAllBtn: {
     paddingVertical: 14,
     alignItems: "center",
@@ -1766,4 +2067,99 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   seeAllText: { ...typography.body, color: NAVY, fontWeight: "600" },
+
+  sessionRowActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  deleteBtn: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#fff0f0",
+  },
+  deleteBtnIcon: { fontSize: 18, color: RED },
+
+  deleteConfirmModal: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 24,
+    marginHorizontal: 24,
+    marginTop: "auto",
+  },
+  deleteConfirmTitle: {
+    ...typography.cardTitle,
+    color: CHARCOAL,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  deleteConfirmMessage: {
+    ...typography.body,
+    color: MUTED,
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  deleteConfirmButtons: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  deleteConfirmCancelBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: OFF_WHITE,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  deleteConfirmCancelText: {
+    ...typography.cardTitle,
+    color: CHARCOAL,
+    fontWeight: "600",
+  },
+  deleteConfirmDeleteBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: RED,
+    alignItems: "center",
+  },
+  deleteConfirmDeleteText: {
+    ...typography.cardTitle,
+    color: "#ffffff",
+    fontWeight: "600",
+  },
+
+  exportBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: OFF_WHITE,
+  },
+  exportBtnText: {
+    ...typography.buttonSmall,
+    color: "#ffffff",
+    fontWeight: "600",
+  },
+
+  attendancePercentBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  attendancePercentText: {
+    ...typography.caption,
+    fontWeight: "700",
+    fontSize: 11,
+  },
+  attendancePercentGood: { color: GREEN },
+  attendancePercentWarn: { color: YELLOW },
+  attendancePercentBad: { color: RED },
 });

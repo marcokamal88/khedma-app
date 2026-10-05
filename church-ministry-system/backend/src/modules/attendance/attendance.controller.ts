@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req,
+  Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Req,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
@@ -63,5 +63,16 @@ export class AttendanceController {
   @Get('report')
   async getReport(@Query() filters: any, @CurrentTenant() churchId: string) {
     return this.attendanceService.getReport(churchId, filters);
+  }
+
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest')
+  @Delete('sessions/:id')
+  async deleteSession(
+    @Param('id') id: string,
+    @CurrentTenant() churchId: string,
+    @Req() req: Request,
+  ) {
+    const user = req.user as any;
+    return this.attendanceService.deleteSession(churchId, id, user.memberId);
   }
 }

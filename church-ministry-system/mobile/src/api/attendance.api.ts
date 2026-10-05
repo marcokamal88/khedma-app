@@ -7,5 +7,8 @@ export const attendanceApi = {
   recordAttendance: (sessionId: string, records: any[]) =>
     apiClient.post(`/attendance/sessions/${sessionId}/records`, { records }),
   updateRecord: (id: string, data: any) => apiClient.put(`/attendance/records/${id}`, data),
+  deleteSession: (id: string) => apiClient.delete(`/attendance/sessions/${id}`),
   getReport: (params?: any) => apiClient.get('/attendance/report', { params }),
+  exportClassAttendance: (params?: any) =>
+    apiClient.get('/reports/servant-class-attendance/excel', { params, responseType: 'blob' }),
 };

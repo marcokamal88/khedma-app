@@ -176,4 +176,18 @@ export class AttendanceService {
 
     return records;
   }
+
+  async deleteSession(churchId: string, id: string, memberId: string) {
+    const session = await this.sessionModel.findOne({
+      where: { id, churchId },
+    });
+    if (!session) throw new NotFoundException('Session not found');
+
+    if (String(session.recordedBy) !== String(memberId)) {
+      throw new BadRequestException('Only the session creator can delete this session');
+    }
+
+    await session.destroy();
+    return { success: true };
+  }
 }

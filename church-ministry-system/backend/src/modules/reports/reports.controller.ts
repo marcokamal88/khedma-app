@@ -90,6 +90,40 @@ export class ReportsController {
     res.send(buf);
   }
 
+  @Roles('servant', 'class_leader', 'service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
+  @Get('servant-class-attendance/excel')
+  async servantClassAttendanceExcel(
+    @Query('classId') classId: string,
+    @Query('serviceYearId') serviceYearId: string,
+    @Query('from') from: string,
+    @Query('to') to: string,
+    @CurrentTenant() churchId: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const user = (req as any).user;
+    let cid = classId;
+    if (!cid && user?.activeContext?.scope?.classId) cid = String(user.activeContext.scope.classId);
+    if (!cid) {
+      return res.status(400).json({ message: 'classId is required' });
+    }
+    try {
+      const buf = await this.reportsService.servantClassAttendanceExcel(churchId, cid, { serviceYearId, from, to });
+      const fname = `ClassAttendance_${cid}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fname)}"; filename*=UTF-8''${encodeURIComponent(fname)}`);
+      res.send(buf);
+    } catch (err: any) {
+      if (err.message === 'Class not found') {
+        return res.status(404).json({ message: 'Class not found' });
+      }
+      if (err.message === 'No students enrolled in this class') {
+        return res.status(400).json({ message: 'No students enrolled in this class' });
+      }
+      throw err;
+    }
+  }
+
   @Roles('service_leader', 'assistant_service_leader', 'sector_leader', 'priest')
   @Get('servant-performance')
   async servantPerformanceReport(

@@ -27,7 +27,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
 
   const port = process.env.APP_PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   console.log(`Church Ministry API running on port ${port}`);
 }
 

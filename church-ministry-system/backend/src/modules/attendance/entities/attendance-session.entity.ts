@@ -49,6 +49,10 @@ export class AttendanceSession extends Model {
   @BelongsTo(() => Class)
   class: Class;
 
-  @HasMany(() => AttendanceRecord)
+  @HasMany(() => AttendanceRecord, {
+    foreignKey: 'attendanceSessionId',
+    onDelete: 'CASCADE',
+    hooks: true,
+  })
   records: AttendanceRecord[];
 }

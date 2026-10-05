@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "123456789",
+    "project_id": "khedma-app",
+    "firebase_url": "https://khedma-app.firebaseio.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789:android:abcdef123456",
+        "android_client_info": {
+          "package_name": "com.church.ministry"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "dummy-key-for-expo-push"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

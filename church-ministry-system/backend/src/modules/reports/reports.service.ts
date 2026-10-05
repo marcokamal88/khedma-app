@@ -201,7 +201,167 @@ export class ReportsService {
     };
   }
 
-  async attendanceExcel(
+  async servantClassAttendanceExcel(
+    churchId: string,
+    classId: string,
+    filters: { serviceYearId?: string; from?: string; to?: string },
+  ): Promise<Buffer> {
+    let serviceYearId = filters.serviceYearId;
+    if (!serviceYearId) {
+      const sy: any = await this.sequelize.query(
+        'SELECT id FROM service_years WHERE church_id = :churchId AND is_current = 1 LIMIT 1',
+        { replacements: { churchId }, type: 'SELECT' },
+      );
+      const row: any = Array.isArray(sy) ? sy[0] : null;
+      if (row?.id) serviceYearId = String(row.id);
+    }
+
+    const cls: any = await this.classModel.findOne({
+      where: { id: Number(classId), churchId: Number(churchId) } as any,
+      attributes: ['id', 'name', 'serviceId'],
+      include: [{ model: Service, attributes: ['id', 'name'] }],
+    });
+    if (!cls) throw new Error('Class not found');
+
+    const sessionWhere: any = { churchId, classId: Number(classId) };
+    if (filters.from || filters.to) {
+      sessionWhere.sessionDate = {};
+      if (filters.from) sessionWhere.sessionDate[Op.gte] = filters.from;
+      if (filters.to) sessionWhere.sessionDate[Op.lte] = filters.to;
+    }
+    const sessions = await this.sessionModel.findAll({
+      where: sessionWhere,
+      attributes: ['id', 'sessionDate', 'serviceId'],
+      order: [['sessionDate', 'ASC']],
+    });
+    const sessionIds = sessions.map((s) => s.id);
+
+    const records: any[] = sessionIds.length
+      ? await this.recordModel.findAll({
+          where: { churchId, attendanceSessionId: { [Op.in]: sessionIds } },
+          attributes: ['attendanceSessionId', 'churchMemberId', 'status'],
+          raw: true,
+        })
+      : [];
+
+    const recBySession = new Map<number, any[]>();
+    for (const r of records) {
+      const arr = recBySession.get(r.attendanceSessionId) || [];
+      arr.push(r);
+      recBySession.set(r.attendanceSessionId, arr);
+    }
+
+    const enrollments: any[] = await this.enrollmentModel.findAll({
+      where: { churchId, classId: Number(classId), serviceId: cls.serviceId, serviceYearId, isActive: true } as any,
+      include: [{ model: ChurchMember, include: [{ model: User, attributes: ['fullName'] }] }],
+      attributes: ['churchMemberId'],
+    });
+
+    if (enrollments.length === 0) {
+      throw new Error('No students enrolled in this class');
+    }
+
+    const memberIds = enrollments.map((e: any) => e.churchMemberId);
+    const profiles: any[] = await this.profileModel.findAll({
+      where: { churchId, churchMemberId: memberIds } as any,
+      attributes: ['churchMemberId', 'gender'],
+      raw: true,
+    });
+    const profMap = new Map<number, any>(profiles.map((p: any) => [Number(p.churchMemberId), p]));
+
+    const sessionMap = new Map<number, any>(sessions.map((s: any) => [s.id, s]));
+    const recByMember = new Map<number, any[]>();
+    for (const r of records) {
+      const arr = recByMember.get(r.churchMemberId) || [];
+      arr.push(r);
+      recByMember.set(r.churchMemberId, arr);
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Khedma';
+    workbook.created = new Date();
+
+    const headers = ['الاسم', 'النوع', 'إجمالي الجلسات', 'حاضر', 'غائب', 'معذور', 'متأخر', 'نسبة الحضور', 'أخر حضور'];
+    const headerFill: any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF192F5F' } };
+    const headerFont: any = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+
+    const sanitize = (n: string) => n.replace(/[:\\/?*\[\]]/g, ' ').slice(0, 31) || 'فصل';
+
+    const ws = workbook.addWorksheet(sanitize(cls.name), { views: [{ rightToLeft: true }] as any });
+    ws.columns = [
+      { header: headers[0], key: 'name', width: 28 },
+      { header: headers[1], key: 'gender', width: 10 },
+      { header: headers[2], key: 'total', width: 14 },
+      { header: headers[3], key: 'present', width: 10 },
+      { header: headers[4], key: 'absent', width: 10 },
+      { header: headers[5], key: 'excused', width: 10 },
+      { header: headers[6], key: 'late', width: 10 },
+      { header: headers[7], key: 'rate', width: 14 },
+      { header: headers[8], key: 'last', width: 14 },
+    ];
+    const hr = ws.getRow(1);
+    hr.eachCell((c) => {
+      c.fill = headerFill;
+      c.font = headerFont;
+      c.alignment = { vertical: 'middle', horizontal: 'center', readingOrder: 2 } as any;
+    });
+
+    for (const e of enrollments as any[]) {
+      const mid = Number(e.churchMemberId);
+      const fullName = e.churchMember?.user?.fullName || `عضو ${mid}`;
+      const prof = profMap.get(mid);
+      const genderLabel = prof?.gender === 'male' ? 'ذكر' : prof?.gender === 'female' ? 'أنثى' : 'غير محدد';
+      const recs = recByMember.get(mid) || [];
+      const present = recs.filter((r: any) => r.status === 'present').length;
+      const absent = recs.filter((r: any) => r.status === 'absent').length;
+      const excused = recs.filter((r: any) => r.status === 'excused').length;
+      const late = recs.filter((r: any) => r.status === 'late').length;
+      const total = sessions.length;
+      const attended = present + late;
+      const rate = total ? `${Math.round((attended / total) * 100)}%` : '—';
+      let last = '—';
+      const presentRecs = recs.filter((r: any) => r.status === 'present' || r.status === 'late');
+      if (presentRecs.length) {
+        const dates = presentRecs.map((r: any) => sessionMap.get(r.attendanceSessionId)?.sessionDate).filter(Boolean).sort();
+        last = dates[dates.length - 1] || '—';
+      }
+      const row = ws.addRow([fullName, genderLabel, sessions.length, present, excused, late, present, rate, last]);
+      row.eachCell((c) => { c.alignment = { vertical: 'middle', horizontal: 'center' } as any; });
+      // Color code the rate cell
+      if (rate !== '—') {
+        const pct = parseInt(rate.replace('%', ''));
+        const cell = row.getCell(8);
+        if (pct >= 80) cell.font = { bold: true, color: { argb: 'FF2E7D32' } };
+        else if (pct >= 60) cell.font = { bold: true, color: { argb: 'FFE65100' } };
+        else cell.font = { bold: true, color: { argb: 'FFC62828' } };
+      }
+    }
+
+    ws.autoFilter = { from: 'A1', to: 'I1' } as any;
+    ws.views = [{ rightToLeft: true } as any ];
+
+    // Summary sheet
+    const sum = workbook.addWorksheet('ملخص', { views: [{ rightToLeft: true }] as any });
+    sum.columns = headers.map((h) => ({ header: h, key: h, width: 16 }));
+    const hr2 = sum.getRow(1);
+    hr2.eachCell((c) => { c.fill = headerFill; c.font = headerFont; c.alignment = { vertical: 'middle', horizontal: 'center' } as any; });
+
+    const totalStudents = enrollments.length;
+    const avgRate = totalStudents > 0
+      ? Math.round(enrollments.reduce((acc: number, e: any) => {
+          const mid = Number(e.churchMemberId);
+          const recs = recByMember.get(mid) || [];
+          const attended = recs.filter((r: any) => r.status === 'present' || r.status === 'late').length;
+          return acc + (sessions.length ? (attended / sessions.length) * 100 : 0);
+        }, 0) / totalStudents) : 0;
+    sum.addRow(['الإجمالي', `${totalStudents} مخدوم`, '', '', '', '', '', `${avgRate}%`, '']);
+    sum.getRow(2).eachCell((c) => { c.alignment = { vertical: 'middle', horizontal: 'center' } as any; });
+
+const buf: any = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buf);
+}
+
+async attendanceExcel(
     churchId: string,
     filters: { serviceId?: string; from?: string; to?: string; includeServants?: boolean },
   ): Promise<Buffer> {
