@@ -11,8 +11,8 @@ export const useAuth = () => {
   const { token, user, memberId, roles, contexts, activeContext, isLoading } =
     useSelector((state: RootState) => state.auth);
 
-  const login = useCallback(async (data: { email?: string; phone?: string; password: string }) => {
-    console.log(`[useAuth] login() START | identifier: ${data.email || data.phone}`);
+  const login = useCallback(async (data: { username?: string; email?: string; phone?: string; password: string }) => {
+    console.log(`[useAuth] login() START | identifier: ${data.username || data.email || data.phone}`);
     dispatch(setLoading(true));
     try {
       console.log(`[useAuth] Calling authApi.login()`);
@@ -45,7 +45,7 @@ export const useAuth = () => {
     }
   }, [dispatch]);
 
-  const signup = useCallback(async (data: { fullName: string; email?: string; phone?: string; password: string }) => {
+  const signup = useCallback(async (data: { fullName: string; username: string; phone?: string; password: string }) => {
     dispatch(setLoading(true));
     try {
       const response: any = await authApi.signup(data);

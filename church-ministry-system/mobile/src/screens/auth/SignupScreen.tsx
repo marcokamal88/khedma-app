@@ -17,16 +17,16 @@ export default function SignupScreen({ navigation }: any) {
   const { signup, isLoading } = useAuth();
   const { t, isRTL } = useLocale();
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [signupError, setSignupError] = useState<string | null>(null);
 
   const handleSignup = async () => {
-    if (!fullName || (!email && !phone) || !password) return;
+    if (!fullName || !username || !password) return;
     setSignupError(null);
     try {
-      await signup({ fullName, email: email || undefined, phone: phone || undefined, password });
+      await signup({ fullName, username, phone: phone || undefined, password });
     } catch (err: any) {
       setSignupError(err?.message || t('auth.signupError'));
     }
@@ -52,10 +52,10 @@ export default function SignupScreen({ navigation }: any) {
           />
           <AppInput
             placeholder={t('auth.email')}
-            value={email}
-            onChangeText={setEmail}
+            value={username}
+            onChangeText={setUsername}
             autoCapitalize="none"
-            keyboardType="email-address"
+            autoCorrect={false}
           />
           <Text style={styles.orText}>{t('auth.or')}</Text>
           <AppInput

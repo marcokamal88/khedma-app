@@ -47,6 +47,10 @@ const safeInsert = async (qi, table, rows) => {
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Skipping comprehensive-data seeder in production.');
+      return;
+    }
     const pw = await bcrypt.hash('password123', 10);
     const now = new Date();
     const roles = await queryInterface.sequelize.query('SELECT id, name FROM roles', { type: Sequelize.QueryTypes.SELECT });

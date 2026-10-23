@@ -25,7 +25,7 @@ export const churchApi = {
     apiClient.get('/members/search', { params: { q, ...(serviceId ? { serviceId } : {}) } }),
   registerMember: (data: {
     fullName: string;
-    email?: string;
+    username: string;
     phone?: string;
     password: string;
     serviceId?: string;
@@ -35,4 +35,11 @@ export const churchApi = {
     birthDate?: string;
     notes?: string;
   }) => apiClient.post('/members/register', data),
+  createServant: (data: {
+    fullName: string;
+    username: string;
+    phone?: string;
+    password: string;
+    classId: string;
+  }) => apiClient.post('/servants', data),
 };

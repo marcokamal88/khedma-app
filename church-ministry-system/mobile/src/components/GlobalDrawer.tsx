@@ -40,6 +40,7 @@ const SERVANT_MENU: MenuGroup[] = [
       { key: 'Home', icon: '\u2302', label: 'الرئيسية' },
       { key: 'Preparations', icon: '\u270E', label: 'إعداد الدرس' },
       { key: 'Attendance', icon: '\u2637', label: 'الحضور' },
+      { key: 'MyStudents', icon: '\u25C9', label: 'مخدوميّ' },
       { key: 'Tasks', icon: '\u2611', label: 'المهام' },
       { key: 'FollowUp', icon: '\u2606', label: 'المتابعة' },
       { key: 'Library', icon: '\u2702', label: 'مكتبة الدروس' },

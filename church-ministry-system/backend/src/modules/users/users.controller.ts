@@ -3,9 +3,9 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { CreateServantDto } from './dto/create-servant.dto';
 import { UpdateUserDto, UpdateMemberDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../../core/auth/jwt-auth.guard';
-import { Public } from '../../shared/decorators/public.decorator';
 import { Roles } from '../../shared/decorators/roles.decorator';
 import { CurrentTenant } from '../../core/tenant/tenant.decorator';
 import { Request } from 'express';
@@ -14,7 +14,8 @@ import { Request } from 'express';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @Public()
+  @UseGuards(JwtAuthGuard)
+  @Roles('priest', 'sector_leader', 'service_leader', 'assistant_service_leader')
   @Post('members')
   async create(@Body() dto: CreateUserDto, @CurrentTenant() churchId: string) {
     return this.usersService.create(dto, churchId);
@@ -68,8 +69,20 @@ export class UsersController {
       schoolGrade?: number;
     },
     @CurrentTenant() churchId: string,
+    @Req() req: Request,
   ) {
-    return this.usersService.registerMember(dto, churchId);
+    return this.usersService.registerMember(dto, churchId, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('service_leader', 'assistant_service_leader')
+  @Post('servants')
+  async createServant(
+    @Body() dto: CreateServantDto,
+    @CurrentTenant() churchId: string,
+    @Req() req: Request,
+  ) {
+    return this.usersService.createServant(dto, churchId, req.user);
   }
 
   @UseGuards(JwtAuthGuard)

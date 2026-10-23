@@ -1,8 +1,8 @@
 import apiClient from './client';
 
 export const authApi = {
-  login: (data: { email?: string; phone?: string; password: string }) => {
-    console.log(`[AUTH API] login() called | identifier: ${data.email || data.phone}`);
+  login: (data: { username?: string; email?: string; phone?: string; password: string }) => {
+    console.log(`[AUTH API] login() called | identifier: ${data.username || data.email || data.phone}`);
     return apiClient.post('/auth/login', data)
       .then((res: any) => {
         console.log(`[AUTH API] login() response received`);
@@ -10,7 +10,7 @@ export const authApi = {
       });
   },
 
-  signup: (data: { fullName: string; email?: string; phone?: string; password: string }) => {
+  signup: (data: { fullName: string; username: string; phone?: string; password: string }) => {
     console.log(`[AUTH API] signup() called | fullName: ${data.fullName}`);
     return apiClient.post('/auth/signup', data)
       .then((res: any) => {

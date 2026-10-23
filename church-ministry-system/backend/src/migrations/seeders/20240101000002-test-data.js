@@ -14,6 +14,10 @@ const IDS = {
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Skipping test-data seeder in production.');
+      return;
+    }
     const passwordHash = await bcrypt.hash('password123', 10);
     const now = new Date();
     const churchId = IDS.church;

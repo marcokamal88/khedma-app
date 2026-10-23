@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, ForbiddenException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/sequelize';
@@ -20,6 +20,7 @@ import { SwitchContextDto } from './dto/switch-context.dto';
 import { MemberProfile } from '../../modules/users/entities/member-profile.entity';
 import { JwtPayload, ActiveContext } from './jwt.strategy';
 import { Sequelize } from 'sequelize-typescript';
+import { normalizeUsername } from '../utils/username.util';
 
 @Injectable()
 export class AuthService {
@@ -39,12 +40,15 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto, churchId: number) {
-    const identifier = dto.email || dto.phone;
+    const identifier = dto.username || dto.email || dto.phone;
+    if (!identifier) {
+      throw new BadRequestException('Username or phone is required');
+    }
 
     const user = await this.userModel.findOne({
-      where: {
-        ...(dto.email ? { email: dto.email } : { phone: dto.phone }),
-      },
+      where: dto.username || dto.email
+        ? { email: normalizeUsername(dto.username || dto.email) }
+        : { phone: dto.phone },
     });
 
     if (!user) {
@@ -87,6 +91,7 @@ export class AuthService {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
+        username: user.email,
         phone: user.phone,
         avatarUrl: user.avatarUrl,
       },
@@ -159,22 +164,31 @@ export class AuthService {
   }
 
   async signup(dto: SignupDto, churchId: number) {
-    if (!dto.email && !dto.phone) {
-      throw new BadRequestException('Email or phone is required');
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Self signup is disabled');
     }
+
+    const username = normalizeUsername(dto.username);
+    if (!username) {
+      throw new BadRequestException('Username is required');
+    }
+
     const existing = await this.userModel.findOne({
       where: {
-        ...(dto.email ? { email: dto.email } : { phone: dto.phone }),
+        [Op.or]: [
+          { email: username },
+          ...(dto.phone ? [{ phone: dto.phone }] : []),
+        ],
       },
     });
     if (existing) {
-      throw new BadRequestException('Account already exists with this email/phone');
+      throw new BadRequestException('Account already exists with this username/phone');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = await this.userModel.create({
       fullName: dto.fullName,
-      email: dto.email || null,
+      email: username,
       phone: dto.phone || null,
       passwordHash,
     } as any);
@@ -218,6 +232,7 @@ export class AuthService {
         id: user.id,
         fullName: user.fullName,
         email: user.email,
+        username: user.email,
         phone: user.phone,
         avatarUrl: user.avatarUrl,
       },

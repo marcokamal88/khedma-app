@@ -34,6 +34,7 @@ export default function StudentsManagementScreen({ navigation, route }: any) {
   const [selectedMember, setSelectedMember] = useState<any>(null);
 
   const [newName, setNewName] = useState('');
+  const [newUsername, setNewUsername] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newGender, setNewGender] = useState('');
   const [newAddress, setNewAddress] = useState('');
@@ -123,6 +124,7 @@ export default function StudentsManagementScreen({ navigation, route }: any) {
 
   const handleRegister = async () => {
     if (!newName.trim()) { Alert.alert('', t('attendance.searchPlaceholder')); return; }
+    if (!newUsername.trim() || newPassword.trim().length < 6) { Alert.alert('', t('auth.credentialsRequired')); return; }
     const targetClassId = selectedClassId || (classes[0] ? String(classes[0].id) : '');
     if (!targetClassId) { Alert.alert('', t('classManagement.noClasses')); return; }
     try {
@@ -138,9 +140,9 @@ export default function StudentsManagementScreen({ navigation, route }: any) {
     try {
       const syRes: any = await apiClient.get('/service-years/current');
       const syId = syRes?.data?.id || syRes?.id;
-      await churchApi.registerMember({ fullName: newName.trim(), phone: newPhone.trim() || undefined, password: newPassword.trim() || 'changeme123', serviceId: serviceIdStr!, classId: targetClassId, serviceYearId: String(syId), address: newAddress.trim() || undefined, birthDate: newBirthDate.trim() || undefined, notes: newNotes.trim() || undefined, gender: newGender || undefined } as any);
+      await churchApi.registerMember({ fullName: newName.trim(), username: newUsername.trim().toLowerCase(), phone: newPhone.trim() || undefined, password: newPassword.trim(), serviceId: serviceIdStr!, classId: targetClassId, serviceYearId: String(syId), address: newAddress.trim() || undefined, birthDate: newBirthDate.trim() || undefined, notes: newNotes.trim() || undefined, gender: newGender || undefined } as any);
       Alert.alert('', t('attendance.addedSuccess'));
-      setShowAdd(false); setNewName(''); setNewPhone(''); setNewGender(''); setNewAddress(''); setNewBirthDate(''); setNewNotes(''); setNewPassword('');
+      setShowAdd(false); setNewName(''); setNewUsername(''); setNewPhone(''); setNewGender(''); setNewAddress(''); setNewBirthDate(''); setNewNotes(''); setNewPassword('');
       loadStudents();
     } catch (err: any) { Alert.alert('', err?.response?.data?.message || err?.message || t('app.error')); } finally { setSaving(false); }
   };
@@ -266,12 +268,13 @@ export default function StudentsManagementScreen({ navigation, route }: any) {
               ) : (
                 <View>
                   <TextInput style={styles.input} value={newName} onChangeText={setNewName} placeholder={t('attendance.searchPlaceholder').replace('ابحث باسم الطالب...','الاسم')} placeholderTextColor={MUTED} />
+                  <TextInput style={styles.input} value={newUsername} onChangeText={setNewUsername} placeholder={t('auth.username')} placeholderTextColor={MUTED} autoCapitalize="none" autoCorrect={false} />
                   <TextInput style={styles.input} value={newPhone} onChangeText={setNewPhone} placeholder={t('parent.phonePlaceholder') || 'phone'} placeholderTextColor={MUTED} keyboardType="phone-pad" />
                   <View style={styles.genderRow}>
                     <TouchableOpacity style={[styles.genderBtn, newGender === 'male' && styles.genderActive]} onPress={() => setNewGender('male')} activeOpacity={0.7}><Text style={[styles.genderText, newGender === 'male' && styles.genderTextActive]}>{t('home.male')}</Text></TouchableOpacity>
                     <TouchableOpacity style={[styles.genderBtn, newGender === 'female' && styles.genderActive]} onPress={() => setNewGender('female')} activeOpacity={0.7}><Text style={[styles.genderText, newGender === 'female' && styles.genderTextActive]}>{t('home.female')}</Text></TouchableOpacity>
                   </View>
-                  <TextInput style={styles.input} value={newPassword} onChangeText={setNewPassword} placeholder={t('attendance.passwordPlaceholder')} placeholderTextColor={MUTED} secureTextEntry />
+                  <TextInput style={styles.input} value={newPassword} onChangeText={setNewPassword} placeholder={t('auth.tempPassword')} placeholderTextColor={MUTED} secureTextEntry />
                   <TouchableOpacity style={styles.input} onPress={() => setShowCalendar(true)} activeOpacity={0.7}><Text style={{ color: newBirthDate ? NAVY : MUTED }}>{newBirthDate || t('attendance.birthDatePlaceholder')}</Text></TouchableOpacity>
                   <TextInput style={styles.input} value={newAddress} onChangeText={setNewAddress} placeholder={t('attendance.addressPlaceholder')} placeholderTextColor={MUTED} />
                   <TextInput style={[styles.input, { minHeight: 60, textAlignVertical: 'top' }]} value={newNotes} onChangeText={setNewNotes} placeholder={t('attendance.notesPlaceholder')} placeholderTextColor={MUTED} multiline />

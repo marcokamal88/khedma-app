@@ -11,6 +11,8 @@
     "migration:run": "npx sequelize-cli db:migrate",
     "migration:create": "npx sequelize-cli migration:create --name",
     "seed": "npx sequelize-cli db:seed:all",
+    "seed:roles": "npx sequelize-cli db:seed --seed 20240101000001-initial-roles.js",
+    "seed:bootstrap": "npx sequelize-cli db:seed --seed 20240101000020-prod-bootstrap.js",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:e2e": "jest --config ./test/jest-e2e.json"
@@ -28,6 +30,7 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "dotenv": "^16.4.5",
     "exceljs": "^4.4.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.7.0",

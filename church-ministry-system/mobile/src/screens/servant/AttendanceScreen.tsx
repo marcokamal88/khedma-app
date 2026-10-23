@@ -130,6 +130,7 @@ export default function AttendanceScreen() {
   const [newAddress, setNewAddress] = useState("");
   const [newBirthDate, setNewBirthDate] = useState("");
   const [newNotes, setNewNotes] = useState("");
+  const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
   const loadData = useCallback(async () => {
@@ -263,12 +264,17 @@ export default function AttendanceScreen() {
 
   const registerStudent = useCallback(async () => {
     if (!newName.trim() || !classAssignment) return;
+    if (!newUsername.trim() || newPassword.trim().length < 6) {
+      Alert.alert("", t("auth.credentialsRequired"));
+      return;
+    }
     setEnrolling(true);
     try {
       await churchApi.registerMember({
         fullName: newName.trim(),
+        username: newUsername.trim().toLowerCase(),
         phone: newPhone.trim() || undefined,
-        password: newPassword || "changeme123",
+        password: newPassword.trim(),
         serviceId: String(classAssignment.service.id),
         classId: String(classAssignment.class.id),
         serviceYearId: String(classAssignment.serviceYearId),
@@ -285,6 +291,7 @@ export default function AttendanceScreen() {
       setNewAddress("");
       setNewBirthDate("");
       setNewNotes("");
+      setNewUsername("");
       setNewPassword("");
       loadData();
     } catch (err: any) {
@@ -299,6 +306,7 @@ export default function AttendanceScreen() {
     newAddress,
     newBirthDate,
     newNotes,
+    newUsername,
     newPassword,
     classAssignment,
     loadData,
@@ -1130,7 +1138,16 @@ export default function AttendanceScreen() {
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder={t("attendance.passwordPlaceholder")}
+                    placeholder={t("auth.username")}
+                    placeholderTextColor={MUTED}
+                    value={newUsername}
+                    onChangeText={setNewUsername}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t("auth.tempPassword")}
                     placeholderTextColor={MUTED}
                     value={newPassword}
                     onChangeText={setNewPassword}

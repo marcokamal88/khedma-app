@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput,
-  ScrollView, ActivityIndicator, Modal, KeyboardAvoidingView, Platform, Alert,
+  ScrollView, ActivityIndicator, Modal, KeyboardAvoidingView, Platform, Alert, Share,
 } from 'react-native';
 import { useLocale } from '../../hooks/useLocale';
 import { useActiveContext } from '../../hooks/useActiveContext';
@@ -32,11 +32,16 @@ export default function ServantManagementScreen({ navigation }: any) {
 
   // assign modal
   const [showAssign, setShowAssign] = useState(false);
+  const [assignMode, setAssignMode] = useState<'existing' | 'new'>('existing');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [assignClassId, setAssignClassId] = useState('');
   const [assignRole, setAssignRole] = useState('servant');
+  const [newFullName, setNewFullName] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newPassword, setNewPassword] = useState('');
 
   const loadData = useCallback(async () => {
     if (!serviceIdStr) return;
@@ -158,11 +163,59 @@ export default function ServantManagementScreen({ navigation }: any) {
   };
 
   const resetAssign = () => {
+    setAssignMode('existing');
     setSearchQuery('');
     setSearchResults([]);
     setSelectedMember(null);
     setAssignClassId('');
     setAssignRole('servant');
+    setNewFullName('');
+    setNewUsername('');
+    setNewPhone('');
+    setNewPassword('');
+  };
+
+  const handleCreateServant = async () => {
+    if (!assignClassId) {
+      Alert.alert('', t('servantManagement.selectClass'));
+      return;
+    }
+    if (!newFullName.trim() || !newUsername.trim() || newPassword.trim().length < 6) {
+      Alert.alert('', t('auth.credentialsRequired'));
+      return;
+    }
+    setSaving(true);
+    try {
+      const username = newUsername.trim().toLowerCase();
+      const password = newPassword.trim();
+      await churchApi.createServant({
+        fullName: newFullName.trim(),
+        username,
+        phone: newPhone.trim() || undefined,
+        password,
+        classId: assignClassId,
+      });
+      setShowAssign(false);
+      resetAssign();
+      loadData();
+      Alert.alert(
+        t('auth.credentialsCreated'),
+        `${t('auth.username')}: ${username}\n${t('auth.tempPassword')}: ${password}`,
+        [
+          { text: t('app.cancel'), style: 'cancel' },
+          {
+            text: t('app.share') || 'Share',
+            onPress: () => Share.share({
+              message: `${t('auth.username')}: ${username}\n${t('auth.tempPassword')}: ${password}`,
+            }),
+          },
+        ],
+      );
+    } catch (err: any) {
+      Alert.alert('', err?.response?.data?.message || err?.message || t('app.error'));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const renderServant = ({ item }: { item: any }) => {
@@ -353,6 +406,29 @@ export default function ServantManagementScreen({ navigation }: any) {
               </TouchableOpacity>
             </View>
 
+            <View style={styles.modeRow}>
+              <TouchableOpacity
+                style={[styles.modeBtn, assignMode === 'existing' && styles.modeBtnActive]}
+                onPress={() => setAssignMode('existing')}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.modeText, assignMode === 'existing' && styles.modeTextActive]}>
+                  {t('servantManagement.existing')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modeBtn, assignMode === 'new' && styles.modeBtnActive]}
+                onPress={() => setAssignMode('new')}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.modeText, assignMode === 'new' && styles.modeTextActive]}>
+                  {t('servantManagement.create') || 'New'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {assignMode === 'existing' ? (
+              <>
             <TextInput
               style={styles.searchInput}
               value={searchQuery}
@@ -431,6 +507,68 @@ export default function ServantManagementScreen({ navigation }: any) {
                   loading={saving}
                   disabled={!assignClassId}
                   variant="navy"
+                />
+              </>
+            )}
+              </>
+            ) : (
+              <>
+                <TextInput
+                  style={styles.searchInput}
+                  value={newFullName}
+                  onChangeText={setNewFullName}
+                  placeholder={t('auth.fullName')}
+                  placeholderTextColor={MUTED}
+                />
+                <TextInput
+                  style={styles.searchInput}
+                  value={newUsername}
+                  onChangeText={setNewUsername}
+                  placeholder={t('auth.username')}
+                  placeholderTextColor={MUTED}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <TextInput
+                  style={styles.searchInput}
+                  value={newPhone}
+                  onChangeText={setNewPhone}
+                  placeholder={t('parent.phonePlaceholder') || 'Phone'}
+                  placeholderTextColor={MUTED}
+                  keyboardType="phone-pad"
+                />
+                <TextInput
+                  style={styles.searchInput}
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                  placeholder={t('auth.tempPassword')}
+                  placeholderTextColor={MUTED}
+                  secureTextEntry
+                />
+
+                <Text style={styles.label}>{t('servantManagement.selectClass')}</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionsRow}>
+                  {classes.map((c: any) => (
+                    <TouchableOpacity
+                      key={c.id}
+                      style={[styles.optionChip, assignClassId === String(c.id) && styles.optionChipActive]}
+                      onPress={() => setAssignClassId(String(c.id))}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.optionChipText, assignClassId === String(c.id) && styles.optionChipTextActive]}>
+                        {c.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+
+                <AppButton
+                  title={t('servantManagement.create') || 'Create'}
+                  onPress={handleCreateServant}
+                  loading={saving}
+                  disabled={!assignClassId}
+                  variant="navy"
+                  style={{ marginTop: 16 }}
                 />
               </>
             )}
@@ -520,6 +658,11 @@ const styles = StyleSheet.create({
   deactivateBtnText: { ...typography.button, color: '#c62828' },
 
   searchInput: { backgroundColor: CREAM, borderRadius: 28, paddingHorizontal: 16, paddingVertical: 12, ...typography.body, color: NAVY, marginBottom: 12 },
+  modeRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  modeBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: CREAM, alignItems: 'center', borderWidth: 1, borderColor: '#eceae4' },
+  modeBtnActive: { backgroundColor: NAVY, borderColor: NAVY },
+  modeText: { ...typography.buttonSmall, color: MUTED },
+  modeTextActive: { color: '#ffffff' },
   searchResults: { backgroundColor: CREAM, borderRadius: 12, padding: 8, marginBottom: 12 },
   searchResultItem: { paddingVertical: 10, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#eceae4' },
   searchResultName: { ...typography.body, color: NAVY },

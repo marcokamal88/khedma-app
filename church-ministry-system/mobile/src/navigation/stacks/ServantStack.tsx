@@ -7,6 +7,7 @@ import AttendanceScreen from "../../screens/servant/AttendanceScreen";
 import PreparationScreen from "../../screens/servant/PreparationScreen";
 import TasksScreen from "../../screens/servant/TasksScreen";
 import TaioAwardScreen from "../../screens/servant/TaioAwardScreen";
+import MyStudentsScreen from "../../screens/servant/MyStudentsScreen";
 import NotificationsScreen from "../../screens/shared/NotificationsScreen";
 import FollowUpStack from "./FollowUpStack";
 import LessonLibraryScreen from "../../screens/lesson-library/LessonLibraryScreen";
@@ -35,6 +36,7 @@ export default function ServantStack() {
 
       {/* Hidden tabs — navigable from the drawer */}
       <Tab.Screen name="Preparations" component={PreparationScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="MyStudents" component={MyStudentsScreen} options={{ title: t('studentsManagement.title'), tabBarButton: () => null }} />
       <Tab.Screen name="FollowUp" component={FollowUpStack} options={{ title: t("followUp.title"), tabBarButton: () => null }} />
       <Tab.Screen name="Achievements" component={AchievementsScreen} options={{ title: t("achievements.title"), tabBarButton: () => null }} />
       <Tab.Screen name="Library" component={LessonLibraryScreen} options={{ title: t("tabs.library"), tabBarButton: () => null }} />

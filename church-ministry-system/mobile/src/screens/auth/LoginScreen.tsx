@@ -16,16 +16,16 @@ export default function LoginScreen({ navigation }: any) {
   const { login, isLoading } = useAuth();
   const { t, lang, toggleLang, isRTL } = useLocale();
   const styles = createStyles(isRTL);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    if (!email || !password) return;
+    if (!username || !password) return;
     setLoginError(null);
     try {
-      await login({ email, password });
+      await login({ username, password });
     } catch (err: any) {
       setLoginError(err?.message || t('auth.loginError'));
     }
@@ -58,11 +58,11 @@ export default function LoginScreen({ navigation }: any) {
 
           <AppInput
             placeholder={t('auth.email')}
-            value={email}
-            onChangeText={setEmail}
+            value={username}
+            onChangeText={setUsername}
             autoCapitalize="none"
+            autoCorrect={false}
             style={{ textAlign: isRTL ? 'right' : 'left' }}
-            rightIcon={<Text style={{ fontSize: 16, color: colors.mutedGray }}>@</Text>}
           />
           <AppInput
             placeholder={t('auth.password')}
