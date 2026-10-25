@@ -81,7 +81,7 @@ const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
 
 interface GlobalDrawerProps {
   children: React.ReactNode;
-  navigationRef: { navigate: (name: string, params?: any) => void };
+  navigationRef: { navigate: (...args: any[]) => void };
   menuConfig?: MenuGroup[];
 }
 

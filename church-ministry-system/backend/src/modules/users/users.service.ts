@@ -527,6 +527,7 @@ export class UsersService {
       await this.profileModel.create({
         churchId,
         churchMemberId: member.id,
+        gender: dto.gender || null,
         phones: dto.phone ? [dto.phone] : null,
       } as any, { transaction });
 

@@ -34,6 +34,7 @@ export const churchApi = {
     address?: string;
     birthDate?: string;
     notes?: string;
+    gender?: string;
   }) => apiClient.post('/members/register', data),
   createServant: (data: {
     fullName: string;
@@ -41,5 +42,6 @@ export const churchApi = {
     phone?: string;
     password: string;
     classId: string;
+    gender?: string;
   }) => apiClient.post('/servants', data),
 };

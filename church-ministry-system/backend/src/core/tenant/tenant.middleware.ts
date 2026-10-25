@@ -6,7 +6,7 @@ export class TenantMiddleware implements NestMiddleware {
   use(req: Request, _res: Response, next: NextFunction) {
     // Skip tenant check for health endpoints
     const url = req.originalUrl || req.url || req.path || '';
-    if (url.includes('/health')) {
+    if (url.includes('/health') || url.includes('/admin')) {
       return next();
     }
 

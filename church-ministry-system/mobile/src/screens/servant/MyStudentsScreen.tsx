@@ -26,6 +26,7 @@ export default function MyStudentsScreen({ navigation }: any) {
   const [newName, setNewName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [newGender, setNewGender] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -62,6 +63,7 @@ export default function MyStudentsScreen({ navigation }: any) {
     setNewName('');
     setNewUsername('');
     setNewPhone('');
+    setNewGender('');
     setNewPassword('');
   };
 
@@ -79,6 +81,7 @@ export default function MyStudentsScreen({ navigation }: any) {
         username,
         phone: newPhone.trim() || undefined,
         password,
+        gender: newGender || undefined,
       });
       setShowAdd(false);
       resetAdd();
@@ -210,6 +213,22 @@ export default function MyStudentsScreen({ navigation }: any) {
                 placeholderTextColor={MUTED}
                 keyboardType="phone-pad"
               />
+              <View style={styles.genderRow}>
+                <TouchableOpacity
+                  style={[styles.genderBtn, newGender === 'male' && styles.genderActive]}
+                  onPress={() => setNewGender('male')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.genderText, newGender === 'male' && styles.genderTextActive]}>{t('home.male')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.genderBtn, newGender === 'female' && styles.genderActive]}
+                  onPress={() => setNewGender('female')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.genderText, newGender === 'female' && styles.genderTextActive]}>{t('home.female')}</Text>
+                </TouchableOpacity>
+              </View>
               <TextInput
                 style={styles.input}
                 value={newPassword}
@@ -262,4 +281,9 @@ const styles = StyleSheet.create({
   modalClose: { fontSize: 22, color: MUTED, paddingHorizontal: 8 },
   sheetContent: { padding: 20, paddingBottom: 60 },
   input: { backgroundColor: '#ffffff', borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, ...typography.body, color: NAVY, marginBottom: 10 },
+  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  genderBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ffffff', borderWidth: 1, borderColor: colors.border, alignItems: 'center' },
+  genderActive: { backgroundColor: NAVY, borderColor: NAVY },
+  genderText: { ...typography.buttonSmall, color: MUTED },
+  genderTextActive: { color: '#ffffff' },
 });

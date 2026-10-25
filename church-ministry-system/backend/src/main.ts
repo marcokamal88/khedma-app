@@ -10,9 +10,15 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   app.enableCors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    origin: [
+      '*',
+      'http://localhost:3001',
+      'http://localhost:3000',
+      process.env.FRONTEND_URL || '',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Church-ID'],
+    credentials: true,
   });
 
   app.useGlobalPipes(

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, Text } from 'react-native';
 import { tasksApi } from '../../api/tasks.api';
 import { useLocale } from '../../hooks/useLocale';
 import { AppCard, AppBadge, AppButton, AppEmptyState } from '../../components/ui';

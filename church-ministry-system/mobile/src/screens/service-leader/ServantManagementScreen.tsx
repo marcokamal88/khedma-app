@@ -41,6 +41,7 @@ export default function ServantManagementScreen({ navigation }: any) {
   const [newFullName, setNewFullName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [newGender, setNewGender] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
   const loadData = useCallback(async () => {
@@ -172,6 +173,7 @@ export default function ServantManagementScreen({ navigation }: any) {
     setNewFullName('');
     setNewUsername('');
     setNewPhone('');
+    setNewGender('');
     setNewPassword('');
   };
 
@@ -194,6 +196,7 @@ export default function ServantManagementScreen({ navigation }: any) {
         phone: newPhone.trim() || undefined,
         password,
         classId: assignClassId,
+        gender: newGender || undefined,
       });
       setShowAssign(false);
       resetAssign();
@@ -537,6 +540,22 @@ export default function ServantManagementScreen({ navigation }: any) {
                   placeholderTextColor={MUTED}
                   keyboardType="phone-pad"
                 />
+                <View style={styles.genderRow}>
+                  <TouchableOpacity
+                    style={[styles.genderBtn, newGender === 'male' && styles.genderActive]}
+                    onPress={() => setNewGender('male')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.genderText, newGender === 'male' && styles.genderTextActive]}>{t('home.male')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.genderBtn, newGender === 'female' && styles.genderActive]}
+                    onPress={() => setNewGender('female')}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.genderText, newGender === 'female' && styles.genderTextActive]}>{t('home.female')}</Text>
+                  </TouchableOpacity>
+                </View>
                 <TextInput
                   style={styles.searchInput}
                   value={newPassword}
@@ -663,6 +682,11 @@ const styles = StyleSheet.create({
   modeBtnActive: { backgroundColor: NAVY, borderColor: NAVY },
   modeText: { ...typography.buttonSmall, color: MUTED },
   modeTextActive: { color: '#ffffff' },
+  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
+  genderBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ffffff', borderWidth: 1, borderColor: colors.border, alignItems: 'center' },
+  genderActive: { backgroundColor: NAVY, borderColor: NAVY },
+  genderText: { ...typography.buttonSmall, color: MUTED },
+  genderTextActive: { color: '#ffffff' },
   searchResults: { backgroundColor: CREAM, borderRadius: 12, padding: 8, marginBottom: 12 },
   searchResultItem: { paddingVertical: 10, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#eceae4' },
   searchResultName: { ...typography.body, color: NAVY },

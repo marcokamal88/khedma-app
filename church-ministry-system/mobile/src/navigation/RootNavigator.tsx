@@ -13,7 +13,7 @@ function PushNotificationsSetup() {
 }
 
 function InnerNavigator({ token, needsContextSelection }: { token: string | null; needsContextSelection: boolean }) {
-  const navigationRef = createNavigationContainerRef();
+  const navigationRef = createNavigationContainerRef<any>();
 
   const renderNavigator = () => {
     if (!token) {
