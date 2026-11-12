@@ -535,6 +535,7 @@ export default function AttendanceScreen() {
       <View style={styles.root}>
         <ScrollView
           style={styles.scroll}
+          contentContainerStyle={{ paddingBottom: 110 }}
           bounces={false}
           showsVerticalScrollIndicator={false}
         >
@@ -675,6 +676,7 @@ export default function AttendanceScreen() {
     <View style={styles.root}>
       <ScrollView
         style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -1545,74 +1547,78 @@ const styles = StyleSheet.create({
 
   classInfoCard: {
     backgroundColor: "rgba(255,255,255,0.10)",
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
-    padding: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
   },
   classInfoRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   classInfoIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 12,
+    marginLeft: 10,
   },
-  classInfoIcon: { fontSize: 18 },
+  classInfoIcon: { fontSize: 16 },
   classInfoTextWrap: { flex: 1 },
   classInfoTitle: {
-    ...typography.cardTitle,
+    fontSize: 13,
+    lineHeight: 17,
     color: "#ffffff",
     fontWeight: "700",
-    textAlign: "left",
-    marginLeft: 16,
+    textAlign: "right",
   },
   classInfoMeta: {
-    ...typography.caption,
-    color: "rgba(255,255,255,0.6)",
-    marginTop: 2,
-    textAlign: "left",
-    marginLeft: 16,
+    fontSize: 11,
+    lineHeight: 15,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 1,
+    textAlign: "right",
   },
 
   sessionInfoCard: {
     backgroundColor: "rgba(255,255,255,0.10)",
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
-    padding: 14,
-    marginTop: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    marginTop: 10,
   },
   sessionInfoRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   sessionInfoIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 12,
+    marginLeft: 10,
   },
-  sessionInfoIcon: { fontSize: 18, color: "#ffffff" },
+  sessionInfoIcon: { fontSize: 16, color: "#ffffff" },
   sessionInfoTextWrap: { flex: 1 },
   sessionInfoTitle: {
-    ...typography.cardTitle,
+    fontSize: 13,
+    lineHeight: 17,
     color: "#ffffff",
     fontWeight: "700",
     textAlign: "right",
   },
   sessionInfoMeta: {
-    ...typography.caption,
-    color: "rgba(255,255,255,0.6)",
-    marginTop: 2,
+    fontSize: 11,
+    lineHeight: 15,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 1,
     textAlign: "right",
   },
 
@@ -1746,7 +1752,7 @@ const styles = StyleSheet.create({
     backgroundColor: NAVY,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginLeft: 12,
   },
   studentAvatarText: {
     ...typography.subHeading,
@@ -1758,7 +1764,7 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: CHARCOAL,
     fontWeight: "600",
-    textAlign: "left",
+    textAlign: "right",
     flex: 1,
   },
   taioBadge: {
@@ -1807,7 +1813,7 @@ const styles = StyleSheet.create({
     backgroundColor: NAVY,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginLeft: 12,
   },
   sessionIcon: { fontSize: 16, color: "#ffffff" },
   sessionTextWrap: { flex: 1 },
@@ -1815,13 +1821,13 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: CHARCOAL,
     fontWeight: "600",
-    textAlign: "left",
+    textAlign: "right",
   },
   sessionMeta: {
     ...typography.caption,
     color: MUTED,
     marginTop: 2,
-    textAlign: "left",
+    textAlign: "right",
   },
   attendedPill: {
     backgroundColor: "#e8f5e9",

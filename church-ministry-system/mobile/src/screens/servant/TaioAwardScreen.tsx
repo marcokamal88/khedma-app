@@ -196,6 +196,7 @@ export default function TaioAwardScreen() {
     <View style={styles.root}>
       <ScrollView
         style={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}
       >
@@ -353,35 +354,40 @@ const styles = StyleSheet.create({
 
   classInfoCard: {
     backgroundColor: "rgba(255,255,255,0.10)",
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
-    padding: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
   },
   classInfoRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
   },
   classInfoIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 12,
+    marginLeft: 10,
   },
-  classInfoIcon: { fontSize: 24, color: GOLD },
+  classInfoIcon: { fontSize: 18, color: GOLD },
   classInfoTextWrap: { flex: 1 },
   classInfoTitle: {
-    ...typography.cardTitle,
+    fontSize: 13,
+    lineHeight: 17,
     color: "#ffffff",
     fontWeight: "700",
+    textAlign: "right",
   },
   classInfoMeta: {
-    ...typography.caption,
-    color: "rgba(255,255,255,0.6)",
-    marginTop: 2,
+    fontSize: 11,
+    lineHeight: 15,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 1,
+    textAlign: "right",
   },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },

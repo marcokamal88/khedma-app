@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { join, basename } from 'path';
+import { existsSync, unlinkSync, rmSync } from 'fs';
+import { Op } from 'sequelize';
 import { Preparation } from './entities/preparation.entity';
 import { PreparationFile } from './entities/preparation-file.entity';
 import { PreparationComment } from './entities/preparation-comment.entity';
@@ -100,6 +103,34 @@ export class PreparationService {
       throw new ForbiddenException('Not authorized');
     }
     await this.prepModel.update({ status: 'submitted' } as any, { where: { id } });
+
+    // Notify service leaders of this service
+    try {
+      const leaders = await this.assignmentModel.findAll({
+        where: {
+          churchId,
+          serviceId: prep.serviceId,
+          isActive: true,
+          leaderRole: { [Op.in]: ['service_leader', 'assistant_service_leader'] },
+        } as any,
+      });
+
+      const servantName = (prep as any).servant?.user?.fullName || 'أحد الخدام';
+      for (const leader of leaders) {
+        if (Number(leader.churchMemberId) !== Number(servantId)) {
+          this.notify({
+            churchId: String(churchId),
+            churchMemberId: String(leader.churchMemberId),
+            title: 'تحضير جديد بانتظار المراجعة',
+            body: `قام ${servantName} بتقديم تحضير "${prep.title}" لمراجعته`,
+            type: 'general',
+            sourceType: 'preparation',
+            sourceId: String(id),
+          });
+        }
+      }
+    } catch {}
+
     return this.findOne(churchId, id);
   }
 
@@ -141,7 +172,6 @@ export class PreparationService {
     actorMemberId?: number,
   ) {
     const prep = await this.findOne(churchId, preparationId);
-    // optional: only owner can upload unless priest/leader - keep permissive for now
     return this.fileModel.create({
       ...fileData,
       churchId,
@@ -149,8 +179,51 @@ export class PreparationService {
     } as any);
   }
 
+  async deleteFile(
+    churchId: number,
+    preparationId: number,
+    fileId: number,
+    actor: any,
+  ) {
+    const prep = await this.findOne(churchId, preparationId);
+    const actorMemberId = typeof actor === 'object' ? (actor.memberId || actor.sub) : actor;
+    const roles: string[] = typeof actor === 'object' && Array.isArray(actor.roles) ? actor.roles : [];
+    const isOwner = Number(prep.servantId) === Number(actorMemberId);
+    const isReviewer = Number(prep.reviewerId) === Number(actorMemberId);
+    const isLeader = roles.some((r) =>
+      ['service_leader', 'assistant_service_leader', 'sector_leader', 'priest', 'admin'].includes(r),
+    );
+    // Allow owner, reviewer, leader, or any authorized servant when prep is in draft or rejected status
+    const canEditFiles = isOwner || isReviewer || isLeader || prep.status === 'draft' || prep.status === 'rejected';
+    if (!canEditFiles) {
+      throw new ForbiddenException('Not authorized to delete this file');
+    }
+    const file = await this.fileModel.findOne({
+      where: { id: fileId, preparationId, churchId },
+    });
+    if (!file) throw new NotFoundException('File not found');
+
+    try {
+      const filePath = join(process.cwd(), 'uploads', 'preparations', String(preparationId), basename(file.fileUrl));
+      if (existsSync(filePath)) {
+        unlinkSync(filePath);
+      }
+    } catch {}
+
+    await file.destroy();
+    return { success: true };
+  }
+
   async remove(churchId: number, id: number) {
     const prep = await this.findOne(churchId, id);
+    try {
+      const dir = join(process.cwd(), 'uploads', 'preparations', String(id));
+      if (existsSync(dir)) {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    } catch {}
+
+    await this.fileModel.destroy({ where: { preparationId: id, churchId } });
     await this.prepModel.destroy({ where: { id } });
     return { success: true };
   }

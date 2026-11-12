@@ -4,15 +4,18 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { notificationsApi } from '../api/notifications.api';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+}
 
 export async function registerForPushNotificationsAsync(memberId: string, churchId: string): Promise<string | null> {
+  if (Platform.OS === 'web') return null;
   let token: string | null = null;
 
   if (Platform.OS === 'android') {
@@ -55,6 +58,7 @@ export async function registerForPushNotificationsAsync(memberId: string, church
 }
 
 export function setupNotificationListener(onNotification: (notification: Notifications.Notification) => void) {
+  if (Platform.OS === 'web') return () => {};
   const subscription = Notifications.addNotificationReceivedListener(onNotification);
   const responseSubscription = Notifications.addNotificationResponseReceivedListener((response) => {
     onNotification(response.notification);
@@ -66,6 +70,7 @@ export function setupNotificationListener(onNotification: (notification: Notific
 }
 
 export async function getPushToken(): Promise<string | null> {
+  if (Platform.OS === 'web') return null;
   const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.expoConfig?.extra?.projectId;
   return (await Notifications.getExpoPushTokenAsync({ projectId })).data;
 }

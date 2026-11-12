@@ -540,6 +540,7 @@ export default function ServantManagementScreen({ navigation }: any) {
                   placeholderTextColor={MUTED}
                   keyboardType="phone-pad"
                 />
+                <Text style={styles.label}>{t('servantManagement.gender')}</Text>
                 <View style={styles.genderRow}>
                   <TouchableOpacity
                     style={[styles.genderBtn, newGender === 'male' && styles.genderActive]}
