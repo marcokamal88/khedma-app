@@ -102,12 +102,14 @@ export const ar = {
     avgAge: "متوسط العمر",
   },
   followUp: {
-    title: "المتابعة",
+    title: "الافتقاد",
+    detail: "تفاصيل الافتقاد",
+    new: "افتقاد جديد",
+    addActivity: "تسجيل افتقاد",
     addFollowUp: "إضافة متابعة",
     servant: "الخادم",
     servedMember: "المخدوم",
     activities: "النشاطات",
-    addActivity: "إضافة نشاط",
     activityType: "نوع النشاط",
     call: "اتصال",
     visit: "زيارة",
@@ -122,8 +124,6 @@ export const ar = {
     paused: "متوقف",
     completed: "مكتمل",
     notes: "ملاحظات",
-    new: "متابعة جديدة",
-    detail: "تفاصيل المتابعة",
     service: "الخدمة",
   },
   achievements: {
@@ -225,12 +225,6 @@ export const ar = {
   notifications: {
     title: "الإشعارات",
     empty: "لا توجد إشعارات",
-  },
-  followUp: {
-    title: "الافتقاد",
-    detail: "تفاصيل الافتقاد",
-    new: "افتقاد جديد",
-    addActivity: "تسجيل افتقاد",
   },
   store: {
     title: "متجر طايو",

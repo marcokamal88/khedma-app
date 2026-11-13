@@ -103,6 +103,8 @@ export const en = {
   },
   followUp: {
     title: 'Follow Up',
+    detail: 'Follow Up Detail',
+    new: 'New Follow Up',
     addFollowUp: 'Add Follow Up',
     servant: 'Servant',
     servedMember: 'Member',
@@ -122,8 +124,6 @@ export const en = {
     paused: 'Paused',
     completed: 'Completed',
     notes: 'Notes',
-    new: 'New Follow Up',
-    detail: 'Follow Up Details',
     service: 'Service',
   },
   achievements: {
@@ -225,12 +225,6 @@ seeAll: 'See All',
   notifications: {
     title: 'Notifications',
     empty: 'No notifications',
-  },
-  followUp: {
-    title: 'Follow Up',
-    detail: 'Follow Up Detail',
-    new: 'New Follow Up',
-    addActivity: 'Add Follow Up Activity',
   },
   store: {
     title: 'Taio Store',
