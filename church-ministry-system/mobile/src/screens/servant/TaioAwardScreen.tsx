@@ -203,9 +203,6 @@ export default function TaioAwardScreen() {
         <AppHeader greetingText={t("award.title")}>
           <View style={styles.classInfoCard}>
             <View style={styles.classInfoRow}>
-              <View style={styles.classInfoIconWrap}>
-                <Text style={styles.classInfoIcon}>{"\u2605"}</Text>
-              </View>
               <View style={styles.classInfoTextWrap}>
                 <Text style={styles.classInfoTitle}>
                   {classAssignment?.service?.name}
@@ -214,6 +211,9 @@ export default function TaioAwardScreen() {
                   {classAssignment?.class?.stageGroup?.name} -{" "}
                   {classAssignment?.class?.name}
                 </Text>
+              </View>
+              <View style={styles.classInfoIconWrap}>
+                <Text style={styles.classInfoIcon}>{"\u2605"}</Text>
               </View>
             </View>
           </View>
@@ -250,6 +250,7 @@ export default function TaioAwardScreen() {
                   <Text style={styles.memberName} numberOfLines={1}>
                     {student.fullName}
                   </Text>
+                  <View style={{ flex: 1 }} />
                   <View style={styles.balanceBadge}>
                     <Text style={styles.balanceBadgeValue}>
                       {student.taioBalance ?? 0}
@@ -363,6 +364,7 @@ const styles = StyleSheet.create({
   classInfoRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   classInfoIconWrap: {
     width: 34,
@@ -371,23 +373,27 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
   },
   classInfoIcon: { fontSize: 18, color: GOLD },
-  classInfoTextWrap: { flex: 1 },
+  classInfoTextWrap: {
+    flex: 1,
+    marginEnd: 10,
+  },
   classInfoTitle: {
     fontSize: 13,
     lineHeight: 17,
     color: "#ffffff",
     fontWeight: "700",
-    textAlign: "right",
+    textAlign: "left",
+    writingDirection: "rtl",
   },
   classInfoMeta: {
     fontSize: 11,
     lineHeight: 15,
     color: "rgba(255,255,255,0.7)",
     marginTop: 1,
-    textAlign: "right",
+    textAlign: "left",
+    writingDirection: "rtl",
   },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },
@@ -454,6 +460,9 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: CHARCOAL,
     fontWeight: "600",
+    textAlign: "right",
+    writingDirection: "rtl",
+    maxWidth: "50%",
   },
   balanceBadge: {
     flexDirection: "row",

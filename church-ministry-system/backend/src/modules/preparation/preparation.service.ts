@@ -36,6 +36,9 @@ export class PreparationService {
 
   async create(churchId: number, data: Partial<Preparation>, servantId: number) {
     const resolved: any = { ...data };
+    if (resolved.notes !== undefined && resolved.description === undefined) {
+      resolved.description = resolved.notes;
+    }
     if (!resolved.serviceYearId) {
       const sy: any = await this.serviceYearModel.findOne({ where: { churchId, isCurrent: true } as any });
       if (!sy) throw new BadRequestException('No active service year');
@@ -88,25 +91,47 @@ export class PreparationService {
     return prep;
   }
 
-  async update(churchId: number, id: number, data: Partial<Preparation>, userId: number) {
+  async update(churchId: number, id: number, data: Partial<Preparation>, actor: any) {
     const prep = await this.findOne(churchId, id);
-    if (prep.servantId !== userId && !data.reviewerId) {
+    const actorMemberId = typeof actor === 'object' ? (actor.memberId || actor.sub) : actor;
+    const roles: string[] = typeof actor === 'object' && Array.isArray(actor.roles) ? actor.roles : [];
+    const isLeader = roles.some((r) =>
+      ['service_leader', 'assistant_service_leader', 'sector_leader', 'priest', 'admin'].includes(r),
+    );
+
+    // Servant cannot update preparation once it has been confirmed/approved by service leader
+    if (prep.status === 'approved' && !isLeader) {
+      throw new ForbiddenException('لا يمكن تعديل التحضير بعد اعتماده من أمين الخدمة');
+    }
+
+    if (Number(prep.servantId) !== Number(actorMemberId) && !isLeader && !data.reviewerId) {
       throw new ForbiddenException('Not authorized to update this preparation');
     }
-    await this.prepModel.update(data as any, { where: { id } });
+
+    const updateData: any = { ...data };
+    if (updateData.notes !== undefined && updateData.description === undefined) {
+      updateData.description = updateData.notes;
+    }
+
+    await this.prepModel.update(updateData, { where: { id } });
     return this.findOne(churchId, id);
   }
 
   async submit(churchId: number, id: number, servantId: number) {
     const prep = await this.findOne(churchId, id);
-    if (prep.servantId !== servantId) {
+    if (Number(prep.servantId) !== Number(servantId)) {
       throw new ForbiddenException('Not authorized');
     }
+
+    if (prep.status === 'approved') {
+      throw new BadRequestException('تم اعتماد هذا التحضير بالفعل ومغلق للتعديل');
+    }
+
     await this.prepModel.update({ status: 'submitted' } as any, { where: { id } });
 
     // Notify service leaders of this service
     try {
-      const leaders = await this.assignmentModel.findAll({
+      let leaders = await this.assignmentModel.findAll({
         where: {
           churchId,
           serviceId: prep.serviceId,
@@ -115,6 +140,16 @@ export class PreparationService {
         } as any,
       });
 
+      if (!leaders || leaders.length === 0) {
+        leaders = await this.assignmentModel.findAll({
+          where: {
+            churchId,
+            isActive: true,
+            leaderRole: { [Op.in]: ['service_leader', 'assistant_service_leader'] },
+          } as any,
+        });
+      }
+
       const servantName = (prep as any).servant?.user?.fullName || 'أحد الخدام';
       for (const leader of leaders) {
         if (Number(leader.churchMemberId) !== Number(servantId)) {
@@ -122,7 +157,7 @@ export class PreparationService {
             churchId: String(churchId),
             churchMemberId: String(leader.churchMemberId),
             title: 'تحضير جديد بانتظار المراجعة',
-            body: `قام ${servantName} بتقديم تحضير "${prep.title}" لمراجعته`,
+            body: `قام الخادم ${servantName} بتقديم تحضير "${prep.title}" لمراجعته واعتماده`,
             type: 'general',
             sourceType: 'preparation',
             sourceId: String(id),
@@ -169,9 +204,19 @@ export class PreparationService {
     churchId: number,
     preparationId: number,
     fileData: Partial<PreparationFile>,
-    actorMemberId?: number,
+    actor?: any,
   ) {
     const prep = await this.findOne(churchId, preparationId);
+    const actorMemberId = typeof actor === 'object' ? (actor.memberId || actor.sub) : actor;
+    const roles: string[] = typeof actor === 'object' && Array.isArray(actor.roles) ? actor.roles : [];
+    const isLeader = roles.some((r) =>
+      ['service_leader', 'assistant_service_leader', 'sector_leader', 'priest', 'admin'].includes(r),
+    );
+
+    if (prep.status === 'approved' && !isLeader) {
+      throw new ForbiddenException('لا يمكن إضافة مرفقات بعد اعتماد التحضير من أمين الخدمة');
+    }
+
     return this.fileModel.create({
       ...fileData,
       churchId,
@@ -193,6 +238,11 @@ export class PreparationService {
     const isLeader = roles.some((r) =>
       ['service_leader', 'assistant_service_leader', 'sector_leader', 'priest', 'admin'].includes(r),
     );
+
+    if (prep.status === 'approved' && !isLeader) {
+      throw new ForbiddenException('لا يمكن حذف مرفقات التحضير بعد اعتماده من أمين الخدمة');
+    }
+
     // Allow owner, reviewer, leader, or any authorized servant when prep is in draft or rejected status
     const canEditFiles = isOwner || isReviewer || isLeader || prep.status === 'draft' || prep.status === 'rejected';
     if (!canEditFiles) {
@@ -214,8 +264,17 @@ export class PreparationService {
     return { success: true };
   }
 
-  async remove(churchId: number, id: number) {
+  async remove(churchId: number, id: number, actor?: any) {
     const prep = await this.findOne(churchId, id);
+    const roles: string[] = typeof actor === 'object' && Array.isArray(actor?.roles) ? actor.roles : [];
+    const isLeader = roles.some((r) =>
+      ['service_leader', 'assistant_service_leader', 'sector_leader', 'priest', 'admin'].includes(r),
+    );
+
+    if (prep.status === 'approved' && !isLeader) {
+      throw new ForbiddenException('لا يمكن حذف التحضير بعد اعتماده من أمين الخدمة');
+    }
+
     try {
       const dir = join(process.cwd(), 'uploads', 'preparations', String(id));
       if (existsSync(dir)) {

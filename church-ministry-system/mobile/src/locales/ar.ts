@@ -47,7 +47,7 @@ export const ar = {
     profile: "الملف الشخصي",
     attendance: "الحضور",
     preparation: "التحضير",
-    followUp: "المتابعة",
+    followUp: "الافتقاد",
     reports: "التقارير",
     notifications: "الإشعارات",
     store: "المتجر",
@@ -225,6 +225,12 @@ export const ar = {
   notifications: {
     title: "الإشعارات",
     empty: "لا توجد إشعارات",
+  },
+  followUp: {
+    title: "الافتقاد",
+    detail: "تفاصيل الافتقاد",
+    new: "افتقاد جديد",
+    addActivity: "تسجيل افتقاد",
   },
   store: {
     title: "متجر طايو",

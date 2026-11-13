@@ -30,14 +30,14 @@ export default function ServantStack() {
       {/* Visible tabs */}
       <Tab.Screen name="Home" component={ServantDashboard} options={{ title: t('tabs.home') }} />
       <Tab.Screen name="Attendance" component={AttendanceScreen} options={{ title: t('tabs.attendance') }} />
-      <Tab.Screen name="Tasks" component={TasksScreen} options={{ title: t('tabs.tasks') }} />
+      <Tab.Screen name="Preparations" component={PreparationScreen} options={{ title: t('tabs.preparation') }} />
+      <Tab.Screen name="FollowUp" component={FollowUpStack} options={{ title: t('tabs.followUp') }} />
       <Tab.Screen name="Taiao" component={TaioAwardScreen} options={{ title: t('tabs.taio') }} />
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
 
       {/* Hidden tabs — navigable from the drawer */}
-      <Tab.Screen name="Preparations" component={PreparationScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="Tasks" component={TasksScreen} options={{ title: t('tabs.tasks'), tabBarButton: () => null }} />
       <Tab.Screen name="MyStudents" component={MyStudentsScreen} options={{ title: t('studentsManagement.title'), tabBarButton: () => null }} />
-      <Tab.Screen name="FollowUp" component={FollowUpStack} options={{ title: t("followUp.title"), tabBarButton: () => null }} />
       <Tab.Screen name="Achievements" component={AchievementsScreen} options={{ title: t("achievements.title"), tabBarButton: () => null }} />
       <Tab.Screen name="Library" component={LessonLibraryScreen} options={{ title: t("tabs.library"), tabBarButton: () => null }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />

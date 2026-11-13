@@ -112,14 +112,14 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     color: "rgba(255,255,255,0.65)",
     marginBottom: 2,
-    textAlign: "right",
+    textAlign: "left",
   },
   userName: {
     fontSize: 18,
     lineHeight: 22,
     color: "#ffffff",
     fontWeight: "700",
-    textAlign: "right",
+    textAlign: "left",
   },
   waveContainer: {
     height: 14,

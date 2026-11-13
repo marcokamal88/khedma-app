@@ -26,6 +26,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { useLocale } from '../../hooks/useLocale';
 import AppHeader from '../../components/AppHeader';
+import CalendarPicker from '../../components/CalendarPicker';
 import { AppInput, AppButton, AppCard, AppBadge, AppEmptyState } from '../../components/ui';
 import { preparationsApi } from '../../api/preparations.api';
 import apiClient from '../../api/client';
@@ -64,11 +65,9 @@ export default function PreparationScreen() {
   const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState('');
   const [lessonDate, setLessonDate] = useState(new Date().toISOString().split('T')[0]);
-  const [keyPointInput, setKeyPointInput] = useState('');
-  const [keyPoints, setKeyPoints] = useState<string[]>([]);
-  const [verseInput, setVerseInput] = useState('');
-  const [bibleVerses, setBibleVerses] = useState<string[]>([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [notes, setNotes] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<Array<{ uri: string; name: string; mimeType?: string; size?: number }>>([]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -95,32 +94,54 @@ export default function PreparationScreen() {
   const resetModal = () => {
     setTitle('');
     setLessonDate(new Date().toISOString().split('T')[0]);
-    setKeyPointInput('');
-    setKeyPoints([]);
-    setVerseInput('');
-    setBibleVerses([]);
     setNotes('');
+    setSelectedFiles([]);
+    setShowDatePicker(false);
     setModalVisible(false);
   };
 
-  const handleAddKeyPoint = () => {
-    if (!keyPointInput.trim()) return;
-    setKeyPoints((prev) => [...prev, keyPointInput.trim()]);
-    setKeyPointInput('');
+  const pickNewPrepFile = async () => {
+    try {
+      const picker = getDocumentPicker();
+      if (!picker || typeof picker.getDocumentAsync !== 'function') {
+        Alert.alert(
+          'تنبيه',
+          'ميزة اختيار الملفات تتطلب إعادة بناء التطبيق لتحديث الحزم الأصلية على هاتفك. يُرجى تشغيل:\nnpx expo run:android'
+        );
+        return;
+      }
+
+      const res = await picker.getDocumentAsync({
+        type: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/vnd.ms-powerpoint',
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          'image/*',
+          'text/plain',
+        ],
+        copyToCacheDirectory: true,
+        multiple: true,
+      });
+
+      if (res.canceled || !res.assets || res.assets.length === 0) return;
+
+      const newFiles = res.assets.map((asset) => ({
+        uri: asset.uri,
+        name: asset.name,
+        mimeType: asset.mimeType,
+        size: asset.size,
+      }));
+
+      setSelectedFiles((prev) => [...prev, ...newFiles]);
+    } catch (err: any) {
+      Alert.alert('', err?.message || 'فشل اختيار الملف');
+    }
   };
 
-  const handleRemoveKeyPoint = (idx: number) => {
-    setKeyPoints((prev) => prev.filter((_, i) => i !== idx));
-  };
-
-  const handleAddVerse = () => {
-    if (!verseInput.trim()) return;
-    setBibleVerses((prev) => [...prev, verseInput.trim()]);
-    setVerseInput('');
-  };
-
-  const handleRemoveVerse = (idx: number) => {
-    setBibleVerses((prev) => prev.filter((_, i) => i !== idx));
+  const removeSelectedFile = (idx: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const createPreparation = async () => {
@@ -130,18 +151,27 @@ export default function PreparationScreen() {
     }
     setCreating(true);
     try {
-      const description = JSON.stringify({
-        keyPoints: keyPoints.length > 0 ? keyPoints : [title.trim()],
-        bibleVerses,
-        text: notes.trim(),
-      });
-      await preparationsApi.create({
+      const createdRes: any = await preparationsApi.create({
         title: title.trim(),
         lessonDate,
-        description,
+        description: notes.trim(),
         status: 'draft',
       });
-      Alert.alert('', t('preparation.created') || 'تم إنشاء التحضير بنجاح');
+      const newPrep = createdRes?.data || createdRes;
+      const newPrepId = String(newPrep?.id);
+
+      // Upload any files attached during creation
+      if (selectedFiles.length > 0 && newPrepId) {
+        for (const f of selectedFiles) {
+          try {
+            await preparationsApi.uploadFile(newPrepId, f.uri, f.name, f.mimeType);
+          } catch (uploadErr) {
+            console.warn('[Preparation] Failed uploading attached file:', uploadErr);
+          }
+        }
+      }
+
+      Alert.alert('', t('preparation.created') || 'تم إنشاء التحضير وإرفاق الملفات بنجاح');
       resetModal();
       await loadData();
     } catch (err: any) {
@@ -229,8 +259,8 @@ export default function PreparationScreen() {
 
   const submitPreparation = async (prepId: string) => {
     Alert.alert(
-      t('preparation.submit') || 'تقديم التحضير',
-      t('preparation.submitConfirm') || 'هل تريد تقديم هذا التحضير لمراجعته من قبل أمين الخدمة؟',
+      t('preparation.submit') || 'تقديم التحضير للمراجعة',
+      t('preparation.submitConfirm') || 'هل تريد تقديم هذا التحضير لأمناء الخدمة لمراجعته واعتماده؟',
       [
         { text: t('preparation.cancel') || 'إلغاء', style: 'cancel' },
         {
@@ -238,7 +268,10 @@ export default function PreparationScreen() {
           onPress: async () => {
             try {
               await preparationsApi.submit(prepId);
-              Alert.alert('', t('preparation.submittedSuccess') || 'تم تقديم التحضير للمراجعة بنجاح');
+              Alert.alert(
+                'تم الإرسال بنجاح',
+                'تم إرسال التحضير إلى أمناء الخدمة للمراجعة والاعتماد، وتم إرسال إشعار لهم.'
+              );
               await loadData();
             } catch (err: any) {
               Alert.alert('', err?.message || 'فشل تقديم التحضير');
@@ -271,20 +304,20 @@ export default function PreparationScreen() {
     );
   };
 
-  const parseDescription = (raw: string | null | undefined) => {
-    if (!raw || typeof raw !== 'string') return { text: '', keyPoints: [], bibleVerses: [] };
+  const parseDescription = (raw: string | null | undefined): string => {
+    if (!raw || typeof raw !== 'string') return '';
     const trimmed = raw.trim();
-    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return { text: trimmed, keyPoints: [], bibleVerses: [] };
-    try {
-      const obj = JSON.parse(trimmed);
-      if (obj && typeof obj === 'object') {
-        const kp = Array.isArray(obj.keyPoints) ? obj.keyPoints.filter(Boolean) : [];
-        const bv = Array.isArray(obj.bibleVerses) ? obj.bibleVerses.filter(Boolean) : [];
-        const extra = typeof obj.text === 'string' ? obj.text : '';
-        return { text: extra, keyPoints: kp, bibleVerses: bv };
-      }
-    } catch { }
-    return { text: trimmed, keyPoints: [], bibleVerses: [] };
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      try {
+        const obj = JSON.parse(trimmed);
+        if (obj && typeof obj === 'object') {
+          if (typeof obj.text === 'string' && obj.text) return obj.text;
+          if (typeof obj.notes === 'string' && obj.notes) return obj.notes;
+          if (Array.isArray(obj.keyPoints) && obj.keyPoints.length > 0) return obj.keyPoints.join(' • ');
+        }
+      } catch { }
+    }
+    return trimmed;
   };
 
   const filteredPreparations = preparations.filter((p) => {
@@ -300,7 +333,9 @@ export default function PreparationScreen() {
   const renderPrep = ({ item }: { item: any }) => {
     const files = item.files || [];
     const statusConfig = STATUS_MAP[item.status] || { label: item.status, variant: 'neutral' as const };
-    const parsedDesc = parseDescription(item.description);
+    const notesContent = parseDescription(item.description);
+    const isApproved = item.status === 'approved';
+    const canModify = !isApproved;
     const canSubmit = item.status === 'draft' || item.status === 'rejected';
     const canDelete = item.status === 'draft';
     const isUploadingThis = uploadingPrepId === String(item.id);
@@ -316,6 +351,16 @@ export default function PreparationScreen() {
           <AppBadge label={statusConfig.label} variant={statusConfig.variant} />
         </View>
 
+        {/* Approved and locked notice banner */}
+        {isApproved && (
+          <View style={styles.approvedBanner}>
+            <Text style={styles.approvedBannerIcon}>✓</Text>
+            <Text style={styles.approvedBannerText}>
+              تم اعتماد هذا التحضير من قبل أمين الخدمة (مغلق للتعديل)
+            </Text>
+          </View>
+        )}
+
         {/* Rejection / Review Notes Banner */}
         {item.reviewNotes ? (
           <View style={styles.reviewNotesBox}>
@@ -324,25 +369,13 @@ export default function PreparationScreen() {
           </View>
         ) : null}
 
-        {/* Key Points */}
-        {parsedDesc.keyPoints.length > 0 && (
-          <View style={styles.pointsWrap}>
-            {parsedDesc.keyPoints.map((kp: string, idx: number) => (
-              <Text key={idx} style={styles.pointLine} numberOfLines={2}>
-                • {kp}
-              </Text>
-            ))}
+        {/* Notes / Content Box */}
+        {notesContent ? (
+          <View style={styles.notesBox}>
+            <Text style={styles.notesBoxTitle}>الملاحظات:</Text>
+            <Text style={styles.notesBoxText}>{notesContent}</Text>
           </View>
-        )}
-
-        {/* Bible Verses */}
-        {parsedDesc.bibleVerses.length > 0 && (
-          <View style={styles.versesRow}>
-            {parsedDesc.bibleVerses.map((v: string, idx: number) => (
-              <AppBadge key={idx} label={v} variant="info" style={styles.verseBadge} />
-            ))}
-          </View>
-        )}
+        ) : null}
 
         {/* Attached Files Section */}
         {files.length > 0 && (
@@ -383,7 +416,7 @@ export default function PreparationScreen() {
                       <Text style={styles.fileDownloadText}>{t('preparation.download') || 'عرض'}</Text>
                     </TouchableOpacity>
 
-                    {canSubmit && (
+                    {canModify && canSubmit && (
                       <TouchableOpacity
                         style={styles.fileDeleteBtn}
                         onPress={() => deleteFile(String(item.id), String(f.id))}
@@ -401,19 +434,21 @@ export default function PreparationScreen() {
 
         {/* Card Actions */}
         <View style={styles.cardActionsRow}>
-          {/* Attach Document / Image */}
-          <TouchableOpacity
-            style={styles.attachBtn}
-            onPress={() => pickAndUpload(String(item.id))}
-            activeOpacity={0.7}
-            disabled={isUploadingThis}
-          >
-            {isUploadingThis ? (
-              <ActivityIndicator size="small" color={NAVY} />
-            ) : (
-              <Text style={styles.attachBtnText}>+ {t('preparation.attachFile') || 'إرفاق ملف أو صورة'}</Text>
-            )}
-          </TouchableOpacity>
+          {/* Attach Document / Image (only when not approved) */}
+          {canModify && (
+            <TouchableOpacity
+              style={styles.attachBtn}
+              onPress={() => pickAndUpload(String(item.id))}
+              activeOpacity={0.7}
+              disabled={isUploadingThis}
+            >
+              {isUploadingThis ? (
+                <ActivityIndicator size="small" color={NAVY} />
+              ) : (
+                <Text style={styles.attachBtnText}>+ {t('preparation.attachFile') || 'إرفاق ملف أو صورة'}</Text>
+              )}
+            </TouchableOpacity>
+          )}
 
           {/* Submit Button */}
           {canSubmit && (
@@ -447,9 +482,6 @@ export default function PreparationScreen() {
       <AppHeader greetingText={t('preparation.heading') || 'تحضير الدروس'}>
         <View style={styles.classInfoCard}>
           <View style={styles.classInfoRow}>
-            <View style={styles.classInfoIconWrap}>
-              <Text style={styles.classInfoIcon}>{"\uD83D\uDCD6"}</Text>
-            </View>
             <View style={styles.classInfoTextWrap}>
               <Text style={styles.classInfoTitle}>
                 {activeContext?.displayLabel || 'خدمة مدارس الأحد'}
@@ -457,6 +489,9 @@ export default function PreparationScreen() {
               <Text style={styles.classInfoMeta}>
                 {t('preparation.heading') || 'تحضير ومتابعة الدروس الأسبوعية'}
               </Text>
+            </View>
+            <View style={styles.classInfoIconWrap}>
+              <Text style={styles.classInfoIcon}>{"\uD83D\uDCD6"}</Text>
             </View>
           </View>
         </View>
@@ -552,87 +587,76 @@ export default function PreparationScreen() {
 
             <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
               {/* Title Input */}
-              <Text style={styles.fieldLabel}>{t('preparation.titlePlaceholder') || 'عنوان الدرس'}</Text>
+              <Text style={styles.fieldLabel}>عنوان وموضوع الدرس</Text>
               <AppInput
-                placeholder={t('preparation.titlePlaceholder') || 'عنوان الدرس'}
+                placeholder="مثال: مثل السامري الصالح"
                 value={title}
                 onChangeText={setTitle}
                 textAlign="right"
               />
 
-              {/* Lesson Date */}
-              <Text style={styles.fieldLabel}>تاريخ الدرس (YYYY-MM-DD)</Text>
-              <AppInput
-                placeholder="2026-11-20"
-                value={lessonDate}
-                onChangeText={setLessonDate}
-                textAlign="right"
-              />
+              {/* Date Input with CalendarPicker */}
+              <Text style={styles.fieldLabel}>تاريخ الدرس</Text>
+              <TouchableOpacity
+                style={styles.datePickerBtn}
+                onPress={() => setShowDatePicker(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.datePickerIcon}>📅</Text>
+                <Text style={styles.datePickerText}>{lessonDate}</Text>
+              </TouchableOpacity>
 
-              {/* Key Points */}
-              <Text style={styles.fieldLabel}>{t('preparation.keyPoints') || 'النقاط الرئيسية'}</Text>
-              <View style={styles.inlineAddRow}>
-                <TextInput
-                  style={styles.inlineInput}
-                  placeholder="أضف نقطة رئيسية..."
-                  placeholderTextColor={MUTED}
-                  value={keyPointInput}
-                  onChangeText={setKeyPointInput}
-                  textAlign="right"
-                />
-                <TouchableOpacity style={styles.inlineAddBtn} onPress={handleAddKeyPoint} activeOpacity={0.7}>
-                  <Text style={styles.inlineAddBtnText}>+</Text>
-                </TouchableOpacity>
-              </View>
-              {keyPoints.map((kp, idx) => (
-                <View key={idx} style={styles.tagItem}>
-                  <Text style={styles.tagText} numberOfLines={1}>• {kp}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveKeyPoint(idx)}>
-                    <Text style={styles.tagRemove}>✕</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-
-              {/* Bible Verses */}
-              <Text style={[styles.fieldLabel, { marginTop: spacing.sm }]}>
-                {t('preparation.bibleVerses') || 'الشواهد والآيات'}
-              </Text>
-              <View style={styles.inlineAddRow}>
-                <TextInput
-                  style={styles.inlineInput}
-                  placeholder="مثال: يوحنا 3:16"
-                  placeholderTextColor={MUTED}
-                  value={verseInput}
-                  onChangeText={setVerseInput}
-                  textAlign="right"
-                />
-                <TouchableOpacity style={styles.inlineAddBtn} onPress={handleAddVerse} activeOpacity={0.7}>
-                  <Text style={styles.inlineAddBtnText}>+</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.tagContainer}>
-                {bibleVerses.map((v, idx) => (
-                  <View key={idx} style={styles.verseChip}>
-                    <Text style={styles.verseChipText}>{v}</Text>
-                    <TouchableOpacity onPress={() => handleRemoveVerse(idx)}>
-                      <Text style={styles.verseChipRemove}>✕</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-
-              {/* Notes */}
-              <Text style={[styles.fieldLabel, { marginTop: spacing.sm }]}>ملاحظات ومحتوى إضافي</Text>
+              {/* Notes Input */}
+              <Text style={[styles.fieldLabel, { marginTop: spacing.md }]}>ملاحظات ومحتوى التحضير</Text>
               <TextInput
                 style={styles.textArea}
-                placeholder="أضف ملاحظات أو شرحاً إضافياً للدرس..."
+                placeholder="أضف ملاحظات أو شرحاً للدرس..."
                 placeholderTextColor={MUTED}
                 value={notes}
                 onChangeText={setNotes}
                 multiline
-                numberOfLines={4}
+                numberOfLines={5}
                 textAlign="right"
               />
+
+              {/* Attach File Section */}
+              <Text style={[styles.fieldLabel, { marginTop: spacing.xs }]}>
+                إرفاق ملف الدرس (PDF، Word، PowerPoint، صور)
+              </Text>
+              <TouchableOpacity
+                style={styles.modalUploadBtn}
+                onPress={pickNewPrepFile}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalUploadIcon}>📎</Text>
+                <Text style={styles.modalUploadBtnText}>+ اختيار ملف أو صورة للدرس</Text>
+              </TouchableOpacity>
+
+              {/* Selected Files List */}
+              {selectedFiles.map((f, idx) => (
+                <View key={idx} style={styles.selectedFilePill}>
+                  <Text style={styles.selectedFileIcon}>
+                    {f.name.endsWith('.pdf') ? '📄' : f.name.match(/\.(png|jpg|jpeg|webp)$/i) ? '🖼' : f.name.match(/\.(ppt|pptx)$/i) ? '📊' : '📝'}
+                  </Text>
+                  <View style={styles.selectedFileInfo}>
+                    <Text style={styles.selectedFileName} numberOfLines={1}>
+                      {f.name}
+                    </Text>
+                    {f.size ? (
+                      <Text style={styles.selectedFileSize}>
+                        {(f.size / 1024).toFixed(0)} KB
+                      </Text>
+                    ) : null}
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => removeSelectedFile(idx)}
+                    style={styles.selectedFileRemoveBtn}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.selectedFileRemoveText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
 
               <View style={styles.modalActions}>
                 <AppButton
@@ -653,6 +677,17 @@ export default function PreparationScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Calendar Picker Modal */}
+      <CalendarPicker
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onSelect={(dateStr) => {
+          setLessonDate(dateStr);
+          setShowDatePicker(false);
+        }}
+        initialDate={lessonDate}
+      />
     </View>
   );
 }
@@ -673,6 +708,7 @@ const styles = StyleSheet.create({
   classInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   classInfoIconWrap: {
     width: 34,
@@ -681,23 +717,27 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10,
   },
   classInfoIcon: { fontSize: 16 },
-  classInfoTextWrap: { flex: 1 },
+  classInfoTextWrap: {
+    flex: 1,
+    marginEnd: 10,
+  },
   classInfoTitle: {
     fontSize: 13,
     lineHeight: 17,
     color: '#ffffff',
     fontWeight: '700',
-    textAlign: 'right',
+    textAlign: 'left',
+    writingDirection: 'rtl',
   },
   classInfoMeta: {
     fontSize: 11,
     lineHeight: 15,
     color: 'rgba(255,255,255,0.7)',
     marginTop: 1,
-    textAlign: 'right',
+    textAlign: 'left',
+    writingDirection: 'rtl',
   },
 
   contentWrap: {
@@ -739,13 +779,13 @@ const styles = StyleSheet.create({
     ...typography.cardTitle,
     color: CHARCOAL,
     fontWeight: '700',
-    textAlign: 'right',
+    textAlign: 'left',
   },
   createCardSubtitle: {
     ...typography.caption,
     color: MUTED,
     marginTop: 2,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   createCardArrow: { fontSize: 16, color: MUTED },
 
@@ -813,13 +853,15 @@ const styles = StyleSheet.create({
     ...typography.cardTitle,
     color: CHARCOAL,
     fontWeight: '700',
-    textAlign: 'right',
+    textAlign: 'left',
+    writingDirection: 'rtl',
   },
   cardDate: {
     ...typography.caption,
     color: MUTED,
     marginTop: 2,
-    textAlign: 'right',
+    textAlign: 'left',
+    writingDirection: 'rtl',
   },
   reviewNotesBox: {
     backgroundColor: '#fff8e1',
@@ -834,30 +876,62 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#8c6b12',
     marginBottom: 2,
-    textAlign: 'right',
+    textAlign: 'left',
+    writingDirection: 'rtl',
   },
   reviewNotesText: {
     ...typography.caption,
     color: CHARCOAL,
-    textAlign: 'right',
+    textAlign: 'left',
+    writingDirection: 'rtl',
   },
-  pointsWrap: {
-    marginTop: 6,
-    gap: 2,
+  approvedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E6F5EE',
+    borderWidth: 1,
+    borderColor: '#a5d6a7',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginVertical: 8,
+    gap: 8,
   },
-  pointLine: {
+  approvedBannerIcon: {
+    color: '#2e7d32',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  approvedBannerText: {
+    ...typography.caption,
+    color: '#2e7d32',
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'left',
+    writingDirection: 'rtl',
+  },
+  notesBox: {
+    backgroundColor: 'rgba(28, 28, 28, 0.03)',
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 6,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  notesBoxTitle: {
+    ...typography.caption,
+    fontWeight: '700',
+    color: CHARCOAL,
+    marginBottom: 4,
+    textAlign: 'left',
+    writingDirection: 'rtl',
+  },
+  notesBoxText: {
     ...typography.caption,
     color: CHARCOAL,
-    textAlign: 'right',
-  },
-  versesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 6,
-  },
-  verseBadge: {
-    backgroundColor: 'rgba(25, 47, 95, 0.08)',
+    textAlign: 'left',
+    writingDirection: 'rtl',
+    lineHeight: 18,
   },
   fileSection: {
     marginTop: 10,
@@ -870,7 +944,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: CHARCOAL,
     marginBottom: 6,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   fileItem: {
     flexDirection: 'row',
@@ -893,12 +967,12 @@ const styles = StyleSheet.create({
     ...typography.caption,
     fontWeight: '600',
     color: CHARCOAL,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   fileSizeText: {
     fontSize: 10,
     color: MUTED,
-    textAlign: 'right',
+    textAlign: 'left',
   },
   fileActions: {
     flexDirection: 'row',
@@ -1021,80 +1095,25 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     marginTop: spacing.xs,
   },
-  inlineAddRow: {
+  datePickerBtn: {
     flexDirection: 'row',
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  inlineInput: {
-    flex: 1,
-    height: 40,
+    alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: spacing.xs,
+  },
+  datePickerIcon: {
+    fontSize: 18,
+    marginEnd: 10,
+  },
+  datePickerText: {
     ...typography.body,
-    color: colors.textPrimary,
-  },
-  inlineAddBtn: {
-    width: 40,
-    height: 40,
-    backgroundColor: NAVY,
-    borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  inlineAddBtnText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  tagItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    borderRadius: borderRadius.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 4,
-  },
-  tagText: {
-    ...typography.caption,
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  tagRemove: {
-    color: colors.error,
-    fontWeight: 'bold',
-    marginStart: spacing.xs,
-  },
-  tagContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
-    marginBottom: spacing.xs,
-  },
-  verseChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.charcoal40,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: borderRadius.full,
-  },
-  verseChipText: {
-    ...typography.overline,
-    color: colors.offWhite,
-  },
-  verseChipRemove: {
-    color: colors.offWhite,
-    fontWeight: 'bold',
-    marginStart: 6,
-    fontSize: 10,
+    color: CHARCOAL,
+    fontWeight: '600',
   },
   textArea: {
     minHeight: 80,
@@ -1106,7 +1125,72 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textPrimary,
     textAlignVertical: 'top',
-    marginBottom: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  modalUploadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(212, 168, 67, 0.12)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 168, 67, 0.35)',
+    borderStyle: 'dashed',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: spacing.xs,
+    gap: 8,
+  },
+  modalUploadIcon: {
+    fontSize: 18,
+  },
+  modalUploadBtnText: {
+    ...typography.buttonSmall,
+    color: '#9e7310',
+    fontWeight: '700',
+  },
+  selectedFilePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 6,
+    gap: 8,
+  },
+  selectedFileIcon: {
+    fontSize: 18,
+  },
+  selectedFileInfo: {
+    flex: 1,
+  },
+  selectedFileName: {
+    ...typography.caption,
+    fontWeight: '600',
+    color: CHARCOAL,
+    textAlign: 'left',
+  },
+  selectedFileSize: {
+    fontSize: 10,
+    color: MUTED,
+    textAlign: 'left',
+    marginTop: 2,
+  },
+  selectedFileRemoveBtn: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(198, 40, 40, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedFileRemoveText: {
+    color: '#c62828',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
   modalActions: {
     flexDirection: 'row',

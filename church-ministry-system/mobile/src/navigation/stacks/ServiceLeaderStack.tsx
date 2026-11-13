@@ -31,6 +31,7 @@ export default function ServiceLeaderStack() {
       <Tab.Screen name="FollowUp" component={FollowUpStack} options={{ title: t("followUp.title") }} />
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
 
+      <Tab.Screen name="Preparations" component={PreparationsReviewScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="ServantManagement" component={ServantManagementScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="ClassManagement" component={ClassManagementScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="StudentsManagement" component={StudentsManagementScreen} options={{ tabBarButton: () => null }} />

@@ -226,6 +226,12 @@ seeAll: 'See All',
     title: 'Notifications',
     empty: 'No notifications',
   },
+  followUp: {
+    title: 'Follow Up',
+    detail: 'Follow Up Detail',
+    new: 'New Follow Up',
+    addActivity: 'Add Follow Up Activity',
+  },
   store: {
     title: 'Taio Store',
     balance: 'Your Balance: ',

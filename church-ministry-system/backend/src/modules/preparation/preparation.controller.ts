@@ -46,7 +46,7 @@ export class PreparationController {
     @Req() req: Request,
   ) {
     const user = req.user as any;
-    return this.prepService.update(churchId, +id, body, user.memberId);
+    return this.prepService.update(churchId, +id, body, user);
   }
 
   @Roles('servant', 'class_leader', 'sector_leader', 'priest')
@@ -70,8 +70,9 @@ export class PreparationController {
 
   @Roles('servant', 'class_leader', 'sector_leader', 'priest')
   @Delete(':id')
-  async remove(@Param('id') id: string, @CurrentTenant() churchId: number) {
-    return this.prepService.remove(churchId, +id);
+  async remove(@Param('id') id: string, @CurrentTenant() churchId: number, @Req() req: Request) {
+    const user = req.user as any;
+    return this.prepService.remove(churchId, +id, user);
   }
 
   @Roles('servant', 'class_leader', 'sector_leader', 'priest', 'service_leader', 'assistant_service_leader')
@@ -106,7 +107,7 @@ export class PreparationController {
     else if (mime.includes('msword') || mime.includes('word')) fileType = 'document';
     const fileUrl = `/uploads/preparations/${id}/${file.filename}`;
     const user = (req as any).user;
-    return this.prepService.addFile(churchId, +id, { fileName: file.originalname, fileUrl, fileType, fileSizeBytes: file.size } as any, user?.memberId);
+    return this.prepService.addFile(churchId, +id, { fileName: file.originalname, fileUrl, fileType, fileSizeBytes: file.size } as any, user);
   }
 
   @Get(':id/files')

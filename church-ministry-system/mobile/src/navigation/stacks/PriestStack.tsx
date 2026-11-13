@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useLocale } from "../../hooks/useLocale";
 import PriestDashboard from "../../screens/priest/DashboardScreen";
 import ReportsScreen from "../../screens/leader/ReportsScreen";
+import PreparationsReviewScreen from "../../screens/leader/PreparationsReviewScreen";
 import NotificationsScreen from "../../screens/shared/NotificationsScreen";
 import ContextSwitcherScreen from "../../screens/auth/ContextSwitcherScreen";
 import CustomTabBar from "../CustomTabBar";
@@ -24,6 +25,8 @@ export default function PriestStack() {
       <Tab.Screen name="SwitchContext" component={EmptyScreen} options={{ title: t('tabs.more') }} />
 
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="Preparations" component={PreparationsReviewScreen} options={{ tabBarButton: () => null }} />
+      <Tab.Screen name="Reviews" component={PreparationsReviewScreen} options={{ tabBarButton: () => null }} />
       <Tab.Screen name="ContextSwitcher" component={ContextSwitcherScreen} options={{ title: t('auth.switchContext'), tabBarButton: () => null }} />
     </Tab.Navigator>
   );

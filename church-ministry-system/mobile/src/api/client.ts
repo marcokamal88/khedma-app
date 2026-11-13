@@ -6,7 +6,7 @@ import { Platform } from "react-native";
 // iOS simulator can use localhost. Physical device needs your machine's LAN IP.
 // Web can use current browser hostname.
 const getHost = () => {
-  if (Platform.OS === "android") return "10.20.164.56";
+  if (Platform.OS === "android") return "10.20.164.26";
   if (Platform.OS === "web" && typeof window !== "undefined") {
     return window.location.hostname || "localhost";
   }

@@ -146,9 +146,7 @@ export default function NotificationsScreen({ navigation }: any) {
             </TouchableOpacity>
           ) : null
         }
-      >
-        <View style={styles.card} />
-      </AppHeader>
+      />
 
       <FlatList
         data={items}
@@ -201,11 +199,36 @@ const styles = StyleSheet.create({
   typeText: { ...typography.overline, fontWeight: '700', fontSize: 11 },
   unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: NAVY },
 
-  title: { ...typography.cardTitle, color: CHARCOAL, fontWeight: '700', marginBottom: 6, textAlign: 'right' },
-  body: { ...typography.body, color: CHARCOAL, lineHeight: 22, textAlign: 'right' },
+  title: {
+    ...typography.cardTitle,
+    color: CHARCOAL,
+    fontWeight: '700',
+    marginBottom: 6,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
+  body: {
+    ...typography.body,
+    color: CHARCOAL,
+    lineHeight: 22,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
 
-  metaRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: BORDER },
-  dateText: { ...typography.caption, color: MUTED },
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: BORDER,
+  },
+  dateText: {
+    ...typography.caption,
+    color: MUTED,
+    textAlign: 'right',
+    writingDirection: 'rtl',
+  },
 
   readAllBtn: { ...typography.buttonSmall, color: NAVY, fontWeight: '600' },
 });

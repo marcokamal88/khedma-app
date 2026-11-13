@@ -5,7 +5,7 @@ import { useDrawer } from '../contexts/DrawerContext';
 const ROUTE_ICON_NAME: Record<string, string> = {
   Home: 'home',
   Attendance: 'calendar',
-  Preparations: 'check-square',
+  Preparations: 'preparation',
   Tasks: 'tasks',
   Taiao: 'taio',
   FollowUp: 'followUp',

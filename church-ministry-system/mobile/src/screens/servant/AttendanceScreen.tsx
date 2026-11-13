@@ -14,7 +14,9 @@ import {
   RefreshControl,
   Share,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 import { attendanceApi } from "../../api/attendance.api";
 import { churchApi } from "../../api/church.api";
 import apiClient from "../../api/client";
@@ -99,6 +101,7 @@ export default function AttendanceScreen() {
     {},
   );
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [noClass, setNoClass] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -181,37 +184,71 @@ export default function AttendanceScreen() {
   );
 
   const exportAttendanceExcel = useCallback(async () => {
-    if (!classAssignment) return;
+    if (!classAssignment || exporting) return;
+    setExporting(true);
     try {
-      Alert.alert(t("app.loading"), t("attendance.exporting"));
       const classId = String(classAssignment.class.id);
-      const res = await attendanceApi.exportClassAttendance({
-        classId,
-        from: undefined,
-        to: undefined,
+      const apiBase =
+        (apiClient.defaults.baseURL as string) || "http://localhost:3000/api/v1";
+      const downloadUrl = `${apiBase}/reports/servant-class-attendance/excel?classId=${classId}`;
+      const token = await AsyncStorage.getItem("access_token");
+      const churchId = (await AsyncStorage.getItem("church_id")) || "1";
+
+      if (Platform.OS === "web") {
+        const response = await fetch(downloadUrl, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "X-Church-ID": churchId,
+          },
+        });
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Attendance_${classId}_${new Date().toISOString().split("T")[0]}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        Alert.alert(t("app.success"), t("attendance.exportSuccess") || "تم تصدير كشف الحضور بنجاح");
+        return;
+      }
+
+      const fileName = `Attendance_${classId}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+      const res = await FileSystem.downloadAsync(downloadUrl, fileUri, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "X-Church-ID": churchId,
+        },
       });
 
-      // Convert blob to base64
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(res.data);
-      });
-
-      // Extract base64 content (remove data:...;base64, prefix)
-      const base64Content = base64.split(",")[1];
-      const fileUri = `${FileSystem.documentDirectory}Attendance_${classAssignment.class.id}_${new Date().toISOString().split("T")[0]}.xlsx`;
-      await FileSystem.writeAsStringAsync(fileUri, base64Content, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      await Share.share({ url: fileUri, title: "Attendance Report" });
-      Alert.alert(t("app.success"), t("attendance.exportSuccess"));
+      if (res.status === 200) {
+        if (await Sharing.isAvailableAsync().catch(() => false)) {
+          await Sharing.shareAsync(res.uri, {
+            mimeType:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            dialogTitle: "تصدير كشف الحضور",
+            UTI: "com.microsoft.excel.xlsx",
+          });
+        } else {
+          await Share.share({
+            url: res.uri,
+            title: "كشف حضور الفصل",
+            message: `كشف حضور فصل ${classAssignment.class.name}`,
+          });
+        }
+      } else {
+        throw new Error(`فشل التصدير (رمز الحالة: ${res.status})`);
+      }
     } catch (err: any) {
       console.error("Export error:", err);
       Alert.alert(t("app.error"), err?.message || t("app.retry"));
+    } finally {
+      setExporting(false);
     }
-  }, [classAssignment, t]);
+  }, [classAssignment, exporting, t]);
 
   useEffect(() => {
     loadData();
@@ -542,9 +579,6 @@ export default function AttendanceScreen() {
           <AppHeader greetingText={t("attendance.title")}>
             <View style={styles.sessionInfoCard}>
               <View style={styles.sessionInfoRow}>
-                <View style={styles.sessionInfoIconWrap}>
-                  <Text style={styles.sessionInfoIcon}>{"\u25F7"}</Text>
-                </View>
                 <View style={styles.sessionInfoTextWrap}>
                   <Text style={styles.sessionInfoTitle}>
                     {classAssignment?.service?.name} -{" "}
@@ -553,6 +587,9 @@ export default function AttendanceScreen() {
                   <Text style={styles.sessionInfoMeta}>
                     {selectedSession.sessionDate}
                   </Text>
+                </View>
+                <View style={styles.sessionInfoIconWrap}>
+                  <Text style={styles.sessionInfoIcon}>{"\u25F7"}</Text>
                 </View>
               </View>
             </View>
@@ -585,6 +622,7 @@ export default function AttendanceScreen() {
                     <Text style={styles.memberName} numberOfLines={1}>
                       {student.fullName}
                     </Text>
+                    <View style={{ flex: 1 }} />
                   </View>
                   <View style={styles.statusButtons}>
                     {statusButtons.map((s) => {
@@ -690,9 +728,6 @@ export default function AttendanceScreen() {
         <AppHeader greetingText={t("attendance.title")}>
           <View style={styles.classInfoCard}>
             <View style={styles.classInfoRow}>
-              <View style={styles.classInfoIconWrap}>
-                <Text style={styles.classInfoIcon}>{"\uD83C\uDF93"}</Text>
-              </View>
               <View style={styles.classInfoTextWrap}>
                 <Text style={styles.classInfoTitle}>
                   {classAssignment?.service?.name}
@@ -701,6 +736,9 @@ export default function AttendanceScreen() {
                   {classAssignment?.class?.stageGroup?.name} -{" "}
                   {classAssignment?.class?.name}
                 </Text>
+              </View>
+              <View style={styles.classInfoIconWrap}>
+                <Text style={styles.classInfoIcon}>{"\uD83C\uDF93"}</Text>
               </View>
             </View>
           </View>
@@ -767,9 +805,13 @@ export default function AttendanceScreen() {
                   style={styles.exportBtn}
                   onPress={exportAttendanceExcel}
                   activeOpacity={0.7}
-                  disabled={sessions.length === 0}
+                  disabled={sessions.length === 0 || exporting}
                 >
-                  <Text style={styles.exportBtnText}>📥</Text>
+                  {exporting ? (
+                    <ActivityIndicator size="small" color={NAVY} />
+                  ) : (
+                    <Text style={styles.exportBtnText}>📥</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
@@ -796,6 +838,7 @@ export default function AttendanceScreen() {
                       <Text style={styles.studentName} numberOfLines={1}>
                         {student.fullName}
                       </Text>
+                      <View style={{ flex: 1 }} />
                       <View style={styles.taioBadge}>
                         <Text style={styles.taioBadgeText}>
                           {student.taioBalance ?? 0}
@@ -1352,6 +1395,7 @@ export default function AttendanceScreen() {
                     <Text style={styles.studentName} numberOfLines={1}>
                       {student.fullName}
                     </Text>
+                    <View style={{ flex: 1 }} />
                     <View style={styles.taioBadge}>
                       <Text style={styles.taioBadgeText}>
                         {student.taioBalance ?? 0}
@@ -1556,6 +1600,7 @@ const styles = StyleSheet.create({
   classInfoRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   classInfoIconWrap: {
     width: 34,
@@ -1564,23 +1609,27 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
   },
   classInfoIcon: { fontSize: 16 },
-  classInfoTextWrap: { flex: 1 },
+  classInfoTextWrap: {
+    flex: 1,
+    marginEnd: 10,
+  },
   classInfoTitle: {
     fontSize: 13,
     lineHeight: 17,
     color: "#ffffff",
     fontWeight: "700",
-    textAlign: "right",
+    textAlign: "left",
+    writingDirection: "rtl",
   },
   classInfoMeta: {
     fontSize: 11,
     lineHeight: 15,
     color: "rgba(255,255,255,0.7)",
     marginTop: 1,
-    textAlign: "right",
+    textAlign: "left",
+    writingDirection: "rtl",
   },
 
   sessionInfoCard: {
@@ -1595,6 +1644,7 @@ const styles = StyleSheet.create({
   sessionInfoRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   sessionInfoIconWrap: {
     width: 34,
@@ -1603,23 +1653,27 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
   },
   sessionInfoIcon: { fontSize: 16, color: "#ffffff" },
-  sessionInfoTextWrap: { flex: 1 },
+  sessionInfoTextWrap: {
+    flex: 1,
+    marginEnd: 10,
+  },
   sessionInfoTitle: {
     fontSize: 13,
     lineHeight: 17,
     color: "#ffffff",
     fontWeight: "700",
-    textAlign: "right",
+    textAlign: "left",
+    writingDirection: "rtl",
   },
   sessionInfoMeta: {
     fontSize: 11,
     lineHeight: 15,
     color: "rgba(255,255,255,0.7)",
     marginTop: 1,
-    textAlign: "right",
+    textAlign: "left",
+    writingDirection: "rtl",
   },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },
@@ -1765,7 +1819,9 @@ const styles = StyleSheet.create({
     color: CHARCOAL,
     fontWeight: "600",
     textAlign: "right",
-    flex: 1,
+    writingDirection: "rtl",
+    marginHorizontal: 8,
+    maxWidth: "50%",
   },
   taioBadge: {
     flexDirection: "row",
@@ -1821,13 +1877,15 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: CHARCOAL,
     fontWeight: "600",
-    textAlign: "right",
+    textAlign: "left",
+    marginLeft:10,
   },
   sessionMeta: {
     ...typography.caption,
     color: MUTED,
     marginTop: 2,
-    textAlign: "right",
+    textAlign: "left",
+    marginLeft:10,
   },
   attendedPill: {
     backgroundColor: "#e8f5e9",
@@ -1846,7 +1904,7 @@ const styles = StyleSheet.create({
   },
 
   memberRow: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: OFF_WHITE,
@@ -1857,7 +1915,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   memberRowRight: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "center",
     flex: 1,
   },
@@ -1881,11 +1939,13 @@ const styles = StyleSheet.create({
     color: CHARCOAL,
     fontWeight: "600",
     textAlign: "right",
-    flex: 1,
+    writingDirection: "rtl",
+    marginHorizontal: 8,
+    maxWidth: "55%",
   },
 
   statusButtons: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     gap: 6,
   },
   statusBtn: {

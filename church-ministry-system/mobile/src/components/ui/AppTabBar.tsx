@@ -25,7 +25,7 @@ const TAB_ICONS: Record<string, string> = {
   taio: '\u2605',
   store: '\u2693',
   notifications: '\u2630',
-  followUp: '\u263C',
+  followUp: '\u2661',
   achievements: '\u2606',
   library: '\u2702',
   reports: '\u2261',

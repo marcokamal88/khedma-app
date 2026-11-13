@@ -9,6 +9,8 @@ import {
   ScrollView,
   SafeAreaView,
   Switch,
+  Platform,
+  I18nManager,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -42,7 +44,7 @@ const SERVANT_MENU: MenuGroup[] = [
       { key: 'Attendance', icon: '\u2637', label: 'الحضور' },
       { key: 'MyStudents', icon: '\u25C9', label: 'مخدوميّ' },
       { key: 'Tasks', icon: '\u2611', label: 'المهام' },
-      { key: 'FollowUp', icon: '\u2606', label: 'المتابعة' },
+      { key: 'FollowUp', icon: '\u2661', label: 'الافتقاد' },
       { key: 'Library', icon: '\u2702', label: 'مكتبة الدروس' },
       { key: 'Achievements', icon: '\u2605', label: 'الإنجازات' },
     ],
@@ -77,7 +79,7 @@ const MEMBER_MENU: MenuGroup[] = [
 ];
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
+const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.85, 380);
 
 interface GlobalDrawerProps {
   children: React.ReactNode;
@@ -229,12 +231,14 @@ const styles = StyleSheet.create({
   drawer: {
     position: 'absolute',
     top: 0,
-    right: 0,
     bottom: 0,
     width: DRAWER_WIDTH,
     backgroundColor: NAVY,
     zIndex: 1001,
     elevation: 10,
+    ...(Platform.OS === 'web'
+      ? { right: 0 }
+      : (I18nManager.isRTL ? { left: 0 } : { right: 0 })),
   },
   container: { flex: 1 },
 
@@ -278,8 +282,8 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   contextInfo: { marginBottom: 10 },
-  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'right' },
-  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'right' },
+  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'left' },
+  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'left' },
   contextSwitchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -300,7 +304,7 @@ const styles = StyleSheet.create({
   groupTitle: {
     ...typography.overline,
     color: 'rgba(255,255,255,0.4)',
-    textAlign: 'right',
+    textAlign: 'left',
     marginBottom: 8,
     paddingRight: 4,
     textTransform: 'uppercase',
