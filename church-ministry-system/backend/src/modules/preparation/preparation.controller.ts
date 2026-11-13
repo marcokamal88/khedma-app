@@ -115,6 +115,18 @@ export class PreparationController {
     return (prep as any).files || [];
   }
 
+  @Roles('servant', 'class_leader', 'sector_leader', 'priest', 'service_leader', 'assistant_service_leader')
+  @Delete(':id/files/:fileId')
+  async deleteFile(
+    @Param('id') id: string,
+    @Param('fileId') fileId: string,
+    @CurrentTenant() churchId: number,
+    @Req() req: Request,
+  ) {
+    const user = req.user as any;
+    return this.prepService.deleteFile(churchId, +id, +fileId, user);
+  }
+
   @Get(':id/comments')
   async getComments(@Param('id') id: string, @CurrentTenant() churchId: number) {
     return this.prepService.getComments(churchId, +id);

@@ -81,7 +81,7 @@ const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
 
 interface GlobalDrawerProps {
   children: React.ReactNode;
-  navigationRef: { navigate: (name: string, params?: any) => void };
+  navigationRef: { navigate: (...args: any[]) => void };
   menuConfig?: MenuGroup[];
 }
 
@@ -153,14 +153,16 @@ function DrawerContent({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={closeDrawer} style={styles.closeBtn} activeOpacity={0.7}>
-          <Text style={styles.closeIcon}>{'\u2715'}</Text>
-        </TouchableOpacity>
-        <View style={styles.profileRow}>
-          <View style={styles.profileTextWrap}>
-            <Text style={styles.profileName}>{user?.fullName}</Text>
-            <Text style={styles.profileRole}>{t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}</Text>
+        <View style={styles.topBarRow}>
+          <View style={styles.profileRow}>
+            <View style={styles.profileTextWrap}>
+              <Text style={styles.profileName}>{user?.fullName}</Text>
+              <Text style={styles.profileRole}>{t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}</Text>
+            </View>
           </View>
+          <TouchableOpacity onPress={closeDrawer} style={styles.closeBtn} activeOpacity={0.7}>
+            <Text style={styles.closeIcon}>{'\u2715'}</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -190,8 +192,10 @@ function DrawerContent({
                 activeOpacity={0.7}
                 onPress={() => onNavigate(item.key)}
               >
-                <Text style={styles.menuLabel}>{item.label}</Text>
-                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <View style={styles.menuItemContent}>
+                  <Text style={styles.menuIcon}>{item.icon}</Text>
+                  <Text style={styles.menuLabel}>{item.label}</Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -225,10 +229,7 @@ const styles = StyleSheet.create({
   drawer: {
     position: 'absolute',
     top: 0,
-    // Logical edge: physical right while the app forces RTL (I18nManager).
-    // Do NOT change back to `right: 0` — under RTL swap it renders on the
-    // physical left. Slide animation (+width → 0) already matches this side.
-    start: 0,
+    right: 0,
     bottom: 0,
     width: DRAWER_WIDTH,
     backgroundColor: NAVY,
@@ -242,27 +243,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
   },
+  topBarRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   closeBtn: {
-    // Outer edge of a right-side drawer (physical left under forced RTL).
-    alignSelf: 'flex-end',
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
   },
   closeIcon: { fontSize: 16, color: '#ffffff' },
 
   profileRow: {
-    // Right-anchored by packing (not flex): packs the text block at the
-    // row start = physical right under RTL. `direction` pins this even if
-    // the global RTL flag ever changes.
     flexDirection: 'row',
-    direction: 'rtl',
-    justifyContent: 'flex-start',
     alignItems: 'center',
+    flex: 1,
   },
   profileTextWrap: {},
   profileName: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700', textAlign: 'right' },
@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
   contextCard: {
     marginHorizontal: 20,
     marginBottom: 8,
-    direction: 'rtl',
     backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 14,
     borderWidth: 1,
@@ -279,8 +278,8 @@ const styles = StyleSheet.create({
     padding: 14,
   },
   contextInfo: { marginBottom: 10 },
-  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'left' },
-  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'left' },
+  contextLabel: { ...typography.overline, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textAlign: 'right' },
+  contextValue: { ...typography.body, color: '#ffffff', fontWeight: '600', textAlign: 'right' },
   contextSwitchBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -308,19 +307,17 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   menuItem: {
-    // Label first = rightmost under RTL; icon sits immediately left of it.
-    // No flex anywhere, so label/icon are always adjacent — a gap between
-    // them is structurally impossible (flex:1 + textAlign proved unreliable).
-    flexDirection: 'row',
-    direction: 'rtl',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
     paddingVertical: 13,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.05)',
   },
+  menuItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
   menuIcon: {
+    width: 24,
     fontSize: 18,
     color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',

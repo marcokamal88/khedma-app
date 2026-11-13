@@ -70,7 +70,7 @@ export default function ServantDashboard({ navigation }: any) {
 
   return (
     <View style={styles.root}>
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
+      <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 110 }} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
         <AppHeader greetingText={t('home.welcomeBack')}>
           <ContextCard defaultRole="servant" />
         </AppHeader>

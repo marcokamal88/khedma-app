@@ -4,9 +4,17 @@ import { Platform } from "react-native";
 
 // Android emulator uses 10.0.2.2 to reach host machine.
 // iOS simulator can use localhost. Physical device needs your machine's LAN IP.
-const HOST = Platform.OS === "android" ? "10.20.164.56" : "localhost";
-const BASE_URL =  `http://${HOST}:3000/api/v1`;//"https://khedma-app.onrender.com/api/v1";
-console.log(`[API] Platform: ${Platform.OS} | BASE_URL: ${HOST}`);
+// Web can use current browser hostname.
+const getHost = () => {
+  if (Platform.OS === "android") return "10.20.164.56";
+  if (Platform.OS === "web" && typeof window !== "undefined") {
+    return window.location.hostname || "localhost";
+  }
+  return "localhost";
+};
+const HOST = getHost();
+const BASE_URL = `http://${HOST}:3000/api/v1`;//"https://khedma-app.onrender.com/api/v1"
+console.log(`[API] Platform: ${Platform.OS} | BASE_URL: ${BASE_URL}`);
 
 // Matches the test church seeded by seeders (INT AUTO_INCREMENT)
 const DEFAULT_CHURCH_ID = "1";

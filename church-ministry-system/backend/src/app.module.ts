@@ -26,6 +26,7 @@ import { HealthModule } from './modules/health/health.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { UtilsModule } from './core/utils/utils.module';
 import { AuditModule } from './shared/interceptors/audit.module';
 import { AuditInterceptor } from './shared/interceptors/audit.interceptor';
@@ -49,6 +50,7 @@ import { ScopeGuard } from './shared/guards/scope.guard';
     TenantModule,
     ContextModule,
     AuthModule,
+    AdminModule,
     UsersModule,
     ChurchModule,
     ServiceYearModule,
