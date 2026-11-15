@@ -1,0 +1,799 @@
+{
+  "modules": [
+    {
+      "name": "app",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\android\\app\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\android\\app\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\android\\app\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-constants\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-constants\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-constants\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-client\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-client\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-client\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "expo-dev-launcher-gradle-plugin",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\build\\"
+      ],
+      "classpath": [
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\bin\\main",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk8\\1.8.10\\7c002ac41f547a82e81dfebd2a20577a738dbf3f\\kotlin-stdlib-jdk8-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\gradle\\7.3.1\\e05fdef1532d40d90ef6d2f80f76dfc78d098bb9\\gradle-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk7\\1.8.10\\cb726a23c808a850a43e7d6b9d1ba91b02fe9f05\\kotlin-stdlib-jdk7-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib\\1.8.10\\6d5560a229477df9406943d5feda5618e98eb64c\\kotlin-stdlib-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\builder\\7.3.1\\3e23401ece1637cecbae6be5c02cc18ab7e452e5\\builder-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\builder-model\\7.3.1\\fddc6058293b89467794f8fcd6bfb35e37739c48\\builder-model-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\gradle-api\\7.3.1\\a2723750277a10ca522477752d98f996653ebf14\\gradle-api-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-common\\1.8.10\\a61b182458550492c12aee66157d7b524a63a5ec\\kotlin-stdlib-common-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains\\annotations\\13.0\\919f0dfe192fb4e063e7dacadee7f8bb9a2672a9\\annotations-13.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\manifest-merger\\30.3.1\\71f4364c86bbe1ff328c6e5eac880d07c8c92943\\manifest-merger-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android\\zipflinger\\7.3.1\\16999dcec6ec960f9dc53c76081936bd545b4dc9\\zipflinger-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\apksig\\7.3.1\\46b1d756b1dd2f41714f24c84b611306d39ec065\\apksig-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\apkzlib\\7.3.1\\5b1abe37db589a8c57e1023c0c709d41424d87dd\\apkzlib-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.squareup\\javawriter\\2.5.0\\81241ff7078ef14f42ea2a8995fa09c096256e6b\\javawriter-2.5.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.1\\a99500cf6eea30535eeac6be73899d048f8d12a8\\asm-9.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.lint\\lint-model\\30.3.1\\99d568ce7c22b37aeae3568889364a33a540db76\\lint-model-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\sdk-common\\30.3.1\\10deeec417af159c070f839d6eb4dae29a293593\\sdk-common-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\sdklib\\30.3.1\\c7d208823ca1a0b5c11c1b94329f517d9582b346\\sdklib-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\repository\\30.3.1\\87b80c1a37843e2db9a3356d2bb5b6f59e4feb0f\\repository-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\builder-test-api\\7.3.1\\5f4b0978a05b1ff995ca255da73fdc76f5b99949\\builder-test-api-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.ddms\\ddmlib\\30.3.1\\f271cb990dc62f580b608a75c87c509683c75da9\\ddmlib-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\aaptcompiler\\7.3.1\\de743c148d7ecd5b896c0911a98f7d3eb41d1b1e\\aaptcompiler-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\tracker\\30.3.1\\5e65e94c9dcd4a9e3b88e6d022c3db8a52248bc9\\tracker-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\shared\\30.3.1\\e1c363b7347d680e674c12eb21ecdafbb49b2fe6\\shared-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\androidx.databinding\\databinding-compiler-common\\7.3.1\\7d9048591c2f0932195a8f9019cf7f7f86afd043\\databinding-compiler-common-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-retention-proto\\30.3.1\\8ee698bf4845058318330a48d13950f2d9c56430\\android-test-plugin-host-retention-proto-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.layoutlib\\layoutlib-api\\30.3.1\\5f0a18661da3c0f524b42fddb0d801d224e19a84\\layoutlib-api-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\dvlib\\30.3.1\\2053a677dd70d49240d711929ba11f5955ecba7e\\dvlib-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\common\\30.3.1\\6d00d4eaf6e80712b579a71e50f574483e6aef31\\common-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build.jetifier\\jetifier-processor\\1.0.0-beta10\\946c39eb0c052ff4f60a8939648a8b99af20d604\\jetifier-processor-1.0.0-beta10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build.jetifier\\jetifier-core\\1.0.0-beta10\\6e621022a9c95af12a7004d6b55805bbd1126837\\jetifier-core-1.0.0-beta10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-reflect\\1.5.31\\1523fcd842a47da0820cea772b19c51056fec8a9\\kotlin-reflect-1.5.31.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\bundletool\\1.9.0\\e144fc87490d12ee601c79dbcb60798a23d1b702\\bundletool-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\aapt2-proto\\7.3.1-8691043\\c5ced5de396317a62df687ed0ba4404898bdc266\\aapt2-proto-7.3.1-8691043.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\crash\\30.3.1\\528046bc127bdb59fec52d3ca3997bee71151bcc\\crash-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.lint\\lint-typedef-remover\\30.3.1\\2c7bb3fcd0052f8311973c915913fb1979979f40\\lint-typedef-remover-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\androidx.databinding\\databinding-common\\7.3.1\\9ce4d7d086454caee5620765f7aa39115aeffb47\\databinding-common-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.databinding\\baseLibrary\\7.3.1\\d8866960f7a5beb7cda6c6c53a770f00bbcf4496\\baseLibrary-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-device-provider-ddmlib-proto\\30.3.1\\bb5d5b14533aad60deca6766fa403f9e335a9cf9\\android-device-provider-ddmlib-proto-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-device-provider-gradle-proto\\30.3.1\\e1427d46551936e6d3c2a0d6be7e4469bbe257ae\\android-device-provider-gradle-proto-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-additional-test-output-proto\\30.3.1\\f970263cd7f02e515393506fe846bdda43fd718c\\android-test-plugin-host-additional-test-output-proto-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-coverage-proto\\30.3.1\\e9fdeb8417e35e6528fa3e352e4677c8e898639c\\android-test-plugin-host-coverage-proto-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-result-listener-gradle-proto\\30.3.1\\262cca037fd00f58dd5ca7dd7a32a6a837b4b993\\android-test-plugin-result-listener-gradle-proto-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\transform-api\\2.0.0-deprecated-use-gradle-api\\47f6c56527c42425742fa9b56ffd3fd80763fe03\\transform-api-2.0.0-deprecated-use-gradle-api.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\httpmime\\4.5.6\\164343da11db817e81e24e0d9869527e069850c9\\httpmime-4.5.6.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\commons-io\\commons-io\\2.4\\b1b6ea3b7e4aa4f492509a4952029cd8e48019ad\\commons-io-2.4.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.1\\8b971b182eb5cf100b9e8d4119152d83e00e0fdd\\asm-commons-9.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.1\\36464a45d871779f3383a8a9aba2b26562a86729\\asm-util-9.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.1\\4f61b83b81d8b659958f4bcc48907e93ecea55a0\\asm-analysis-9.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.1\\c333f2a855069cb8eb17a40a3eb8b1b67755d0eb\\asm-tree-9.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.bouncycastle\\bcpkix-jdk15on\\1.67\\5f48020a2a60a8d6bcbecceca23529d225b28efb\\bcpkix-jdk15on-1.67.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.glassfish.jaxb\\jaxb-runtime\\2.3.2\\5528bc882ea499a09d720b42af11785c4fc6be2a\\jaxb-runtime-2.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.sf.jopt-simple\\jopt-simple\\4.9\\ee9e9eaa0a35360dcfeac129ff4923215fd65904\\jopt-simple-4.9.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.squareup\\javapoet\\1.10.0\\712c178d35185d8261295913c9f2a7d6867a6007\\javapoet-1.10.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.protobuf\\protobuf-java-util\\3.17.2\\88801cfefba20827bf5cd9f2cc4866bd8c766242\\protobuf-java-util-3.17.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-protobuf\\1.39.0\\b7789ed9dd819a4fb9f5e3cf44d02f16fa49031e\\grpc-protobuf-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.crypto.tink\\tink\\1.3.0-rc2\\c7efb1ecc3b667b8a0789a1b019b06269037e19b\\tink-1.3.0-rc2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\protos\\30.3.1\\4078d8e29f3868ef54788d45269c51cb533755ca\\protos-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.api.grpc\\proto-google-common-protos\\2.0.1\\20827628ea2b9f69ae22987b2aedb0050e9c470d\\proto-google-common-protos-2.0.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.protobuf\\protobuf-java\\3.17.2\\d7eec2ad499b605f24d07f49bdcb41c801aafbfc\\protobuf-java-3.17.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-netty\\1.39.0\\d161bd637e2174cd6a73178117ff1774604fd2e0\\grpc-netty-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-core\\1.39.0\\df5bbb97602a059eee86e22e09f6524901a62cfa\\grpc-core-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.code.gson\\gson\\2.8.6\\9180733b7df8542621dc12e21e87557e8c99b8cb\\gson-2.8.6.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-stub\\1.39.0\\598232e1142fb0d09067e1fd1fc524580ee9425\\grpc-stub-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.testing.platform\\core-proto\\0.0.8-alpha07\\901b629a7684aa0cae060a7f23f385297add1e26\\core-proto-0.0.8-alpha07.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.tensorflow\\tensorflow-lite-metadata\\0.1.0-rc2\\7aa9b3e16d85c2aae5eff741265315a37c9f731a\\tensorflow-lite-metadata-0.1.0-rc2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.flatbuffers\\flatbuffers-java\\1.12.0\\8201cc7b511177a37071249e891f2f2fea4b32e9\\flatbuffers-java-1.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.jimfs\\jimfs\\1.1\\8fbd0579dc68aba6186935cc1bee21d2f3e7ec1c\\jimfs-1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-protobuf-lite\\1.39.0\\64ccdfc8a5a7c545247381f0ac42a5b8fc936e56\\grpc-protobuf-lite-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-api\\1.39.0\\706f68087b8fae59f8949b4302ac9807131c0112\\grpc-api-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\guava\\30.1-jre\\d0c3ce2311c9e36e73228da25a6e99b2ab826f\\guava-30.1-jre.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.dagger\\dagger\\2.28.3\\10d83810ef9e19714116ed518896c90c6606d633\\dagger-2.28.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\javax.inject\\javax.inject\\1\\6975da39a7040257bd51d21a231b76c915872d38\\javax.inject-1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.sf.kxml\\kxml2\\2.3.0\\ccbc77a5fd907ef863c29f3596c6f54ffa4e9442\\kxml2-2.3.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.bouncycastle\\bcprov-jdk15on\\1.67\\8c0998045da87dbc2f1d4b6480458ed811ca7b82\\bcprov-jdk15on-1.67.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.intellij.deps\\trove4j\\1.0.20181211\\216c2e14b070f334479d800987affe4054cd563f\\trove4j-1.0.20181211.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\xerces\\xercesImpl\\2.12.0\\f02c844149fd306601f20e0b34853a670bef7fa2\\xercesImpl-2.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.commons\\commons-compress\\1.20\\b8df472b31e1f17c232d2ad78ceb1c84e00c641b\\commons-compress-1.20.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\httpclient\\4.5.13\\e5f6cae5ca7ecaac1ec2827a9e2d65ae2869cada\\httpclient-4.5.13.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\httpcore\\4.4.13\\853b96d3afbb7bf8cc303fe27ee96836a10c1834\\httpcore-4.4.13.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.sun.activation\\javax.activation\\1.2.0\\bf744c1e2776ed1de3c55c8dac1057ec331ef744\\javax.activation-1.2.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android\\signflinger\\7.3.1\\d8982f3c1b697c0b6b03340152cb9711bccd6de5\\signflinger-7.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\annotations\\30.3.1\\bf7c0de4844ebdce4eec08b202d24d8f1f7ac520\\annotations-30.3.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna-platform\\5.6.0\\d18424ffb8bbfd036d71bcaab9b546858f2ef986\\jna-platform-5.6.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.googlecode.juniversalchardet\\juniversalchardet\\1.0.3\\cd49678784c46aa8789c060538e0154013bb421b\\juniversalchardet-1.0.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\javax.annotation\\javax.annotation-api\\1.3.2\\934c04d3cfef185a8008e7bf34331b79730a9d43\\javax.annotation-api-1.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jvnet.staxex\\stax-ex\\1.8.1\\78011e483a21102fb4858f3e8f269a677e50aa23\\stax-ex-1.8.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\jakarta.xml.bind\\jakarta.xml.bind-api\\2.3.2\\8d49996a4338670764d7ca4b85a1c4ccf7fe665d\\jakarta.xml.bind-api-2.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.glassfish.jaxb\\txw2\\2.3.2\\ce5be7da2e442c25ec14c766cb60cb802741727b\\txw2-2.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.sun.istack\\istack-commons-runtime\\3.0.8\\d6a97364045aa6b99bf2d3c566a3f98599c2d296\\istack-commons-runtime-3.0.8.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.sun.xml.fastinfoset\\FastInfoset\\1.2.16\\4eb6a0adad553bf759ffe86927df6f3b848c8bea\\FastInfoset-1.2.16.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\jakarta.activation\\jakarta.activation-api\\1.2.1\\562a587face36ec7eff2db7f2fc95425c6602bc1\\jakarta.activation-api-1.2.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.auto.value\\auto-value-annotations\\1.6.2\\ed193d86e0af90cc2342aedbe73c5d86b03fa09b\\auto-value-annotations-1.6.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.errorprone\\error_prone_annotations\\2.4.0\\32ecccc595e4e4d813a80ee9e3ab5813d65874eb\\error_prone_annotations-2.4.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.bitbucket.b_c\\jose4j\\0.7.0\\478ee8518687f9b01f20912fc7edd9d7b46d06da\\jose4j-0.7.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.slf4j\\slf4j-api\\1.7.30\\b5a4b6d16ab13e34a88fae84c35cd5d68cac922c\\slf4j-api-1.7.30.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jdom\\jdom2\\2.0.6\\6f14738ec2e9dd0011e343717fa624a10f8aab64\\jdom2-2.0.6.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.android\\annotations\\4.1.1.4\\a1678ba907bf92691d879fef34e1a187038f9259\\annotations-4.1.1.4.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.codehaus.mojo\\animal-sniffer-annotations\\1.19\\1536e1a8fd552dc05f12b5f0827fbb2ee3d5a89b\\animal-sniffer-annotations-1.19.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.perfmark\\perfmark-api\\0.23.0\\b813b7539fae6550541da8caafd6add86d4e22f\\perfmark-api-0.23.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec-http2\\4.1.52.Final\\1e06a41e2b67cd6f91bf97935f4729c843ac1a57\\netty-codec-http2-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-handler-proxy\\4.1.52.Final\\e5701741e851d83b5ef15738f84c825ba2c0688e\\netty-handler-proxy-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.code.findbugs\\jsr305\\3.0.2\\25ea2e8b0c338a877313bd4672d3fe056ea78f0d\\jsr305-3.0.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.json\\json\\20180813\\8566b2b0391d9d4479ea225645c6ed47ef17fe41\\json-20180813.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.checkerframework\\checker-qual\\3.5.0\\2f50520c8abea66fbd8d26e481d3aef5c673b510\\checker-qual-3.5.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\commons-codec\\commons-codec\\1.11\\3acb4705652e16236558f0f4f2192cc33c3bd189\\commons-codec-1.11.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\it.unimi.dsi\\fastutil\\8.4.0\\60fbeaa50799581f6244fcff1cebba0353ec0141\\fastutil-8.4.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.googlecode.json-simple\\json-simple\\1.1\\5e303a03d04e6788dddfa3655272580ae0fc13bb\\json-simple-1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\failureaccess\\1.0.1\\1dcf1de382a0bf95a3d8b0849546c88bac1292c9\\failureaccess-1.0.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\listenablefuture\\9999.0-empty-to-avoid-conflict-with-guava\\b421526c5f297295adef1c886e5246c39d4ac629\\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.j2objc\\j2objc-annotations\\1.3\\ba035118bc8bac37d7eff77700720999acd9986d\\j2objc-annotations-1.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\xml-apis\\xml-apis\\1.4.01\\3789d9fada2d3d458c4ba2de349d48780f381ee3\\xml-apis-1.4.01.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\commons-logging\\commons-logging\\1.2\\4bfc12adfe4842bf07b657f0369c4cb522955686\\commons-logging-1.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.6.0\\330f2244e9030119ab3030fc3fededc86713d9cc\\jna-5.6.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-context\\1.39.0\\637f453f3654aa29bf085ae7ddc86f9f80c937dd\\grpc-context-1.39.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec-http\\4.1.52.Final\\e0d75d03edf6e4d0682c85e8b26762bcde34697d\\netty-codec-http-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-handler\\4.1.52.Final\\eb7d4fa554f4fdc8dacb80dce7e3f806fd1dc2db\\netty-handler-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec-socks\\4.1.52.Final\\93170f664ae83ec70c35752b91cb733f9b80bf90\\netty-codec-socks-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec\\4.1.52.Final\\d98ad5bb86707c3c1a7105a346119dac332bdf23\\netty-codec-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-transport\\4.1.52.Final\\970ee3790f504452bd32692f6b208a590c51f0ee\\netty-transport-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-buffer\\4.1.52.Final\\fdf681985f50d84fac625df52f34b6d6cb699bda\\netty-buffer-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-resolver\\4.1.52.Final\\1fd5a58ff5df4dc9bb3027a6fbf114767d9278d5\\netty-resolver-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-common\\4.1.52.Final\\715bfadb9f3bf86da38fa12b97b4aaa9828b4789\\netty-common-4.1.52.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\8.3\\generated-gradle-jars\\gradle-api-8.3.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-ant-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-astbuilder-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-console-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-datetime-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-dateutil-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-groovydoc-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-json-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-nio-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-sql-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-templates-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-test-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-xml-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\javaparser-core-3.17.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-common-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-reflect-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-jdk7-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-jdk8-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\gradle-installation-beacon-8.3.jar",
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-launcher\\expo-dev-launcher-gradle-plugin\\build\\classes\\kotlin\\main"
+      ]
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-menu\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-menu\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-menu\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-menu-interface\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-menu-interface\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-dev-menu-interface\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-file-system\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-file-system\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-file-system\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-font\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-font\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-font\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-json-utils\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-json-utils\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-json-utils\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-keep-awake\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-keep-awake\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-keep-awake\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-manifests\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-manifests\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-manifests\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\SensorServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\SensorServiceSubscriptionInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\AccelerometerServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\BarometerServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\GravitySensorServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\GyroscopeServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\LightSensorServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\LinearAccelerationSensorServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\MagnetometerServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\MagnetometerUncalibratedServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\PedometerServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\sensors\\services\\RotationVectorSensorServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\barcodescanner\\BarCodeScannerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\barcodescanner\\BarCodeScannerProviderInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\barcodescanner\\BarCodeScannerResult.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\barcodescanner\\BarCodeScannerSettings.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\barcodescanner\\BarCodeScannerSettingsKey.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\camera\\CameraViewInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\constants\\ConstantsInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\facedetector\\FaceDetectionError.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\facedetector\\FaceDetectionSkipped.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\facedetector\\FaceDetectionUnspecifiedError.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\facedetector\\FaceDetectorInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\facedetector\\FaceDetectorProviderInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\facedetector\\FacesDetectionCompleted.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\filesystem\\FilePermissionModuleInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\filesystem\\Permission.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\font\\FontManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\imageloader\\ImageLoaderInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\permissions\\Permissions.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\permissions\\PermissionsResponseListener.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\permissions\\PermissionsStatus.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskConsumer.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskConsumerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskExecutionCallback.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskManagerUtilsInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\interfaces\\taskManager\\TaskServiceInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\ArgumentsHelper.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\BasePackage.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\ExportedModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\MapHelper.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\ModuleRegistry.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\ModuleRegistryProvider.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\Promise.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\ViewManager.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ActivityEventListener.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ActivityProvider.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ApplicationLifecycleListener.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\Arguments.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\CodedThrowable.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\Consumer.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\DoNotStrip.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ExpoMethod.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ExpoProp.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\Function.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\InternalModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\JavaScriptContextProvider.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\LifecycleEventListener.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\Package.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ReactActivityHandler.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ReactActivityLifecycleListener.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\ReactNativeHostHandler.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\RegistryLifecycleListener.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\RuntimeEnvironmentInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\SingletonModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\services\\EventEmitter.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\services\\KeepAwakeManager.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\interfaces\\services\\UIManager.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\errors\\CodedException.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\errors\\CodedRuntimeException.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\errors\\CurrentActivityNotFoundException.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\errors\\InvalidArgumentException.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\errors\\ModuleNotFoundException.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\utilities\\FileUtilities.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\arguments\\MapArguments.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\core\\arguments\\ReadableArguments.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\apploader\\AppLoaderPackagesProviderInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\apploader\\AppLoaderProvider.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\apploader\\HeadlessAppLoader.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\ArgumentsHelper.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\ModuleRegistryAdapter.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\ModuleRegistryReadyNotifier.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\NativeModulesProxy.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\PromiseWrapper.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\ReactAdapterPackage.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\ReactModuleRegistryProvider.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\ReactPackagesProvider.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\services\\CookieManagerModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\services\\EventEmitterModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\services\\FontManagerModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\services\\RuntimeEnvironmentModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\services\\UIManagerModuleWrapper.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\src\\main\\java\\expo\\modules\\adapters\\react\\views\\ViewManagerAdapterUtils.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android-annotation",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\build\\"
+      ],
+      "classpath": [
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\bin\\main",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk7\\1.8.10\\cb726a23c808a850a43e7d6b9d1ba91b02fe9f05\\kotlin-stdlib-jdk7-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib\\1.8.10\\6d5560a229477df9406943d5feda5618e98eb64c\\kotlin-stdlib-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-common\\1.8.10\\a61b182458550492c12aee66157d7b524a63a5ec\\kotlin-stdlib-common-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains\\annotations\\13.0\\919f0dfe192fb4e063e7dacadee7f8bb9a2672a9\\annotations-13.0.jar",
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\build\\classes\\kotlin\\main"
+      ]
+    },
+    {
+      "name": "android-annotation-processor",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\build\\"
+      ],
+      "classpath": [
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\bin\\main",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.squareup\\kotlinpoet-ksp\\1.12.0\\a94d004b878f04abefeae4db52828fc7ce11dbb9\\kotlinpoet-ksp-1.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.squareup\\kotlinpoet\\1.12.0\\2b116a78080106e6fc11fd13bc0f1c8c818a7205\\kotlinpoet-1.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk8\\1.8.10\\7c002ac41f547a82e81dfebd2a20577a738dbf3f\\kotlin-stdlib-jdk8-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk7\\1.8.10\\cb726a23c808a850a43e7d6b9d1ba91b02fe9f05\\kotlin-stdlib-jdk7-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.devtools.ksp\\symbol-processing-api\\1.8.10-1.0.9\\cb23eb105730f05919bd182fe91d709650d328a6\\symbol-processing-api-1.8.10-1.0.9.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib\\1.8.10\\6d5560a229477df9406943d5feda5618e98eb64c\\kotlin-stdlib-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-common\\1.8.10\\a61b182458550492c12aee66157d7b524a63a5ec\\kotlin-stdlib-common-1.8.10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains\\annotations\\13.0\\919f0dfe192fb4e063e7dacadee7f8bb9a2672a9\\annotations-13.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-reflect\\1.7.0\\e660b0079fdaf744dc9cc7f6f3aa3c761ec839b0\\kotlin-reflect-1.7.0.jar",
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation-processor\\build\\classes\\kotlin\\main",
+        "\\expo-modules-core$android-annotation\\bin\\default",
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-modules-core\\android-annotation\\bin\\main"
+      ]
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-secure-store\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-secure-store\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-secure-store\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-sharing\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-sharing\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-sharing\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-sqlite\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-sqlite\\android\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-sqlite\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-updates-interface\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-updates-interface\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-updates-interface\\android\\src\\main\\java\\expo\\modules\\updatesinterface\\UpdatesInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-updates-interface\\android\\src\\main\\java\\expo\\modules\\updatesinterface\\UpdatesInterfaceCallbacks.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\expo-updates-interface\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\main\\java\\com\\reactnativecommunity\\asyncstorage\\AsyncLocalStorageUtil.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\main\\java\\com\\reactnativecommunity\\asyncstorage\\AsyncStorageErrorUtil.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\main\\java\\com\\reactnativecommunity\\asyncstorage\\AsyncStorageExpoMigration.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\main\\java\\com\\reactnativecommunity\\asyncstorage\\AsyncStorageModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\main\\java\\com\\reactnativecommunity\\asyncstorage\\ReactDatabaseSupplier.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\main\\java\\com\\reactnativecommunity\\asyncstorage\\SerialExecutor.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\javaPackage\\java\\com\\reactnativecommunity\\asyncstorage\\AsyncStoragePackage.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\src\\oldarch\\java\\com\\reactnativecommunity\\asyncstorage\\NativeAsyncStorageModuleSpec.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native-async-storage\\async-storage\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\fabric\\src\\main\\java\\com\\swmansion\\gesturehandler\\RNGestureHandlerComponentsRegistry.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\paper\\src\\main\\java\\com\\facebook\\react\\viewmanagers\\RNGestureHandlerButtonManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\paper\\src\\main\\java\\com\\facebook\\react\\viewmanagers\\RNGestureHandlerButtonManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\paper\\src\\main\\java\\com\\facebook\\react\\viewmanagers\\RNGestureHandlerRootViewManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\paper\\src\\main\\java\\com\\facebook\\react\\viewmanagers\\RNGestureHandlerRootViewManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\src\\main\\java\\com\\swmansion\\gesturehandler\\core\\ScaleGestureDetector.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-gesture-handler\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "gradle-plugin",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\build\\"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\bin\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\build\\"
+      ],
+      "classpath": [
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\bin\\main",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk8\\1.8.0\\ed04f49e186a116753ad70d34f0ac2925d1d8020\\kotlin-stdlib-jdk8-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-gradle-plugin\\1.8.0\\d79a079634e8d3bd92c594b224f4de2086bb4a10\\kotlin-gradle-plugin-1.8.0-gradle76.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\gradle\\8.1.1\\8c2d62f29b154bd15bf4cb5122a8f5a52f183855\\gradle-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.code.gson\\gson\\2.8.9\\8a432c1d6825781e21a02db2e2c33c5fde2833b9\\gson-2.8.9.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\guava\\31.0.1-jre\\119ea2b2bc205b138974d351777b20f02b92704b\\guava-31.0.1-jre.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.squareup\\javapoet\\1.13.0\\d6562d385049f35eb50403fa86bb11cce76b866a\\javapoet-1.13.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk7\\1.8.0\\3c91271347f678c239607abb676d4032a7898427\\kotlin-stdlib-jdk7-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib\\1.8.0\\1796921c7a3e2e2665a83e6c8d33399336cd39bc\\kotlin-stdlib-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-gradle-plugin-model\\1.8.0\\9da2fce7af0a94348001ee8dd20a82167f5de284\\kotlin-gradle-plugin-model-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-gradle-plugin-api\\1.8.0\\29f79a3bb109e05b07f1d2893074ab176a4276e0\\kotlin-gradle-plugin-api-1.8.0-gradle76.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-gradle-plugin-api\\1.8.0\\29f79a3bb109e05b07f1d2893074ab176a4276e0\\kotlin-gradle-plugin-api-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-tooling-core\\1.8.0\\da3a4252e4b48833eb566227b2baecbaede8993\\kotlin-tooling-core-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\builder\\8.1.1\\5594d3763845845e708896806fdc639a145f47c9\\builder-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\builder-model\\8.1.1\\c7c2b321263e7d8e9b6868aaab53e1f72e636e7c\\builder-model-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\gradle-api\\8.1.1\\d36f6beb6e0b46efbe7ea40179e2e7952c5c7e66\\gradle-api-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\failureaccess\\1.0.1\\1dcf1de382a0bf95a3d8b0849546c88bac1292c9\\failureaccess-1.0.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\listenablefuture\\9999.0-empty-to-avoid-conflict-with-guava\\b421526c5f297295adef1c886e5246c39d4ac629\\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.code.findbugs\\jsr305\\3.0.2\\25ea2e8b0c338a877313bd4672d3fe056ea78f0d\\jsr305-3.0.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.checkerframework\\checker-qual\\3.12.0\\d5692f0526415fcc6de94bb5bfbd3afd9dd3b3e5\\checker-qual-3.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.errorprone\\error_prone_annotations\\2.7.1\\458d9042f7aa6fa9a634df902b37f544e15aacac\\error_prone_annotations-2.7.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.j2objc\\j2objc-annotations\\1.3\\ba035118bc8bac37d7eff77700720999acd9986d\\j2objc-annotations-1.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-common\\1.8.0\\f7197e7cc76453ac59f8b0f8d5137cc600becd36\\kotlin-stdlib-common-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains\\annotations\\13.0\\919f0dfe192fb4e063e7dacadee7f8bb9a2672a9\\annotations-13.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-native-utils\\1.8.0\\73361435f42e1fecbd81f686ccaa8aa1c498b941\\kotlin-native-utils-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-project-model\\1.8.0\\2b8d20018168339835a79512f46f3251ff09caf5\\kotlin-project-model-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\manifest-merger\\31.1.1\\d5f15475323231ed1506561184e7483f837f27f8\\manifest-merger-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android\\zipflinger\\8.1.1\\b450a19b332659b4190f0af34bc734a7e21d464e\\zipflinger-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\apksig\\8.1.1\\9125e1bb9607abb6d2d582f6b551360b0258658a\\apksig-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\apkzlib\\8.1.1\\cac4447eae289138e1cbbfe13a0d8bb6b4255e56\\apkzlib-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.squareup\\javawriter\\2.5.0\\81241ff7078ef14f42ea2a8995fa09c096256e6b\\javawriter-2.5.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.2\\81a03f76019c67362299c40e0ba13405f5467bff\\asm-9.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-util-io\\1.8.0\\1d7ca3cc3c24111ca8a12e29b10d6df0f778afd8\\kotlin-util-io-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\gradle-settings-api\\8.1.1\\f2cc372826954967fa44fc51b4e53124559b5e01\\gradle-settings-api-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.lint\\lint-model\\31.1.1\\2a8baf9946bcb0d2fe3d171930fddd414447926f\\lint-model-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\sdk-common\\31.1.1\\a7450a5a1fc9574099f661f44dd056637de82dc6\\sdk-common-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\sdklib\\31.1.1\\1ee002c6e1a7c207e2f03eba15864479ad8afe6f\\sdklib-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\repository\\31.1.1\\371ee5bee7cb5fbd24569a2c07944be4ee2b8ce7\\repository-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\aaptcompiler\\8.1.1\\7f64699804514b64d14abd79a12c1d6902de7530\\aaptcompiler-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\tracker\\31.1.1\\4defc338e33c908b6910577a18b4000987325e9f\\tracker-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\shared\\31.1.1\\2f264944222d494cc74fa2feb2b13e08f4b61c7\\shared-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\androidx.databinding\\databinding-compiler-common\\8.1.1\\63d39b93de85c2a0c8407c5ab906ffe39f41f734\\databinding-compiler-common-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-emulator-control-proto\\31.1.1\\11cb514e23daa4b9e3b8bd395014aa58ada6bcec\\android-test-plugin-host-emulator-control-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-retention-proto\\31.1.1\\4319b864edee0328f75afbc17ac4ae8997679420\\android-test-plugin-host-retention-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\builder-test-api\\8.1.1\\5669c77c28e07cfcdaa65f4615c7d3ea3f2da649\\builder-test-api-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.ddms\\ddmlib\\31.1.1\\8c5f283b9aa267c37b9b632484a2ab4ccd1205d7\\ddmlib-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.layoutlib\\layoutlib-api\\31.1.1\\3803332e9fa1f20ac5b4368c54fa9ba830a4e49f\\layoutlib-api-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\dvlib\\31.1.1\\73f9e701a49ce55a5efc5ade01238f5fa9b2655d\\dvlib-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\common\\31.1.1\\71050720fc42680f95e9751305b80cfd84a46755\\common-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk8\\1.8.20-RC2\\3f3b892b2b7261138cc4ad48117553b1eb7e8fc7\\kotlin-stdlib-jdk8-1.8.20-RC2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-result-listener-gradle-proto\\31.1.1\\12e0c415c599bd8768dc1e3db076bbe921db1e08\\android-test-plugin-result-listener-gradle-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build.jetifier\\jetifier-processor\\1.0.0-beta10\\946c39eb0c052ff4f60a8939648a8b99af20d604\\jetifier-processor-1.0.0-beta10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build.jetifier\\jetifier-core\\1.0.0-beta10\\6e621022a9c95af12a7004d6b55805bbd1126837\\jetifier-core-1.0.0-beta10.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\bundletool\\1.14.0\\2fcb426b5e62cc6e879369fdbbe915bb0a43c3e1\\bundletool-1.14.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.protobuf\\protobuf-java-util\\3.19.3\\3e6812cbbb7e6faffa7b56438740dec510e1fc1a\\protobuf-java-util-3.19.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-netty\\1.45.1\\e2a1bc48548213144f00aa709c4da92626b35cd8\\grpc-netty-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-core\\1.45.1\\9d886fc7d591fac00cd1bbd2347ba66efb31ef20\\grpc-core-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.crypto.tink\\tink\\1.7.0\\668b57f109d32349b2870448f06ae6f202713edc\\tink-1.7.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\crash\\31.1.1\\745eed5bd3b46fecd9a285aaf033e64b570b1d68\\crash-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.lint\\lint-typedef-remover\\31.1.1\\644ab9b8a697ba83702c4e32eaaf95c504e1a522\\lint-typedef-remover-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-protobuf\\1.45.1\\480d2a8c2592c7067d2fe9cc773d3a36402bc463\\grpc-protobuf-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-stub\\1.45.1\\3cf1d4ef88808bbabea5d929b78854ccc7f95242\\grpc-stub-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.jimfs\\jimfs\\1.1\\8fbd0579dc68aba6186935cc1bee21d2f3e7ec1c\\jimfs-1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-protobuf-lite\\1.45.1\\a842605124e6542550b2da550a9acae1443a945\\grpc-protobuf-lite-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-api\\1.45.1\\521df70b1f69648d5f418015ee594fc15a065dfc\\grpc-api-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.guava\\guava\\31.1-jre\\60458f877d055d0c9114d9e1a2efb737b4bc282c\\guava-31.1-jre.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-jdk7\\1.8.20-RC2\\d100f7cb452c22f937a7bcca2efcc45cc77c7b15\\kotlin-stdlib-jdk7-1.8.20-RC2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-reflect\\1.8.20-RC2\\23853310e93f1c418a827be6fabe6f903addd231\\kotlin-reflect-1.8.20-RC2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib\\1.8.20-RC2\\436a3cf44ea8dc1c65d7a59abda28e232b05d84a\\kotlin-stdlib-1.8.20-RC2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-gradle-plugin-idea-proto\\1.8.0\\2f0dadae067048a92f7153db7af6613c3a3fb052\\kotlin-gradle-plugin-idea-proto-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-gradle-plugin-idea\\1.8.0\\6998138dffe44597dc30d038d26dbb1fabde2dd2\\kotlin-gradle-plugin-idea-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-util-klib\\1.8.0\\256da9f306860ba60f5d74576a36e962a1697a61\\kotlin-util-klib-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-klib-commonizer-api\\1.8.0\\e5974a8e0109dd31d7c16c8901608281a52b6216\\kotlin-klib-commonizer-api-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-annotation-processing-gradle\\1.8.0\\fa6b4c851584366968803fe879d995bcfe7aa8aa\\kotlin-annotation-processing-gradle-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-android-extensions\\1.8.0\\c53f898318b2228e3bb1e6d3af53fc8e0c22e318\\kotlin-android-extensions-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-compiler-runner\\1.8.0\\8b3e2ba6225ff140efc1f9fa60b2c5ef095f37b0\\kotlin-compiler-runner-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-compiler-embeddable\\1.8.0\\eb9118d4bcceaa2a94b2ae2a33a4ddba7c9a947f\\kotlin-compiler-embeddable-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-scripting-compiler-embeddable\\1.8.0\\e6b1ab0def6f13dc49d53594f31ed6452b653282\\kotlin-scripting-compiler-embeddable-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-scripting-compiler-impl-embeddable\\1.8.0\\3f07d79727996675a2243a4c11045a6615ec228c\\kotlin-scripting-compiler-impl-embeddable-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\aapt2-proto\\8.1.1-10154469\\e38bb50410bed03e4e29bb8772535b46a26fad17\\aapt2-proto-8.1.1-10154469.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\androidx.databinding\\databinding-common\\8.1.1\\2be3530b78477835e69dce953b17adc1dbc5c6fa\\databinding-common-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.databinding\\baseLibrary\\8.1.1\\7e7399239e52d4069896277615e005add7ae8e5a\\baseLibrary-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-device-provider-ddmlib-proto\\31.1.1\\70f460be43fe32ed535b1d34a9966ac955191ce1\\android-device-provider-ddmlib-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-device-provider-gradle-proto\\31.1.1\\622ec6748a5fd9804d1f1a1239826cbd73a960bc\\android-device-provider-gradle-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-additional-test-output-proto\\31.1.1\\94f0a14f0c6cceff5a0374a2d4e0e50bac122899\\android-test-plugin-host-additional-test-output-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-coverage-proto\\31.1.1\\7b3dfe6654185ce95c2e815c3dcbc488a3ea567e\\android-test-plugin-host-coverage-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-logcat-proto\\31.1.1\\fd1c47673952b6b7a50173005322d40a3a106604\\android-test-plugin-host-logcat-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.utp\\android-test-plugin-host-apk-installer-proto\\31.1.1\\c14a7d0b4e1166a2035b26be175fcd52ce167844\\android-test-plugin-host-apk-installer-proto-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.build\\transform-api\\2.0.0-deprecated-use-gradle-api\\47f6c56527c42425742fa9b56ffd3fd80763fe03\\transform-api-2.0.0-deprecated-use-gradle-api.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\httpmime\\4.5.6\\164343da11db817e81e24e0d9869527e069850c9\\httpmime-4.5.6.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\commons-io\\commons-io\\2.4\\b1b6ea3b7e4aa4f492509a4952029cd8e48019ad\\commons-io-2.4.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.2\\f4d7f0fc9054386f2893b602454d48e07d4fbead\\asm-commons-9.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.2\\fbc178fc5ba3dab50fd7e8a5317b8b647c8e8946\\asm-util-9.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.2\\7487dd756daf96cab9986e44b9d7bcb796a61c10\\asm-analysis-9.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.2\\d96c99a30f5e1a19b0e609dbb19a44d8518ac01e\\asm-tree-9.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.bouncycastle\\bcpkix-jdk15on\\1.67\\5f48020a2a60a8d6bcbecceca23529d225b28efb\\bcpkix-jdk15on-1.67.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.glassfish.jaxb\\jaxb-runtime\\2.3.2\\5528bc882ea499a09d720b42af11785c4fc6be2a\\jaxb-runtime-2.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.sf.jopt-simple\\jopt-simple\\4.9\\ee9e9eaa0a35360dcfeac129ff4923215fd65904\\jopt-simple-4.9.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools.analytics-library\\protos\\31.1.1\\8e0699e5e6b59a622048b0b57237e9466740b84f\\protos-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.api.grpc\\proto-google-common-protos\\2.0.1\\20827628ea2b9f69ae22987b2aedb0050e9c470d\\proto-google-common-protos-2.0.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.protobuf\\protobuf-java\\3.19.3\\4b57f1b1b9e281231c3fcfc039ce3021e29ff570\\protobuf-java-3.19.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.testing.platform\\core-proto\\0.0.8-alpha08\\72ca52065789993f2f029b34d797813c467d5d74\\core-proto-0.0.8-alpha08.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.tensorflow\\tensorflow-lite-metadata\\0.1.0-rc2\\7aa9b3e16d85c2aae5eff741265315a37c9f731a\\tensorflow-lite-metadata-0.1.0-rc2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.flatbuffers\\flatbuffers-java\\1.12.0\\8201cc7b511177a37071249e891f2f2fea4b32e9\\flatbuffers-java-1.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.errorprone\\error_prone_annotations\\2.11.0\\c5a0ace696d3f8b1c1d8cc036d8c03cc0cbe6b69\\error_prone_annotations-2.11.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-daemon-embeddable\\1.8.0\\d255216c551685dc3a7e852b53617f5f01aaaa5c\\kotlin-daemon-embeddable-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.intellij.deps\\trove4j\\1.0.20200330\\3afb14d5f9ceb459d724e907a21145e8ff394f02\\trove4j-1.0.20200330.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna-platform\\5.6.0\\d18424ffb8bbfd036d71bcaab9b546858f2ef986\\jna-platform-5.6.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.java.dev.jna\\jna\\5.6.0\\330f2244e9030119ab3030fc3fededc86713d9cc\\jna-5.6.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-build-common\\1.8.0\\90035b6ebbdbbd3c09300d9ba084ce8f5f03b81a\\kotlin-build-common-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-daemon-client\\1.8.0\\67f8cfc94b53e11080d36e44805348ae19d33cd3\\kotlin-daemon-client-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlinx\\kotlinx-coroutines-core-jvm\\1.5.0\\d8cebccdcddd029022aa8646a5a953ff88b13ac8\\kotlinx-coroutines-core-jvm-1.5.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-scripting-jvm\\1.8.0\\1f7345b3fc46786c1f36a4ba0728a95990d05929\\kotlin-scripting-jvm-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-scripting-common\\1.8.0\\ffeb4c0c2b3978876b993d6b55646e6b567077a8\\kotlin-scripting-common-1.8.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.dagger\\dagger\\2.28.3\\10d83810ef9e19714116ed518896c90c6606d633\\dagger-2.28.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\javax.inject\\javax.inject\\1\\6975da39a7040257bd51d21a231b76c915872d38\\javax.inject-1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\net.sf.kxml\\kxml2\\2.3.0\\ccbc77a5fd907ef863c29f3596c6f54ffa4e9442\\kxml2-2.3.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.bouncycastle\\bcprov-jdk15on\\1.67\\8c0998045da87dbc2f1d4b6480458ed811ca7b82\\bcprov-jdk15on-1.67.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\xerces\\xercesImpl\\2.12.0\\f02c844149fd306601f20e0b34853a670bef7fa2\\xercesImpl-2.12.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.commons\\commons-compress\\1.21\\4ec95b60d4e86b5c95a0e919cb172a0af98011ef\\commons-compress-1.21.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\httpclient\\4.5.13\\e5f6cae5ca7ecaac1ec2827a9e2d65ae2869cada\\httpclient-4.5.13.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.apache.httpcomponents\\httpcore\\4.4.15\\7f2e0c573eaa7a74bac2e89b359e1f73d92a0a1d\\httpcore-4.4.15.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.sun.activation\\javax.activation\\1.2.0\\bf744c1e2776ed1de3c55c8dac1057ec331ef744\\javax.activation-1.2.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android\\signflinger\\8.1.1\\13f035dd8e7e470ff8f3216a0b46333187f26df5\\signflinger-8.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.android.tools\\annotations\\31.1.1\\d70720d1aed8e56163636f82782985acfe66eba8\\annotations-31.1.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.googlecode.juniversalchardet\\juniversalchardet\\1.0.3\\cd49678784c46aa8789c060538e0154013bb421b\\juniversalchardet-1.0.3.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\javax.annotation\\javax.annotation-api\\1.3.2\\934c04d3cfef185a8008e7bf34331b79730a9d43\\javax.annotation-api-1.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jvnet.staxex\\stax-ex\\1.8.1\\78011e483a21102fb4858f3e8f269a677e50aa23\\stax-ex-1.8.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\jakarta.xml.bind\\jakarta.xml.bind-api\\2.3.2\\8d49996a4338670764d7ca4b85a1c4ccf7fe665d\\jakarta.xml.bind-api-2.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.glassfish.jaxb\\txw2\\2.3.2\\ce5be7da2e442c25ec14c766cb60cb802741727b\\txw2-2.3.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.sun.istack\\istack-commons-runtime\\3.0.8\\d6a97364045aa6b99bf2d3c566a3f98599c2d296\\istack-commons-runtime-3.0.8.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.sun.xml.fastinfoset\\FastInfoset\\1.2.16\\4eb6a0adad553bf759ffe86927df6f3b848c8bea\\FastInfoset-1.2.16.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\jakarta.activation\\jakarta.activation-api\\1.2.1\\562a587face36ec7eff2db7f2fc95425c6602bc1\\jakarta.activation-api-1.2.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.auto.value\\auto-value-annotations\\1.6.2\\ed193d86e0af90cc2342aedbe73c5d86b03fa09b\\auto-value-annotations-1.6.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.bitbucket.b_c\\jose4j\\0.7.0\\478ee8518687f9b01f20912fc7edd9d7b46d06da\\jose4j-0.7.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.slf4j\\slf4j-api\\1.7.30\\b5a4b6d16ab13e34a88fae84c35cd5d68cac922c\\slf4j-api-1.7.30.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jdom\\jdom2\\2.0.6\\6f14738ec2e9dd0011e343717fa624a10f8aab64\\jdom2-2.0.6.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\com.google.android\\annotations\\4.1.1.4\\a1678ba907bf92691d879fef34e1a187038f9259\\annotations-4.1.1.4.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.codehaus.mojo\\animal-sniffer-annotations\\1.19\\1536e1a8fd552dc05f12b5f0827fbb2ee3d5a89b\\animal-sniffer-annotations-1.19.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.perfmark\\perfmark-api\\0.23.0\\b813b7539fae6550541da8caafd6add86d4e22f\\perfmark-api-0.23.0.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec-http2\\4.1.72.Final\\4b269e666fbace27d2c1efa57703e99b09655822\\netty-codec-http2-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-handler-proxy\\4.1.72.Final\\90de0fe610454d4296052ae36acb8a6a1d0333f1\\netty-handler-proxy-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\commons-codec\\commons-codec\\1.11\\3acb4705652e16236558f0f4f2192cc33c3bd189\\commons-codec-1.11.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\org.jetbrains.kotlin\\kotlin-stdlib-common\\1.8.20-RC2\\948fe79545343155ae7e6669c40ac9e086170e82\\kotlin-stdlib-common-1.8.20-RC2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\xml-apis\\xml-apis\\1.4.01\\3789d9fada2d3d458c4ba2de349d48780f381ee3\\xml-apis-1.4.01.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\commons-logging\\commons-logging\\1.2\\4bfc12adfe4842bf07b657f0369c4cb522955686\\commons-logging-1.2.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.grpc\\grpc-context\\1.45.1\\485a08c019cc78914a477b1dfc7052820b8d822c\\grpc-context-1.45.1.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec-http\\4.1.72.Final\\a8f062d67303a5e4b2bc2ad48fb4fd8c99108e45\\netty-codec-http-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-handler\\4.1.72.Final\\9feee089fee606c64be90c0332db9aef1f7d8e46\\netty-handler-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec-socks\\4.1.72.Final\\d3bc427b6e2dc4bb6dc9d18d1cc47f8530970a8b\\netty-codec-socks-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-codec\\4.1.72.Final\\613c4019d687db4e9a5532564e442f83c4474ed7\\netty-codec-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-transport\\4.1.72.Final\\99138b436a584879355aca8fe3c64b46227d5d79\\netty-transport-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-buffer\\4.1.72.Final\\f306eec3f79541f9b8af9c471a0d5b63b7996272\\netty-buffer-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-resolver\\4.1.72.Final\\4ff458458ea32ed1156086820b624a815fcbf2c0\\netty-resolver-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-common\\4.1.72.Final\\a55bac9c3af5f59828207b551a96ac19bbfc341e\\netty-common-4.1.72.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\modules-2\\files-2.1\\io.netty\\netty-tcnative-classes\\2.0.46.Final\\9937a832d9c19861822d345b48ced388b645aa5f\\netty-tcnative-classes-2.0.46.Final.jar",
+        "C:\\Users\\hp\\.gradle\\caches\\8.3\\generated-gradle-jars\\gradle-api-8.3.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-ant-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-astbuilder-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-console-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-datetime-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-dateutil-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-groovydoc-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-json-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-nio-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-sql-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-templates-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-test-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\groovy-xml-3.0.17.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\javaparser-core-3.17.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-common-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-reflect-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-jdk7-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\kotlin-stdlib-jdk8-1.9.0.jar",
+        "C:\\Users\\hp\\.gradle\\wrapper\\dists\\gradle-8.3-all\\6en3ugtfdg5xnpx44z4qbwgas\\gradle-8.3\\lib\\gradle-installation-beacon-8.3.jar",
+        "D:\\khedma app\\church-ministry-system\\mobile\\node_modules\\@react-native\\gradle-plugin\\build\\classes\\kotlin\\main"
+      ]
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\src\\paper\\java\\com\\th3rdwave\\safeareacontext\\NativeSafeAreaContextSpec.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNCSafeAreaProviderManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNCSafeAreaProviderManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNCSafeAreaViewManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNCSafeAreaViewManagerInterface.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-safe-area-context\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenStackHeaderConfigManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenStackHeaderConfigManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenStackHeaderSubviewManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenStackHeaderSubviewManagerInterface.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenStackManagerDelegate.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\src\\paper\\java\\com\\facebook\\react\\viewmanagers\\RNSScreenStackManagerInterface.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-screens\\android\\build\\"
+      ],
+      "classpath": []
+    },
+    {
+      "name": "android",
+      "path": "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\",
+      "sources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\build\\",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\src\\newarch\\java\\com\\oblador\\vectoricons\\VectorIconsModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\src\\oldarch\\java\\com\\oblador\\vectoricons\\VectorIconsModule.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\src\\main\\java\\com\\oblador\\vectoricons\\VectorIconsModuleImpl.java",
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\src\\main\\java\\com\\oblador\\vectoricons\\VectorIconsPackage.java"
+      ],
+      "testSources": [],
+      "generatedSources": [
+        "d:\\khedma app\\church-ministry-system\\mobile\\node_modules\\react-native-vector-icons\\android\\build\\"
+      ],
+      "classpath": []
+    }
+  ]
+}

@@ -202,6 +202,7 @@ export class AuthService {
     await this.profileModel.create({
       churchId,
       churchMemberId: member.id,
+      gender: dto.gender || null,
     } as any);
 
     const servedMemberRole = await this.roleModel.findOne({ where: { name: 'served_member' } });

@@ -114,6 +114,7 @@ export class AdminService {
     await this.profileModel.create({
       churchId,
       churchMemberId: member.id,
+      gender: dto.gender || null,
     } as any);
 
     await this.memberRoleModel.create({
@@ -172,12 +173,10 @@ export class AdminService {
       } as any);
     }
 
-    const createdMember = await this.memberModel.findByPk(member.id, {
-      include: [
+    const createdMember = await this.memberModel.findOne({ where: { id: member.id }, include: [
         { model: User, attributes: ['id', 'fullName', 'email', 'phone'] },
         { model: MemberRole, include: [{ model: Role, attributes: ['name', 'label'] }] },
-      ],
-    });
+      ] });
 
     return createdMember;
   }
@@ -210,13 +209,10 @@ export class AdminService {
   }
 
   async getUserById(memberId: string, churchId: number) {
-    const member = await this.memberModel.findOne({
-      where: { id: memberId, churchId },
-      include: [
+    const member = await this.memberModel.findOne({ where: { id: Number(memberId), churchId }, include: [
         { model: User, attributes: ['id', 'fullName', 'email', 'phone', 'avatarUrl'] },
         { model: MemberRole, include: [{ model: Role, attributes: ['name', 'label'] }] },
-      ],
-    });
+      ] });
     if (!member) throw new NotFoundException('User not found');
     return member;
   }
@@ -224,13 +220,10 @@ export class AdminService {
   /* ==================== ROLE & CONTEXT DETECTION ==================== */
 
   async getUserContexts(memberId: string, churchId: number) {
-    const member = await this.memberModel.findOne({
-      where: { id: memberId, churchId },
-      include: [
+    const member = await this.memberModel.findOne({ where: { id: Number(memberId), churchId }, include: [
         { model: User, attributes: ['id', 'fullName', 'email'] },
         { model: MemberRole, include: [{ model: Role, attributes: ['name', 'label'] }] },
-      ],
-    });
+      ] });
     if (!member) throw new NotFoundException('User not found');
 
     const roles: string[] = member.memberRoles?.map((mr: any) => mr.role.name) || [];
@@ -342,7 +335,7 @@ export class AdminService {
   /* ==================== ROLE ASSIGNMENT ==================== */
 
   async assignRole(memberId: string, churchId: number, dto: AssignRoleDto) {
-    const member = await this.memberModel.findOne({ where: { id: memberId, churchId } });
+    const member = await this.memberModel.findOne({ where: { id: Number(memberId), churchId } });
     if (!member) throw new NotFoundException('User not found');
 
     const role = await this.roleModel.findOne({ where: { name: dto.role } });
@@ -375,7 +368,7 @@ export class AdminService {
   /* ==================== SERVICE LEADER ASSIGNMENT ==================== */
 
   async assignServiceLeader(memberId: string, churchId: number, dto: AssignServiceLeaderDto) {
-    const member = await this.memberModel.findOne({ where: { id: memberId, churchId } });
+    const member = await this.memberModel.findOne({ where: { id: Number(memberId), churchId } });
     if (!member) throw new NotFoundException('User not found');
 
     const service = await this.serviceModel.findByPk(Number(dto.serviceId));

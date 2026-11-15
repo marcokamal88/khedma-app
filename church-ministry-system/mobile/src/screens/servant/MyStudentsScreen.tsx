@@ -26,7 +26,6 @@ export default function MyStudentsScreen({ navigation }: any) {
   const [newName, setNewName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newGender, setNewGender] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -63,7 +62,6 @@ export default function MyStudentsScreen({ navigation }: any) {
     setNewName('');
     setNewUsername('');
     setNewPhone('');
-    setNewGender('');
     setNewPassword('');
   };
 
@@ -81,7 +79,6 @@ export default function MyStudentsScreen({ navigation }: any) {
         username,
         phone: newPhone.trim() || undefined,
         password,
-        gender: newGender || undefined,
       });
       setShowAdd(false);
       resetAdd();
@@ -213,22 +210,6 @@ export default function MyStudentsScreen({ navigation }: any) {
                 placeholderTextColor={MUTED}
                 keyboardType="phone-pad"
               />
-              <View style={styles.genderRow}>
-                <TouchableOpacity
-                  style={[styles.genderBtn, newGender === 'male' && styles.genderActive]}
-                  onPress={() => setNewGender('male')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.genderText, newGender === 'male' && styles.genderTextActive]}>{t('home.male')}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.genderBtn, newGender === 'female' && styles.genderActive]}
-                  onPress={() => setNewGender('female')}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.genderText, newGender === 'female' && styles.genderTextActive]}>{t('home.female')}</Text>
-                </TouchableOpacity>
-              </View>
               <TextInput
                 style={styles.input}
                 value={newPassword}
@@ -270,8 +251,8 @@ const styles = StyleSheet.create({
   cardRow: { flexDirection: 'row', alignItems: 'center' },
   avatar: { backgroundColor: NAVY, marginEnd: 12 },
   cardInfo: { flex: 1 },
-  name: { ...typography.cardTitle, color: NAVY, marginBottom: 2, textAlign: 'right', writingDirection: 'rtl' },
-  sub: { ...typography.caption, color: MUTED, textAlign: 'right', writingDirection: 'rtl' },
+  name: { ...typography.cardTitle, color: NAVY, marginBottom: 2 },
+  sub: { ...typography.caption, color: MUTED },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: CREAM },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheetWrapper: { backgroundColor: OFF_WHITE, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%', width: '100%', overflow: 'hidden' },
@@ -281,9 +262,4 @@ const styles = StyleSheet.create({
   modalClose: { fontSize: 22, color: MUTED, paddingHorizontal: 8 },
   sheetContent: { padding: 20, paddingBottom: 60 },
   input: { backgroundColor: '#ffffff', borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, ...typography.body, color: NAVY, marginBottom: 10 },
-  genderRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
-  genderBtn: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ffffff', borderWidth: 1, borderColor: colors.border, alignItems: 'center' },
-  genderActive: { backgroundColor: NAVY, borderColor: NAVY },
-  genderText: { ...typography.buttonSmall, color: MUTED },
-  genderTextActive: { color: '#ffffff' },
 });

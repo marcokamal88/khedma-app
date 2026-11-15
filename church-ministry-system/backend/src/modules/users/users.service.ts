@@ -31,6 +31,7 @@ export class UsersService {
     @InjectModel(ServiceYear) private serviceYearModel: typeof ServiceYear,
     @InjectModel(MemberProfile) private profileModel: typeof MemberProfile,
     @InjectModel(Class) private classModel: typeof Class,
+    @InjectModel(Service) private serviceModel: typeof Service,
     private sequelize: Sequelize,
   ) {}
 
@@ -67,6 +68,7 @@ export class UsersService {
     await this.profileModel.create({
       churchId,
       churchMemberId: member.id,
+      gender: dto.gender || null,
     } as any);
 
     return { id: user.id, fullName: user.fullName, username: user.email, phone: user.phone };
@@ -479,8 +481,15 @@ export class UsersService {
   }
 
   async createServant(dto: CreateServantDto, churchId: string, user: any) {
-    const serviceId = await this.resolveLeaderServiceId(churchId, user);
-    if (!serviceId) throw new ForbiddenException('No service assigned to this leader');
+    let serviceId = dto.serviceId ? Number(dto.serviceId) : null;
+    if (!serviceId && dto.classId) {
+      const cls = await this.classModel.findOne({ where: { id: Number(dto.classId), churchId } as any });
+      if (cls) serviceId = Number(cls.serviceId);
+    }
+    if (!serviceId) {
+      serviceId = await this.resolveLeaderServiceId(churchId, user);
+    }
+    if (!serviceId) throw new BadRequestException('Service is required to create a servant');
 
     const serviceYear = await this.serviceYearModel.findOne({
       where: { churchId, isCurrent: true },
@@ -490,7 +499,7 @@ export class UsersService {
     const cls = await this.classModel.findOne({
       where: { id: Number(dto.classId), churchId, serviceId, isActive: true } as any,
     });
-    if (!cls) throw new BadRequestException('Class not found in your service');
+    if (!cls) throw new BadRequestException('Class not found in selected service');
 
     const username = normalizeUsername(dto.username);
     const existing = await this.userModel.findOne({
@@ -527,7 +536,6 @@ export class UsersService {
       await this.profileModel.create({
         churchId,
         churchMemberId: member.id,
-        gender: dto.gender || null,
         phones: dto.phone ? [dto.phone] : null,
       } as any, { transaction });
 
@@ -579,14 +587,19 @@ export class UsersService {
     return assignment ? Number((assignment as any).serviceId) : null;
   }
 
-  async getServantAssignments(churchId: string, serviceId: string, currentMemberId?: number) {
+  async getServantAssignments(churchId: string, serviceId?: string, currentMemberId?: number) {
     const serviceYear = await this.serviceYearModel.findOne({
       where: { churchId, isCurrent: true },
     });
     if (!serviceYear) throw new NotFoundException('No active service year');
 
-    const allServiceMemberIds = await this.getServiceMemberIds(churchId, Number(serviceId), serviceYear.id);
-    const serviceMemberSet = new Set<number>(allServiceMemberIds);
+    const isAll = !serviceId || serviceId === 'all';
+
+    let serviceMemberSet: Set<number> | null = null;
+    if (!isAll) {
+      const allServiceMemberIds = await this.getServiceMemberIds(churchId, Number(serviceId), serviceYear.id);
+      serviceMemberSet = new Set<number>(allServiceMemberIds);
+    }
 
     const SERVANT_ROLES = ['servant', 'class_leader'];
     const servantRoles = await this.roleModel.findAll({
@@ -607,8 +620,18 @@ export class UsersService {
 
     const memberIds = memberRoles
       .map((mr) => Number((mr as any).churchMemberId))
-      .filter((id) => serviceMemberSet.has(id) && !excludeSet.has(id));
+      .filter((id) => (serviceMemberSet ? serviceMemberSet.has(id) : true) && !excludeSet.has(id));
     if (memberIds.length === 0) return [];
+
+    const assignmentWhere: any = {
+      churchId,
+      serviceYearId: serviceYear.id,
+      isActive: true,
+      churchMemberId: memberIds,
+    };
+    if (!isAll) {
+      assignmentWhere.serviceId = Number(serviceId);
+    }
 
     const [members, assignments] = await Promise.all([
       this.memberModel.findAll({
@@ -616,8 +639,11 @@ export class UsersService {
         include: [{ model: User, attributes: ['id', 'fullName', 'email', 'phone', 'avatarUrl'] }],
       }),
       this.servantAssignmentModel.findAll({
-        where: { churchId, serviceId, serviceYearId: serviceYear.id, isActive: true, churchMemberId: memberIds } as any,
-        include: [{ model: Class, attributes: ['id', 'name'] }],
+        where: assignmentWhere,
+        include: [
+          { model: Class, attributes: ['id', 'name'] },
+          { model: Service, attributes: ['id', 'name'] },
+        ],
       }),
     ]);
 
@@ -635,9 +661,107 @@ export class UsersService {
         avatarUrl: (m as any).user?.avatarUrl,
         classId: a ? a.classId : null,
         className: a ? ((a as any).class?.name || '') : '',
+        serviceId: a ? a.serviceId : null,
+        serviceName: a ? ((a as any).service?.name || '') : '',
         leaderRole: a ? (a.leaderRole || 'servant') : null,
       };
     });
+  }
+
+  async assignServiceLeader(
+    data: { churchMemberId: string; serviceId: string; leaderRole: 'service_leader' | 'assistant_service_leader' },
+    churchId: string,
+  ) {
+    const member = await this.memberModel.findOne({ where: { id: Number(data.churchMemberId), churchId } as any });
+    if (!member) throw new NotFoundException('Member not found');
+
+    const service = await this.serviceModel.findOne({ where: { id: Number(data.serviceId), churchId } as any });
+    if (!service) throw new NotFoundException('Service not found');
+
+    const roleName = data.leaderRole || 'service_leader';
+    const role = await this.roleModel.findOne({ where: { name: roleName } });
+    if (!role) throw new NotFoundException(`Role ${roleName} not found`);
+
+    const existingRole = await this.memberRoleModel.findOne({
+      where: { churchMemberId: member.id, roleId: role.id, churchId } as any,
+    });
+    if (!existingRole) {
+      await this.memberRoleModel.create({
+        churchMemberId: member.id,
+        roleId: role.id,
+        churchId,
+      } as any);
+    }
+
+    const serviceYear = await this.serviceYearModel.findOne({
+      where: { churchId, isCurrent: true },
+    });
+    const serviceYearId = serviceYear ? serviceYear.id : 1;
+
+    const existingAssignment = await this.servantAssignmentModel.findOne({
+      where: {
+        churchMemberId: member.id,
+        churchId,
+        serviceId: Number(data.serviceId),
+        leaderRole: roleName,
+      } as any,
+    });
+
+    if (existingAssignment) {
+      await existingAssignment.update({ isActive: true, serviceYearId } as any);
+      return existingAssignment;
+    } else {
+      return this.servantAssignmentModel.create({
+        churchId,
+        churchMemberId: member.id,
+        serviceId: Number(data.serviceId),
+        classId: null,
+        serviceYearId,
+        leaderRole: roleName,
+        isActive: true,
+      } as any);
+    }
+  }
+
+  async reassignServant(
+    data: { assignmentId?: string; churchMemberId: string; targetServiceId: string; targetClassId?: string; leaderRole?: string },
+    churchId: string,
+  ) {
+    const serviceYear = await this.serviceYearModel.findOne({
+      where: { churchId, isCurrent: true },
+    });
+    const serviceYearId = serviceYear ? serviceYear.id : 1;
+
+    let assignment: any = null;
+    if (data.assignmentId) {
+      assignment = await this.servantAssignmentModel.findOne({
+        where: { id: Number(data.assignmentId), churchId } as any,
+      });
+    }
+    if (!assignment && data.churchMemberId) {
+      assignment = await this.servantAssignmentModel.findOne({
+        where: { churchMemberId: Number(data.churchMemberId), churchId, isActive: true } as any,
+      });
+    }
+
+    const updatePayload: any = {
+      serviceId: Number(data.targetServiceId),
+      classId: data.targetClassId ? Number(data.targetClassId) : null,
+      serviceYearId,
+      isActive: true,
+    };
+    if (data.leaderRole) updatePayload.leaderRole = data.leaderRole;
+
+    if (assignment) {
+      await assignment.update(updatePayload);
+      return assignment;
+    } else {
+      return this.servantAssignmentModel.create({
+        churchId,
+        churchMemberId: Number(data.churchMemberId),
+        ...updatePayload,
+      } as any);
+    }
   }
 
   async updateServantAssignment(churchId: string, id: string, data: { classId?: string; leaderRole?: string }) {

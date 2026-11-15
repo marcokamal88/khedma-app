@@ -75,7 +75,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Roles('service_leader', 'assistant_service_leader')
+  @Roles('priest', 'sector_leader', 'service_leader', 'assistant_service_leader')
   @Post('servants')
   async createServant(
     @Body() dto: CreateServantDto,
@@ -111,6 +111,26 @@ export class UsersController {
     @Req() req: Request,
   ) {
     return this.usersService.assignServant(body, churchId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('sector_leader', 'priest')
+  @Post('servant-assignments/service-leader')
+  async assignServiceLeader(
+    @Body() body: { churchMemberId: string; serviceId: string; leaderRole: 'service_leader' | 'assistant_service_leader' },
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.usersService.assignServiceLeader(body, churchId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Roles('sector_leader', 'priest', 'service_leader')
+  @Post('servant-assignments/reassign')
+  async reassignServant(
+    @Body() body: { assignmentId?: string; churchMemberId: string; targetServiceId: string; targetClassId?: string; leaderRole?: string },
+    @CurrentTenant() churchId: string,
+  ) {
+    return this.usersService.reassignServant(body, churchId);
   }
 
   @UseGuards(JwtAuthGuard)

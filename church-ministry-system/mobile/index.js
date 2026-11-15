@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import { registerRootComponent } from 'expo';
+import { AppRegistry } from 'react-native';
 import App from './App';
 
 // Web: inject error display into the root div
@@ -27,4 +27,4 @@ if (typeof window !== 'undefined' && window.document) {
   });
 }
 
-registerRootComponent(App);
+AppRegistry.registerComponent('main', () => App);

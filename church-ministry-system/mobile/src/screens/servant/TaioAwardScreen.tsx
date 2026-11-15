@@ -196,13 +196,15 @@ export default function TaioAwardScreen() {
     <View style={styles.root}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={{ paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}
       >
         <AppHeader greetingText={t("award.title")}>
           <View style={styles.classInfoCard}>
             <View style={styles.classInfoRow}>
+              <View style={styles.classInfoIconWrap}>
+                <Text style={styles.classInfoIcon}>{"\u2605"}</Text>
+              </View>
               <View style={styles.classInfoTextWrap}>
                 <Text style={styles.classInfoTitle}>
                   {classAssignment?.service?.name}
@@ -211,9 +213,6 @@ export default function TaioAwardScreen() {
                   {classAssignment?.class?.stageGroup?.name} -{" "}
                   {classAssignment?.class?.name}
                 </Text>
-              </View>
-              <View style={styles.classInfoIconWrap}>
-                <Text style={styles.classInfoIcon}>{"\u2605"}</Text>
               </View>
             </View>
           </View>
@@ -250,7 +249,6 @@ export default function TaioAwardScreen() {
                   <Text style={styles.memberName} numberOfLines={1}>
                     {student.fullName}
                   </Text>
-                  <View style={{ flex: 1 }} />
                   <View style={styles.balanceBadge}>
                     <Text style={styles.balanceBadgeValue}>
                       {student.taioBalance ?? 0}
@@ -355,45 +353,35 @@ const styles = StyleSheet.create({
 
   classInfoCard: {
     backgroundColor: "rgba(255,255,255,0.10)",
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
-    paddingHorizontal: 12,
-    paddingVertical: 9,
+    padding: 14,
   },
   classInfoRow: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "center",
-    justifyContent: "space-between",
   },
   classInfoIconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 52,
+    height: 52,
+    borderRadius: 14,
     backgroundColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: 12,
   },
-  classInfoIcon: { fontSize: 18, color: GOLD },
-  classInfoTextWrap: {
-    flex: 1,
-    marginEnd: 10,
-  },
+  classInfoIcon: { fontSize: 24, color: GOLD },
+  classInfoTextWrap: { flex: 1 },
   classInfoTitle: {
-    fontSize: 13,
-    lineHeight: 17,
+    ...typography.cardTitle,
     color: "#ffffff",
     fontWeight: "700",
-    textAlign: "left",
-    writingDirection: "rtl",
   },
   classInfoMeta: {
-    fontSize: 11,
-    lineHeight: 15,
-    color: "rgba(255,255,255,0.7)",
-    marginTop: 1,
-    textAlign: "left",
-    writingDirection: "rtl",
+    ...typography.caption,
+    color: "rgba(255,255,255,0.6)",
+    marginTop: 2,
   },
 
   contentSection: { paddingHorizontal: 16, paddingTop: 16 },
@@ -460,9 +448,6 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: CHARCOAL,
     fontWeight: "600",
-    textAlign: "right",
-    writingDirection: "rtl",
-    maxWidth: "50%",
   },
   balanceBadge: {
     flexDirection: "row",

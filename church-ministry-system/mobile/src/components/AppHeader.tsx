@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { RootState } from "../store";
@@ -38,10 +38,6 @@ export default function AppHeader({ greetingText, children, rightElement }: AppH
     <>
       <View style={styles.headerSection}>
         <View style={styles.headerTop}>
-          <View style={styles.headerTextWrap}>
-            <Text style={styles.greeting} numberOfLines={1}>{greetingText}</Text>
-            <Text style={styles.userName} numberOfLines={1}>{user?.fullName}</Text>
-          </View>
           <TouchableOpacity
             style={styles.headerBtn}
             activeOpacity={0.7}
@@ -56,8 +52,12 @@ export default function AppHeader({ greetingText, children, rightElement }: AppH
               </View>
             )}
           </TouchableOpacity>
-        </View>
-        {children}
+          <View style={styles.headerTextWrap}>
+            <Text style={styles.greeting} numberOfLines={1}>{greetingText}</Text>
+            <Text style={styles.userName} numberOfLines={1}>{user?.fullName}</Text>
+          </View>
+</View>
+      {children}
       {rightElement && (
         <View style={styles.rightElementWrapper}>
           {rightElement}
@@ -74,60 +74,58 @@ export default function AppHeader({ greetingText, children, rightElement }: AppH
 const styles = StyleSheet.create({
   headerSection: {
     backgroundColor: NAVY,
-    paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 44 : 36,
-    paddingBottom: 10,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
   },
   headerTop: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   headerBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.12)",
     alignItems: "center",
     justifyContent: "center",
   },
-  bellIcon: { fontSize: 17, color: "#ffffff" },
+  bellIcon: { fontSize: 20, color: "#ffffff" },
   badge: {
     position: "absolute",
-    top: -3,
-    right: -3,
-    minWidth: 17,
-    height: 17,
-    borderRadius: 9,
+    top: -4,
+    right: -4,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: "#c62828",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 4,
+    paddingHorizontal: 5,
   },
-  badgeText: { fontSize: 10, color: "#ffffff", fontWeight: "700" },
-  headerTextWrap: { flex: 1, marginLeft: 10 },
+  badgeText: { fontSize: 11, color: "#ffffff", fontWeight: "700" },
+  headerTextWrap: { flex: 1, marginLeft: 12 },
   greeting: {
-    fontSize: 12,
-    lineHeight: 16,
-    color: "rgba(255,255,255,0.65)",
+    ...typography.body,
+    color: "rgba(255,255,255,0.6)",
     marginBottom: 2,
     textAlign: "left",
   },
   userName: {
-    fontSize: 18,
-    lineHeight: 22,
+    ...typography.sectionHeading,
     color: "#ffffff",
-    fontWeight: "700",
+    marginBottom: 4,
     textAlign: "left",
   },
   waveContainer: {
-    height: 14,
+    height: 30,
     backgroundColor: NAVY,
-    borderBottomLeftRadius: 18,
-    borderBottomRightRadius: 18,
-    marginBottom: -6,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    marginBottom: -8,
   },
   waveDummy: { height: 0 },
-  rightElementWrapper: { marginTop: 6, alignItems: 'flex-start' },
+  rightElementWrapper: { marginTop: 8, alignItems: 'flex-start' },
 });

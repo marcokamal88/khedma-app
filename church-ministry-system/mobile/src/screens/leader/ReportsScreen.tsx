@@ -1,8 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl, Alert, TextInput, Linking, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocale } from '../../hooks/useLocale';
 import { useActiveContext } from '../../hooks/useActiveContext';
+import { useAuth } from '../../hooks/useAuth';
+import { churchApi } from '../../api/church.api';
 import { AppCard, AppBadge, AppButton } from '../../components/ui';
 import { colors, typography, shadows } from '../../theme';
 import apiClient from '../../api/client';
@@ -11,6 +13,7 @@ const NAVY = colors.navy;
 const GOLD = colors.gold;
 const CREAM = colors.cream;
 const MUTED = colors.mutedGray;
+const GREEN = colors.success || '#10b981';
 
 const reportTypes = [
   { key: 'attendance', icon: '📊', color: '#e3f2fd' },
@@ -23,6 +26,14 @@ const reportTypes = [
 export default function ReportsScreen() {
   const { t } = useLocale();
   const { serviceId } = useActiveContext();
+  const { activeContext } = useAuth();
+
+  const isSectorOrPriest = activeContext?.role === 'sector_leader' || activeContext?.role === 'priest';
+
+  const [sectorServices, setSectorServices] = useState<any[]>([]);
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('all');
+  const [sectorOverview, setSectorOverview] = useState<any>(null);
+
   const [report, setReport] = useState<any>(null);
   const [activeType, setActiveType] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,23 +42,54 @@ export default function ReportsScreen() {
   const [to, setTo] = useState('');
   const [downloading, setDownloading] = useState(false);
 
-  const loadReport = useCallback(async (type: string) => {
+  useEffect(() => {
+    if (isSectorOrPriest) {
+      churchApi.getMySectorOverview()
+        .then((res) => {
+          setSectorOverview(res.data);
+          setSectorServices(res.data?.services || []);
+        })
+        .catch(() => {});
+    }
+  }, [isSectorOrPriest]);
+
+  const effectiveServiceId = (isSectorOrPriest && selectedServiceId !== 'all')
+    ? selectedServiceId
+    : (!isSectorOrPriest ? serviceId : undefined);
+
+  const loadReport = useCallback(async (type: string, overrideServiceId?: string) => {
     setActiveType(type);
     setLoading(true);
+    const targetServiceId = overrideServiceId !== undefined ? overrideServiceId : effectiveServiceId;
     try {
       let url = '';
       const params: any = {};
-      if (type === 'attendance') { url = '/reports/attendance'; if (serviceId) params.serviceId = serviceId; }
-      else if (type === 'engagement') { url = '/reports/engagement'; if (serviceId) params.serviceId = serviceId; }
+      if (targetServiceId && targetServiceId !== 'all') {
+        params.serviceId = targetServiceId;
+      }
+      if (isSectorOrPriest && activeContext?.scope?.sectorId) {
+        params.sectorId = activeContext.scope.sectorId;
+      }
+
+      if (type === 'attendance') url = '/reports/attendance';
+      else if (type === 'engagement') url = '/reports/engagement';
       else if (type === 'financial') url = '/reports/financial';
       else if (type === 'taio') url = '/reports/taio';
-      else if (type === 'servant-performance') { url = '/reports/servant-performance'; if (serviceId) params.serviceId = serviceId; }
+      else if (type === 'servant-performance') url = '/reports/servant-performance';
+
       const res: any = await apiClient.get(url, { params });
       setReport({ type, data: res?.data ?? res });
     } catch (e: any) {
       setReport({ type, error: e?.message || t('app.error') });
     } finally { setLoading(false); }
-  }, [serviceId, t]);
+  }, [effectiveServiceId, isSectorOrPriest, activeContext, t]);
+
+  const onSelectService = (sId: string) => {
+    setSelectedServiceId(sId);
+    if (activeType) {
+      loadReport(activeType, sId === 'all' ? undefined : sId);
+    }
+  };
 
   const onRefresh = useCallback(async () => {
     if (!activeType) return;
@@ -57,14 +99,15 @@ export default function ReportsScreen() {
   }, [activeType, loadReport]);
 
   const downloadExcel = useCallback(async () => {
-    if (!serviceId) { Alert.alert('', t('reports.noService') || 'لا توجد خدمة'); return; }
+    const sId = effectiveServiceId;
+    if (!sId) { Alert.alert('', 'يرجى اختيار خدمة محددة لتصدير إكسل الفصول'); return; }
     setDownloading(true);
     try {
       const token = await AsyncStorage.getItem('access_token');
       const churchId = (await AsyncStorage.getItem('church_id')) || '1';
       const base = (apiClient.defaults.baseURL as string) || `http://${Platform.OS === 'android' ? '10.134.143.23' : 'localhost'}:3000/api/v1`;
       const arabicService = report?.data?.serviceName || 'الخدمة';
-      const query = new URLSearchParams({ serviceId: String(serviceId), ...(from.trim() ? { from: from.trim() } : {}), ...(to.trim() ? { to: to.trim() } : {}), ...(token ? { token } : {}), churchId: String(churchId) }).toString();
+      const query = new URLSearchParams({ serviceId: String(sId), ...(from.trim() ? { from: from.trim() } : {}), ...(to.trim() ? { to: to.trim() } : {}), ...(token ? { token } : {}), churchId: String(churchId) }).toString();
       const url = `${base}/reports/attendance/excel?${query}`;
       try {
         const FileSystem: any = require('expo-file-system');
@@ -76,7 +119,7 @@ export default function ReportsScreen() {
       await Linking.openURL(url);
     } catch (e: any) {
       try {
-        const params: any = { serviceId };
+        const params: any = { serviceId: sId };
         if (from.trim()) params.from = from.trim();
         if (to.trim()) params.to = to.trim();
         await apiClient.get('/reports/attendance/excel', { params, responseType: 'arraybuffer' });
@@ -85,10 +128,11 @@ export default function ReportsScreen() {
         Alert.alert('', err?.response?.data?.message || err?.message || t('app.error'));
       }
     } finally { setDownloading(false); }
-  }, [serviceId, from, to, t, report]);
+  }, [effectiveServiceId, from, to, t, report]);
 
   const downloadTaioExcel = useCallback(async () => {
-    if (!serviceId) { Alert.alert('', t('reports.noService') || 'لا توجد خدمة'); return; }
+    const sId = effectiveServiceId;
+    if (!sId) { Alert.alert('', 'يرجى اختيار خدمة محددة لتصدير طايو'); return; }
     setDownloading(true);
     try {
       const token = await AsyncStorage.getItem('access_token');
@@ -97,7 +141,7 @@ export default function ReportsScreen() {
       const syId = syRes?.data?.id || syRes?.id || '';
       const base = (apiClient.defaults.baseURL as string) || `http://${Platform.OS === 'android' ? '10.134.143.23' : 'localhost'}:3000/api/v1`;
       const arb = report?.data?.serviceName || 'الخدمة';
-      const query = new URLSearchParams({ serviceId: String(serviceId), ...(syId ? { serviceYearId: String(syId) } : {}), ...(token ? { token } : {}), churchId: String(churchId) }).toString();
+      const query = new URLSearchParams({ serviceId: String(sId), ...(syId ? { serviceYearId: String(syId) } : {}), ...(token ? { token } : {}), churchId: String(churchId) }).toString();
       const url = `${base}/reports/taio/excel?${query}`;
       try {
         const FileSystem: any = require('expo-file-system');
@@ -110,7 +154,7 @@ export default function ReportsScreen() {
     } catch (e: any) {
       Alert.alert('', e?.message || t('app.error'));
     } finally { setDownloading(false); }
-  }, [serviceId, t, report]);
+  }, [effectiveServiceId, t, report]);
 
   const renderReportContent = () => {
     if (!report) return null;
@@ -122,6 +166,18 @@ export default function ReportsScreen() {
       const s = d.summary || {};
       return (
         <View>
+          {isSectorOrPriest && selectedServiceId === 'all' && sectorOverview?.services && (
+            <View style={styles.comparisonBox}>
+              <Text style={styles.comparisonTitle}>مقارنة نسب الحضور لخدمات القطاع:</Text>
+              {sectorOverview.services.map((srv: any) => (
+                <View key={srv.id} style={styles.compareRow}>
+                  <Text style={styles.compareName}>{srv.name}</Text>
+                  <Text style={styles.comparePercent}>{srv.attendanceRate || 0}%</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
           <View style={styles.statsGrid}>
             <Stat label={t('reports.attendance')} value={`${d.totalSessions ?? 0}`} sub="جلسات" />
             <Stat label="الحضور" value={`${s.present ?? 0}`} sub="present" color={colors.success} />
@@ -132,8 +188,15 @@ export default function ReportsScreen() {
             <TextInput style={styles.filterInput} placeholder="من YYYY-MM-DD" placeholderTextColor={MUTED} value={from} onChangeText={setFrom} />
             <TextInput style={styles.filterInput} placeholder="إلى YYYY-MM-DD" placeholderTextColor={MUTED} value={to} onChangeText={setTo} />
           </View>
-          <AppButton title={downloading ? 'جاري التحميل...' : 'تحميل Excel (مجمّع بالفصول)'} onPress={downloadExcel} variant="navy" size="md" disabled={downloading} style={{ marginTop: 12 }} />
-          <Text style={styles.hint}>الأعمدة: الفصل | الاسم | النوع | الدور | حضور | غياب | النسبة | آخر حضور — ورقة لكل فصل + ملخص. ملاحظة: حضور الخدام غير متتبع حالياً.</Text>
+          <AppButton
+            title={downloading ? 'جاري التحميل...' : 'تحميل Excel (مجمّع بالفصول)'}
+            onPress={downloadExcel}
+            variant="navy"
+            size="md"
+            disabled={downloading}
+            style={{ marginTop: 12 }}
+          />
+          <Text style={styles.hint}>الأعمدة: الفصل | الاسم | النوع | الدور | حضور | غياب | النسبة | آخر حضور — ورقة لكل فصل + ملخص.</Text>
         </View>
       );
     }
@@ -209,6 +272,33 @@ export default function ReportsScreen() {
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[NAVY]} tintColor={NAVY} />}
       >
+        {isSectorOrPriest && (
+          <View style={styles.selectorContainer}>
+            <Text style={styles.selectorLabel}>نطاق التقرير والخدمات:</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.selectorScroll}>
+              <TouchableOpacity
+                style={[styles.selectorChip, selectedServiceId === 'all' && styles.selectorChipActive]}
+                onPress={() => onSelectService('all')}
+              >
+                <Text style={[styles.selectorChipText, selectedServiceId === 'all' && styles.selectorChipTextActive]}>
+                  الكل (مقارنة خدمات القطاع)
+                </Text>
+              </TouchableOpacity>
+              {sectorServices.map((srv) => (
+                <TouchableOpacity
+                  key={srv.id}
+                  style={[styles.selectorChip, selectedServiceId === String(srv.id) && styles.selectorChipActive]}
+                  onPress={() => onSelectService(String(srv.id))}
+                >
+                  <Text style={[styles.selectorChipText, selectedServiceId === String(srv.id) && styles.selectorChipTextActive]}>
+                    {srv.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
         <View style={styles.grid}>
           {reportTypes.map((rt) => {
             const active = activeType === rt.key;
@@ -288,4 +378,31 @@ const styles = StyleSheet.create({
   filterRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
   filterInput: { flex: 1, backgroundColor: CREAM, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8, ...typography.caption, color: NAVY },
   hint: { ...typography.caption, color: MUTED, fontSize: 11, marginTop: 8, textAlign: 'center' },
+  selectorContainer: { marginBottom: 14 },
+  selectorLabel: { fontSize: 13, fontWeight: '700', color: NAVY, marginBottom: 6 },
+  selectorScroll: { flexDirection: 'row' },
+  selectorChip: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  selectorChipActive: { backgroundColor: NAVY, borderColor: NAVY },
+  selectorChipText: { fontSize: 12, color: colors.charcoal || '#1c1c1c', fontWeight: '600' },
+  selectorChipTextActive: { color: '#ffffff' },
+  comparisonBox: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  comparisonTitle: { fontSize: 13, fontWeight: '700', color: NAVY, marginBottom: 8 },
+  compareRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  compareName: { fontSize: 12, color: '#334155', fontWeight: '600' },
+  comparePercent: { fontSize: 12, color: GREEN, fontWeight: '700' },
 });

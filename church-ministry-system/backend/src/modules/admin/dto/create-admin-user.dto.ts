@@ -38,5 +38,9 @@ export class CreateAdminUserDto {
 
   @IsOptional()
   @IsString()
-  stageGroupId?: string; // for served_member
+  stageGroupId?: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: 'male' | 'female';
 }

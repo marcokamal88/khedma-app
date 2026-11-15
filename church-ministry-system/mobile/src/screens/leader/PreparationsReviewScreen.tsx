@@ -6,7 +6,6 @@ import {
 import { useLocale } from '../../hooks/useLocale';
 import { useActiveContext } from '../../hooks/useActiveContext';
 import { preparationsApi } from '../../api/preparations.api';
-import apiClient from '../../api/client';
 import { AppCard, AppBadge, AppButton, AppEmptyState } from '../../components/ui';
 import { colors, typography, shadows } from '../../theme';
 
@@ -108,14 +107,8 @@ export default function PreparationsReviewScreen() {
 
   const handleDownload = async (file: any) => {
     try {
-      const filePath = file.fileUrl || file.file_url || '';
-      if (!filePath) return;
-      let url = filePath;
-      if (!filePath.startsWith('http')) {
-        const apiBase = (apiClient.defaults.baseURL as string) || 'http://localhost:3000/api/v1';
-        const hostBase = apiBase.replace(/\/api\/v1\/?$/, '');
-        url = `${hostBase}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
-      }
+      const base = 'http://10.134.143.23:3000';
+      const url = file.file_url?.startsWith('http') ? file.file_url : `${base}${file.file_url}`;
       await Linking.openURL(url);
     } catch (err: any) { Alert.alert('', err?.message || t('app.error')); }
   };
@@ -293,25 +286,20 @@ export default function PreparationsReviewScreen() {
                 {selectedPrep.files && selectedPrep.files.length > 0 && (
                   <View style={[styles.contentCard, { marginTop: 12 }]}>
                     <Text style={styles.contentLabel}>{t('preparation.files') || 'المرفقات'}</Text>
-                    {selectedPrep.files.map((f: any) => {
-                      const fType = f.fileType || f.file_type || '';
-                      const fName = f.fileName || f.file_name || 'file';
-                      const fSize = f.fileSizeBytes || f.file_size_bytes || 0;
-                      return (
-                        <View key={f.id} style={styles.fileRow}>
-                          <View style={styles.fileIconWrap}>
-                            <Text style={styles.fileIcon}>{fType === 'image' ? '🖼' : fType === 'presentation' ? '📊' : '📄'}</Text>
-                          </View>
-                          <View style={{ flex: 1 }}>
-                            <Text style={styles.fileName} numberOfLines={1}>{fName}</Text>
-                            <Text style={styles.fileMeta}>{fType} {fSize ? `• ${(fSize / 1024).toFixed(0)}KB` : ''}</Text>
-                          </View>
-                          <TouchableOpacity style={styles.downloadBtn} onPress={() => handleDownload(f)} activeOpacity={0.7}>
-                            <Text style={styles.downloadText}>{t('preparation.download') || 'تحميل'}</Text>
-                          </TouchableOpacity>
+                    {selectedPrep.files.map((f: any) => (
+                      <View key={f.id} style={styles.fileRow}>
+                        <View style={styles.fileIconWrap}>
+                          <Text style={styles.fileIcon}>{f.file_type === 'image' ? '🖼' : f.file_type === 'presentation' ? '📊' : '📄'}</Text>
                         </View>
-                      );
-                    })}
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.fileName} numberOfLines={1}>{f.file_name}</Text>
+                          <Text style={styles.fileMeta}>{f.file_type} {f.file_size_bytes ? `• ${(f.file_size_bytes/1024).toFixed(0)}KB` : ''}</Text>
+                        </View>
+                        <TouchableOpacity style={styles.downloadBtn} onPress={() => handleDownload(f)} activeOpacity={0.7}>
+                          <Text style={styles.downloadText}>{t('preparation.download') || 'تحميل'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
                   </View>
                 )}
 

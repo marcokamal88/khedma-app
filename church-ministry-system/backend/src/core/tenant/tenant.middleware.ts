@@ -4,9 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 @Injectable()
 export class TenantMiddleware implements NestMiddleware {
   use(req: Request, _res: Response, next: NextFunction) {
-    // Skip tenant check for health, admin, and public uploads endpoints
+    // Skip tenant check for health endpoints
     const url = req.originalUrl || req.url || req.path || '';
-    if (url.includes('/health') || url.includes('/admin') || url.includes('/uploads')) {
+    if (url.includes('/health') || url.includes('/admin')) {
       return next();
     }
 

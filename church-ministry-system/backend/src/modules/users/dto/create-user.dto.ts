@@ -1,4 +1,4 @@
-import { IsString, IsOptional, MinLength, Matches, IsIn } from 'class-validator';
+import { IsString, IsOptional, MinLength, Matches } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { USERNAME_MESSAGE, USERNAME_PATTERN, normalizeUsername } from '../../../core/utils/username.util';
 
@@ -16,12 +16,11 @@ export class CreateUserDto {
   @IsString()
   phone?: string;
 
-  @IsOptional()
-  @IsString()
-  @IsIn(['male', 'female'])
-  gender?: string;
-
   @IsString()
   @MinLength(6)
   password: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: 'male' | 'female';
 }

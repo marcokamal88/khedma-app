@@ -9,6 +9,10 @@ import { Role } from './entities/role.entity';
 import { ServantAssignment } from './entities/servant-assignment.entity';
 import { Enrollment } from './entities/enrollment.entity';
 import { SectorAssignment } from './entities/sector-assignment.entity';
+import { MemberProfile } from './entities/member-profile.entity';
+import { Class } from '../church/entities/class.entity';
+import { Service } from '../church/entities/service.entity';
+import { ServiceYear } from '../service-year/entities/service-year.entity';
 
 @Module({
   imports: [
@@ -20,6 +24,10 @@ import { SectorAssignment } from './entities/sector-assignment.entity';
       ServantAssignment,
       Enrollment,
       SectorAssignment,
+      MemberProfile,
+      Class,
+      Service,
+      ServiceYear,
     ]),
   ],
   controllers: [UsersController],

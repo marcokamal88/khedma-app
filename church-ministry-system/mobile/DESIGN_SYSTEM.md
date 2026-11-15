@@ -1,176 +1,183 @@
-# Khedma App — Design System & Style Guide (Reference)
+# Khedma Mobile Design System
 
-## 1. Overview & Philosophy
-The **Khedma (خدمة) Ministry System** is an Arabic-first church ministry management platform. Its visual identity balances warm, paper-like warmth (Lovable-inspired cream canvas) with dignified church heritage (deep navy and warm liturgical gold).
+This document captures the app's reusable design language, theme tokens, component patterns, and layout conventions. It is built from the current mobile app theme and UI library.
 
-Key principles:
-1. **Arabic-First (RTL)**: Every component naturally flows from Right to Left.
-2. **Compact & Information-Dense**: Maximum usable screen space without unnecessary visual bloat.
-3. **Paper & Ink Hierarchy**: Warm cream background, clean off-white card surfaces, charcoal ink, and subtle 1px border lines rather than heavy drop shadows.
+## Color palette
 
----
+- `cream`: #f7f4ed — primary surface/background tone.
+- `offWhite`: #fcfbf8 — secondary surface and light fields.
+- `lightCream`: #eceae4 — subtle background accent.
+- `charcoal`: #1c1c1c — primary text and dark actions.
+- `ink`: #030303 — highest contrast text.
+- `mutedGray`: #5f5f5d — secondary text and muted labels.
 
-## 2. Color Palette & Tokens
+Functional colors:
 
-### Primary Theme Colors
-| Token | Hex | Usage |
-|---|---|---|
-| `NAVY` | `#192f5f` | Brand signature, AppHeader background, active drawer, primary buttons, avatars |
-| `GOLD` | `#d4a843` | Secondary action highlights, "+" add buttons, award badges, switch buttons |
-| `CREAM` | `#f7f4ed` | App root canvas, screen backgrounds, scroll view surfaces |
-| `OFF_WHITE` | `#fcfbf8` / `#ffffff` | Content cards, bottom sheets, modal dialogs, input backgrounds |
-| `BORDER` | `#eceae4` | 1px card outlines, list item dividers, modal separators |
-| `CHARCOAL` | `#1c1c1c` | Primary text, titles, headlines, high-emphasis icons |
-| `MUTED` | `#5f5f5d` / `#8c8a84` | Subtitles, meta tags, timestamps, disabled labels |
-| `CRIMSON` | `#9b1b30` / `#c62828` | Logout button, delete actions, rejection notices |
-| `GREEN` / `LIGHT_GREEN` | `#2e7d32` / `#E6F5EE` | Taio points badge, 80%+ attendance pill, success states |
-| `WARN_ORANGE` / `WARN_BG` | `#e65100` / `#fff3e0` | 60%-79% attendance warning, pending/draft status |
+- `success`: #2e7d32
+- `error`: #c62828
+- `warning`: #e65100
+- `info`: #1565c0
+- `focusRing`: rgba(59,130,246,0.5)
 
----
+Semantic aliases:
 
-## 3. Typography Scale & Fonts
+- `background`: #f7f4ed
+- `surface`: #f7f4ed
+- `surfaceAlt`: #fcfbf8
+- `border`: #eceae4
+- `borderStrong`: rgba(28,28,28,0.4)
+- `textPrimary`: #1c1c1c
+- `textSecondary`: #5f5f5d
+- `tabInactive`: #5f5f5d
+- `overlay`: rgba(0,0,0,0.4)
 
-The app relies on the platform native typography with explicit Arabic rendering properties:
-- **Android**: Roboto / Noto Sans Arabic
-- **iOS**: San Francisco / Apple Arabic
+## Typography scale
 
-| Token | Size | Weight | Line Height | Usage |
-|---|---|---|---|---|
-| `displayHero` | 32px | 700 (Bold) | 36px | Main screen titles, hero metrics |
-| `sectionHeading` | 20px - 22px | 700 (Bold) | 26px | Section headers ("آخر جلسات الحضور", "المخدومين") |
-| `cardTitle` | 16px - 17px | 600 (Semibold) | 22px | Student names, lesson titles, list headers |
-| `body` | 14px - 15px | 400 - 500 | 20px | Standard text, list items, description |
-| `button` | 15px | 600 (Semibold) | 20px | Main buttons, modal actions |
-| `buttonSmall` | 13px | 600 (Semibold) | 18px | Chip filters, compact action buttons |
-| `caption` | 12px - 13px | 400 (Regular) | 16px | Subtitles, class meta, timestamps |
-| `overline` | 11px | 600 (Semibold) | 14px | Micro badges, category labels, drawer group titles |
+- `displayHero`: 36 / 700 / 40 (hero headings)
+- `sectionHeading`: 28 / 600 / 32
+- `subHeading`: 22 / 600 / 26
+- `cardTitle`: 18 / 600 / 22
+- `bodyLarge`: 17 / 400 / 24
+- `body`: 15 / 400 / 22
+- `button`: 15 / 500 / 20
+- `buttonSmall`: 13 / 500 / 18
+- `caption`: 13 / 400 / 18
+- `overline`: 11 / 600 / 14
 
-> [!IMPORTANT]
-> **Arabic Text Rules**:
-> - Never apply `letterSpacing` to Arabic text (it disrupts cursive glyph connections).
-> - Always specify `textAlign: "right"` and `writingDirection: "rtl"` for RTL text nodes.
+Font family uses the platform system font:
 
----
+- iOS: `System`
+- Android: `Roboto`
+- Web/default: `System`
 
-## 4. Layout Architecture & Arabic (RTL) Guidelines
+## Font weights
 
-### A. RTL Flow in React Native
-The application forces RTL layout at startup via:
-```tsx
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
-if (Platform.OS === 'web' && typeof document !== 'undefined') {
-  document.documentElement.dir = 'rtl';
-  document.documentElement.lang = 'ar';
-}
-```
+- `700` for bold hero headings
+- `600` for section headings, card titles, overlines
+- `500` for buttons and emphasized text
+- `400` for body copy and captions
 
-### B. Horizontal List Rows (Avatar + Name + Badges)
-In standard RTL flex rows (`flexDirection: "row"`), children naturally flow from **Right (Start) to Left (End)**.
+## Spacing system
 
-**The Golden Pattern for Member/Student Rows**:
-```tsx
-<TouchableOpacity style={styles.row}>
-  <View style={styles.rowRight}>
-    {/* 1. Avatar at the far right */}
-    <View style={styles.avatar}>
-      <Text style={styles.avatarText}>{initials}</Text>
-    </View>
+- `xxs`: 4
+- `xs`: 8
+- `sm`: 12
+- `md`: 16
+- `lg`: 20
+- `xl`: 24
+- `xxl`: 32
+- `xxxl`: 40
+- `xxxxl`: 56
 
-    {/* 2. Name immediately next to the avatar (no flex: 1 on the Text) */}
-    <Text style={styles.name} numberOfLines={1}>
-      {fullName}
-    </Text>
+## Border radius values
 
-    {/* 3. Flexible spacer to push trailing badges to the left */}
-    <View style={{ flex: 1 }} />
+- `sm`: 4
+- `md`: 6
+- `lg`: 8
+- `xl`: 12
+- `full`: 9999
 
-    {/* 4. Badges and actions on the far left */}
-    <View style={styles.pointsBadge}>...</View>
-    <View style={styles.statusBadge}>...</View>
-  </View>
-  <Text style={styles.actionIcon}>✎</Text>
-</TouchableOpacity>
-```
+## Shadows
 
-**Why this pattern is mandatory**:
-If `flex: 1` is applied directly to the `<Text style={styles.name}>` element, Android's text engine stretches the text box across the entire row and aligns the text against the trailing badges, creating an unwanted empty gap between the avatar and the student name. Using a dedicated `<View style={{ flex: 1 }} />` after the name guarantees that the name starts immediately next to the avatar on all platforms.
+- `none`
+- `card`: subtle light shadow for elevated cards (`shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1`)
+- `buttonInset`: simulated inset highlight with top/bottom border lines for tactile sections
 
----
+## Component styles
 
-## 5. Key Reusable Components
+### AppButton
 
-### A. Compact `AppHeader`
-The signature Navy header provides greeting, context, and notification bell in a space-saving compact footprint:
-- **Padding**: `paddingTop: 36` (Android) / `44` (iOS), `paddingHorizontal: 20`, `paddingBottom: 10`, `marginBottom: 10`.
-- **Wave Accent**: Bottom curved container (`height: 14`, `borderBottomLeftRadius: 24`, `borderBottomRightRadius: 24`).
-- **Notification Bell**: 38x38 circular icon button (`backgroundColor: 'rgba(255,255,255,0.12)'`) with crimson unread badge.
-- **Embedded Context Card**:
-  - `backgroundColor: "rgba(255,255,255,0.10)"`
-  - `borderRadius: 12`, `padding: 10px`
-  - 34x34 icon container (`backgroundColor: 'rgba(255,255,255,0.15)'`)
+Variants:
 
-### B. Global Side Menu Drawer (`GlobalDrawer`)
-- **Docked Side**: Anchored to the **RIGHT** side of the screen in RTL mode.
-- **Width**: `Math.min(SCREEN_WIDTH * 0.85, 380)`
-- **Cross-Platform Positioning**:
-  ```tsx
-  drawer: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: DRAWER_WIDTH,
-    backgroundColor: NAVY,
-    zIndex: 1001,
-    elevation: 10,
-    ...(Platform.OS === 'web'
-      ? { right: 0 }
-      : (I18nManager.isRTL ? { left: 0 } : { right: 0 })),
-  }
-  ```
-  *(Note: In React Native on Android Hermes, `I18nManager.isRTL` swaps `left` and `right`. Therefore, setting `left: 0` maps to the physical right edge of the screen).*
-- **Animation**: `translateX` transitions between `+DRAWER_WIDTH` (hidden to the right) and `0` (open on the right).
+- `primary`: charcoal fill, off-white text
+- `secondary`: transparent background with charcoal border
+- `ghost`: transparent background and charcoal text
+- `danger`: red fill with off-white text
+- `success`: green fill with off-white text
 
-### C. Standard Cards (`AppCard` / `RowCard`)
-- `backgroundColor`: `OFF_WHITE` (`#fcfbf8` or `#ffffff`)
-- `borderRadius`: `14px` - `16px`
-- `borderWidth`: `1px`
-- `borderColor`: `BORDER` (`#eceae4`)
-- `padding`: `14px`
-- Shadow: Flat or subtle elevation 1 (`shadowOpacity: 0.05`, `shadowRadius: 2`, `elevation: 1`)
+Sizes:
 
-### D. Action Buttons
-- **Primary Navy Button**: `backgroundColor: NAVY`, text `#ffffff`, `borderRadius: 14`, `paddingVertical: 14`.
-- **Add / Accent Gold Button**: `backgroundColor: GOLD`, text `CHARCOAL` or `#ffffff`, `borderRadius: 14` / `20`.
-- **Destructive Crimson Button**: `backgroundColor: CRIMSON`, text `#ffffff`, `borderRadius: 14`.
+- `sm`: height 36
+- `md`: height 44
+- `lg`: height 52
 
-### E. Scroll Clearance Rule
-Every screen with a scrollable view (`ScrollView` or `FlatList`) that renders above the bottom navigation bar must have:
-```tsx
-contentContainerStyle={{ paddingBottom: 110 }}
-```
-This guarantees that the last card and any bottom buttons remain fully visible and clickable above the bottom tab bar.
+Loading state: shows an `ActivityIndicator` with a matching text color.
 
----
+### AppCard
 
-## 6. Preparation Module Standards
+- default `flat` card: cream background, rounded corners, padded content
+- `bordered`: adds a 1px border with the theme border color
+- `highlighted`: stronger charcoal border for emphasis
 
-### A. Streamlined Creation Form
-The preparation creation workflow is focused and distraction-free:
-1. **Title**: Subject of the lesson (`title`).
-2. **Date Input**: Interactive touchable date pill linked to `<CalendarPicker>`, eliminating manual date string typing.
-3. **Notes**: Freeform rich notes/explanation (`notes` / `description`).
-4. **Direct File Attachments**: Servants can attach PDF, Word, PowerPoint, or image files directly inside the creation modal, which are automatically uploaded upon saving the preparation.
-*Key points and verses inputs have been removed to keep preparation swift and natural.*
+### AppInput
 
-### B. Submission & Leader Notifications
-- When a servant taps **"تقديم للمراجعة"** (Submit for Review), the app presents a clear confirmation modal.
-- Upon submission:
-  1. Status updates to `submitted`.
-  2. The servant receives a prompt: *"تم إرسال التحضير إلى أمناء الخدمة للمراجعة والاعتماد، وتم إرسال إشعار لهم."*
-  3. The backend dispatches notifications (with Expo Push) to all active service leaders and assistant service leaders.
+- cream fill with soft border
+- rounded corners and medium padding
+- label sits above the field with caption typography
+- error state moves border to error red and shows helper text below
 
-### C. Confirmed / Approved Lock Rule
-- Once a service leader confirms/approves (`status === 'approved'`), the preparation becomes **read-only** for the servant:
-  - An approved green badge (`تم اعتماد التحضير من قبل أمين الخدمة ومغلق للتعديل`) is displayed.
-  - Updating fields, uploading files, or deleting files are completely disabled in the UI and enforced with `ForbiddenException` in the backend API.
+### AppModal
+
+- centered overlay with dark translucent backdrop
+- padded surface with rounded corners and action buttons below
+
+### AppHeader
+
+- horizontal header bar with optional back and right actions
+- centered title using `subHeading` typography
+
+### AppAvatar
+
+- circular initials avatar with charcoal background and off-white text
+
+### AppBadge
+
+- small pill badges with colored backgrounds and overline typography
+
+### AppTabBar
+
+- bottom tab bar pattern with simple icon + label buttons
+- active state uses charcoal; inactive state uses muted gray
+
+### AppBottomSheet
+
+- drag-to-close bottom drawer with handle and title area
+
+### AppListItem
+
+- row item with optional icon, title, subtitle, and right arrow
+- uses cream surface and bottom divider line
+
+### AppEmptyState
+
+- centered layout with icon, title, and optional description
+- useful for empty lists and zero-data screens
+
+## Navigation patterns
+
+- Auth flow uses a native stack with hidden default header for clean onboarding screens.
+- Main app uses bottom tabs for role-based flows and a stack navigator for contextual flows.
+- `CustomTabBar` injects the reusable `AppTabBar` component into bottom navigation.
+
+## Layout structure
+
+- Root containers use `backgroundColor: colors.cream` for a warm, approachable app background.
+- Screen content is spaced consistently with `spacing.md` / `spacing.xl` gutters.
+- Cards and panels use `colors.surface` and `borderRadius.lg`.
+
+## Empty states
+
+- Use `AppEmptyState` for list screens and search/no-result screens.
+- Keep messaging concise and center-aligned.
+
+## Loading states
+
+- Use `ActivityIndicator` in a centered full-screen container for data fetch states.
+- Use button-level loading states inside `AppButton` for inline actions.
+
+## Implementation guidance
+
+- Prefer theme tokens from `src/theme` rather than hardcoded values.
+- Use `AppButton`, `AppCard`, `AppInput`, `AppBadge`, and `AppEmptyState` as foundational building blocks.
+- Keep screen-level layout and spacing consistent across role flows.
+- Avoid mixing raw color and spacing values when a theme token already exists.

@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,8 +18,6 @@ export function usePushNotifications() {
   const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
-    if (Platform.OS === 'web') return;
-
     const handleNotification = (notification: Notifications.Notification) => {
       const data = notification.request.content.data as any;
       if (!data?.sourceType || !SOURCE_ROUTES[data.sourceType]) return;

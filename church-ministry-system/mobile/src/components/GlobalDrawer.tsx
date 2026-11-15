@@ -9,8 +9,6 @@ import {
   ScrollView,
   SafeAreaView,
   Switch,
-  Platform,
-  I18nManager,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -44,7 +42,7 @@ const SERVANT_MENU: MenuGroup[] = [
       { key: 'Attendance', icon: '\u2637', label: 'الحضور' },
       { key: 'MyStudents', icon: '\u25C9', label: 'مخدوميّ' },
       { key: 'Tasks', icon: '\u2611', label: 'المهام' },
-      { key: 'FollowUp', icon: '\u2661', label: 'الافتقاد' },
+      { key: 'FollowUp', icon: '\u2606', label: 'المتابعة' },
       { key: 'Library', icon: '\u2702', label: 'مكتبة الدروس' },
       { key: 'Achievements', icon: '\u2605', label: 'الإنجازات' },
     ],
@@ -53,6 +51,60 @@ const SERVANT_MENU: MenuGroup[] = [
     title: 'التفاعل',
     items: [
       { key: 'Taiao', icon: '\u2693', label: 'نقاط طايو' },
+    ],
+  },
+  {
+    title: 'الحساب',
+    items: [
+      { key: 'Notifications', icon: '\u2630', label: 'الإشعارات' },
+    ],
+  },
+];
+
+const SECTOR_LEADER_MENU: MenuGroup[] = [
+  {
+    title: 'إشراف القطاع',
+    items: [
+      { key: 'Home', icon: '\u2302', label: 'الرئيسية (لوحة التحكم)' },
+      { key: 'SectorManagement', icon: '\u25EB', label: 'إدارة خدمات وخدام القطاع' },
+      { key: 'Reports', icon: '\u25C8', label: 'تقارير القطاع والمقارنات' },
+      { key: 'Reviews', icon: '\u270E', label: 'مراجعة تحضيرات الدروس' },
+    ],
+  },
+  {
+    title: 'الحساب',
+    items: [
+      { key: 'Notifications', icon: '\u2630', label: 'الإشعارات' },
+    ],
+  },
+];
+
+const PRIEST_MENU: MenuGroup[] = [
+  {
+    title: 'الإشراف الكنسي العام',
+    items: [
+      { key: 'Home', icon: '\u2302', label: 'الرئيسية' },
+      { key: 'SectorManagement', icon: '\u25EB', label: 'إدارة القطاعات والخدمات' },
+      { key: 'Reports', icon: '\u25C8', label: 'التقارير الشاملة' },
+      { key: 'Reviews', icon: '\u270E', label: 'مراجعة التحضيرات' },
+    ],
+  },
+  {
+    title: 'الحساب',
+    items: [
+      { key: 'Notifications', icon: '\u2630', label: 'الإشعارات' },
+    ],
+  },
+];
+
+const SERVICE_LEADER_MENU: MenuGroup[] = [
+  {
+    title: 'إدارة الخدمة',
+    items: [
+      { key: 'Home', icon: '\u2302', label: 'الرئيسية' },
+      { key: 'Reviews', icon: '\u270E', label: 'اعتماد تحضيرات الدروس' },
+      { key: 'Reports', icon: '\u25C8', label: 'تقارير المرحلة' },
+      { key: 'Attendance', icon: '\u2637', label: 'سجلات الحضور' },
     ],
   },
   {
@@ -79,11 +131,11 @@ const MEMBER_MENU: MenuGroup[] = [
 ];
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.85, 380);
+const DRAWER_WIDTH = SCREEN_WIDTH * 0.85;
 
 interface GlobalDrawerProps {
   children: React.ReactNode;
-  navigationRef: { navigate: (...args: any[]) => void };
+  navigationRef: { navigate: (name: string, params?: any) => void };
   menuConfig?: MenuGroup[];
 }
 
@@ -150,28 +202,36 @@ function DrawerContent({
   const user = useSelector((state: RootState) => state.auth.user);
   const activeContext = useSelector((state: RootState) => state.auth.activeContext);
 
-  const groups = menuConfig || SERVANT_MENU;
+  const getRoleMenu = () => {
+    if (menuConfig) return menuConfig;
+    const role = activeContext?.role;
+    if (role === 'sector_leader') return SECTOR_LEADER_MENU;
+    if (role === 'priest') return PRIEST_MENU;
+    if (role === 'service_leader' || role === 'assistant_service_leader') return SERVICE_LEADER_MENU;
+    if (role === 'served_member') return MEMBER_MENU;
+    return SERVANT_MENU;
+  };
+
+  const groups = getRoleMenu();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <View style={styles.topBarRow}>
-          <View style={styles.profileRow}>
-            <View style={styles.profileTextWrap}>
-              <Text style={styles.profileName}>{user?.fullName}</Text>
-              <Text style={styles.profileRole}>{t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}</Text>
-            </View>
+        <TouchableOpacity onPress={closeDrawer} style={styles.closeBtn} activeOpacity={0.7}>
+          <Text style={styles.closeIcon}>{'\u2715'}</Text>
+        </TouchableOpacity>
+        <View style={styles.profileRow}>
+          <View style={styles.profileTextWrap}>
+            <Text style={styles.profileName}>{user?.fullName}</Text>
+            <Text style={styles.profileRole}>{t(`roles.${roleToLocaleKey(activeContext?.role || 'servant')}`)}</Text>
           </View>
-          <TouchableOpacity onPress={closeDrawer} style={styles.closeBtn} activeOpacity={0.7}>
-            <Text style={styles.closeIcon}>{'\u2715'}</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.contextCard}>
         <View style={styles.contextInfo}>
           <Text style={styles.contextLabel}>السياق الحالي</Text>
-          <Text style={styles.contextValue}>{t('home.classInfo')}</Text>
+          <Text style={styles.contextValue}>{activeContext?.displayLabel || t('home.classInfo')}</Text>
         </View>
         <TouchableOpacity style={styles.contextSwitchBtn} activeOpacity={0.7} onPress={() => onNavigate('ContextSwitcher')}>
           <Text style={styles.contextSwitchIcon}>{'\u21C4'}</Text>
@@ -194,10 +254,8 @@ function DrawerContent({
                 activeOpacity={0.7}
                 onPress={() => onNavigate(item.key)}
               >
-                <View style={styles.menuItemContent}>
-                  <Text style={styles.menuIcon}>{item.icon}</Text>
-                  <Text style={styles.menuLabel}>{item.label}</Text>
-                </View>
+                <Text style={styles.menuLabel}>{item.label}</Text>
+                <Text style={styles.menuIcon}>{item.icon}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -231,14 +289,15 @@ const styles = StyleSheet.create({
   drawer: {
     position: 'absolute',
     top: 0,
+    // Logical edge: physical right while the app forces RTL (I18nManager).
+    // Do NOT change back to `right: 0` — under RTL swap it renders on the
+    // physical left. Slide animation (+width → 0) already matches this side.
+    start: 0,
     bottom: 0,
     width: DRAWER_WIDTH,
     backgroundColor: NAVY,
     zIndex: 1001,
     elevation: 10,
-    ...(Platform.OS === 'web'
-      ? { right: 0 }
-      : (I18nManager.isRTL ? { left: 0 } : { right: 0 })),
   },
   container: { flex: 1 },
 
@@ -247,26 +306,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
   },
-  topBarRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
   closeBtn: {
+    // Outer edge of a right-side drawer (physical left under forced RTL).
+    alignSelf: 'flex-end',
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 16,
   },
   closeIcon: { fontSize: 16, color: '#ffffff' },
 
   profileRow: {
+    // Right-anchored by packing (not flex): packs the text block at the
+    // row start = physical right under RTL. `direction` pins this even if
+    // the global RTL flag ever changes.
     flexDirection: 'row',
+    direction: 'rtl',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    flex: 1,
   },
   profileTextWrap: {},
   profileName: { ...typography.cardTitle, color: '#ffffff', fontWeight: '700', textAlign: 'right' },
@@ -275,6 +335,7 @@ const styles = StyleSheet.create({
   contextCard: {
     marginHorizontal: 20,
     marginBottom: 8,
+    direction: 'rtl',
     backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 14,
     borderWidth: 1,
@@ -304,24 +365,26 @@ const styles = StyleSheet.create({
   groupTitle: {
     ...typography.overline,
     color: 'rgba(255,255,255,0.4)',
-    textAlign: 'left',
+    textAlign: 'right',
     marginBottom: 8,
     paddingRight: 4,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   menuItem: {
+    // Label first = rightmost under RTL; icon sits immediately left of it.
+    // No flex anywhere, so label/icon are always adjacent — a gap between
+    // them is structurally impossible (flex:1 + textAlign proved unreliable).
+    flexDirection: 'row',
+    direction: 'rtl',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
     paddingVertical: 13,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.05)',
   },
-  menuItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
   menuIcon: {
-    width: 24,
     fontSize: 18,
     color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',

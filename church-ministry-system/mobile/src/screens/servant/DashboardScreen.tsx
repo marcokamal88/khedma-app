@@ -70,7 +70,7 @@ export default function ServantDashboard({ navigation }: any) {
 
   return (
     <View style={styles.root}>
-      <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 110 }} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#192f5f']} tintColor="#192f5f" />}>
         <AppHeader greetingText={t('home.welcomeBack')}>
           <ContextCard defaultRole="servant" />
         </AppHeader>
@@ -201,35 +201,33 @@ const styles = StyleSheet.create({
   metricCard: {
     width: '48%',
     backgroundColor: '#ffffff',
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    borderRadius: 16,
+    padding: 16,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: BORDER,
     ...shadows.card,
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   metricIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 10,
   },
-  metricIcon: { fontSize: 16, color: NAVY },
+  metricIcon: { fontSize: 20, color: NAVY },
   metricValue: {
     ...typography.sectionHeading,
-    fontSize: 20,
+    fontSize: 28,
     color: NAVY,
     fontWeight: '800',
     marginBottom: 2,
-    textAlign: 'center',
   },
-  metricLabel: { ...typography.caption, color: MUTED, fontSize: 12, textAlign: 'center' },
+  metricLabel: { ...typography.caption, color: MUTED },
 
   section: { marginBottom: 16 },
   sectionHeader: {
@@ -249,33 +247,21 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     borderColor: BORDER,
-    padding: 12,
+    padding: 14,
     marginBottom: 8,
   },
   taskIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: NAVY,
     alignItems: 'center',
     justifyContent: 'center',
   },
   taskIcon: { fontSize: 16, color: '#ffffff' },
   taskTextWrap: { flex: 1, marginHorizontal: 12 },
-  taskTitle: {
-    ...typography.body,
-    color: CHARCOAL,
-    fontWeight: '600',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
-  taskMeta: {
-    ...typography.caption,
-    color: MUTED,
-    marginTop: 2,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-  },
+  taskTitle: { ...typography.body, color: CHARCOAL, fontWeight: '600' },
+  taskMeta: { ...typography.caption, color: MUTED, marginTop: 2 },
   statusPill: {
     backgroundColor: '#fff3e0',
     borderRadius: 20,

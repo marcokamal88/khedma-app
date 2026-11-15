@@ -34,14 +34,31 @@ export const churchApi = {
     address?: string;
     birthDate?: string;
     notes?: string;
-    gender?: string;
   }) => apiClient.post('/members/register', data),
   createServant: (data: {
     fullName: string;
     username: string;
     phone?: string;
     password: string;
+    serviceId?: string;
     classId: string;
     gender?: string;
   }) => apiClient.post('/servants', data),
+  getMySectorOverview: () => apiClient.get('/sectors/my-sector/overview'),
+  getSectorOverview: (sectorId: string) => apiClient.get(`/sectors/${sectorId}/overview`),
+  getServantAssignments: (serviceId?: string) =>
+    apiClient.get('/servant-assignments', { params: serviceId ? { serviceId } : {} }),
+  assignServiceLeader: (data: {
+    churchMemberId: string;
+    serviceId: string;
+    leaderRole: 'service_leader' | 'assistant_service_leader';
+  }) => apiClient.post('/servant-assignments/service-leader', data),
+  reassignServant: (data: {
+    assignmentId?: string;
+    churchMemberId: string;
+    targetServiceId: string;
+    targetClassId?: string;
+    leaderRole?: string;
+  }) => apiClient.post('/servant-assignments/reassign', data),
+  removeServantAssignment: (id: string) => apiClient.delete(`/servant-assignments/${id}`),
 };

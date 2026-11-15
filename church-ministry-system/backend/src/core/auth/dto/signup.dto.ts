@@ -18,4 +18,8 @@ export class SignupDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  @IsOptional()
+  @IsString()
+  gender?: 'male' | 'female';
 }

@@ -1,17 +1,12 @@
 import React, { Component, ErrorInfo, ReactNode, useEffect } from 'react';
-import { View, Text, StyleSheet, I18nManager, Platform } from 'react-native';
+import { View, Text, StyleSheet, I18nManager } from 'react-native';
 import { Provider } from 'react-redux';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
 
 // Force RTL for Arabic
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);
-if (Platform.OS === 'web' && typeof document !== 'undefined') {
-  document.documentElement.dir = 'rtl';
-  document.documentElement.lang = 'ar';
-}
 
 class ErrorBoundary extends Component<{ children: ReactNode }> {
   state = { error: null as Error | null };
@@ -45,9 +40,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Provider store={store}>
-        <SafeAreaProvider>
-          <RootNavigator />
-        </SafeAreaProvider>
+        <RootNavigator />
       </Provider>
     </ErrorBoundary>
   );
