@@ -14,6 +14,19 @@ export class ChurchController {
     return this.churchService.getSectors(churchId);
   }
 
+  @Get('sectors/my-sector/overview')
+  async getMySectorOverview(@CurrentTenant() churchId: string, @Req() req: any) {
+    return this.churchService.getMySectorOverview(churchId, req.user);
+  }
+
+  @Get('sectors/:id/overview')
+  async getSectorOverview(@Param('id') id: string, @CurrentTenant() churchId: string, @Req() req: any) {
+    if (id === 'my-sector') {
+      return this.churchService.getMySectorOverview(churchId, req.user);
+    }
+    return this.churchService.getSectorOverview(churchId, id);
+  }
+
   @Get('sectors/:id')
   async getSector(@Param('id') id: string, @CurrentTenant() churchId: string) {
     return this.churchService.getSector(churchId, id);

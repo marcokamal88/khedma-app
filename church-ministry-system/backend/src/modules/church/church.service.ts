@@ -13,6 +13,9 @@ import { ChurchMember } from '../users/entities/church-member.entity';
 import { MemberRole } from '../users/entities/member-role.entity';
 import { Role } from '../users/entities/role.entity';
 import { MemberProfile } from '../users/entities/member-profile.entity';
+import { SectorAssignment } from '../users/entities/sector-assignment.entity';
+import { AttendanceRecord } from '../attendance/entities/attendance-record.entity';
+import { ServiceYear } from '../service-year/entities/service-year.entity';
 import { TaioService } from '../taio/taio.service';
 
 const SERVANT_ROLES = ['servant', 'class_leader', 'service_leader', 'assistant_service_leader', 'sector_leader', 'priest'];
@@ -27,8 +30,11 @@ export class ChurchService {
     @InjectModel(Enrollment) private enrollmentModel: typeof Enrollment,
     @InjectModel(ServantAssignment) private servantAssignmentModel: typeof ServantAssignment,
     @InjectModel(AttendanceSession) private sessionModel: typeof AttendanceSession,
+    @InjectModel(AttendanceRecord) private attendanceRecordModel: typeof AttendanceRecord,
     @InjectModel(MemberRole) private memberRoleModel: typeof MemberRole,
     @InjectModel(MemberProfile) private profileModel: typeof MemberProfile,
+    @InjectModel(SectorAssignment) private sectorAssignmentModel: typeof SectorAssignment,
+    @InjectModel(ServiceYear) private serviceYearModel: typeof ServiceYear,
     private taioService: TaioService,
   ) {}
 
@@ -61,6 +67,250 @@ export class ChurchService {
     const sector = await this.sectorModel.findOne({ where: { id, churchId } });
     if (!sector) throw new NotFoundException('Sector not found');
     return sector;
+  }
+
+  async getMySectorOverview(churchId: string, user: any) {
+    let sectorId: number | null = null;
+    const scopeSectorId = user?.activeContext?.scope?.sectorId;
+    if (scopeSectorId) {
+      sectorId = Number(scopeSectorId);
+    } else if (user?.memberId) {
+      const sa: any = await this.sectorAssignmentModel.findOne({
+        where: { churchId, churchMemberId: user.memberId, isActive: true } as any,
+        attributes: ['sectorId'],
+      });
+      if (sa) {
+        sectorId = Number(sa.sectorId);
+      }
+    }
+
+    if (!sectorId) {
+      // Fallback for priest or admin without specific sector in scope: pick first active sector
+      const firstSector = await this.sectorModel.findOne({
+        where: { churchId, isActive: true } as any,
+        order: [['id', 'ASC']],
+      });
+      if (firstSector) {
+        sectorId = firstSector.id;
+      }
+    }
+
+    if (!sectorId) {
+      throw new NotFoundException('No active sector found for user or church');
+    }
+
+    return this.getSectorOverview(churchId, String(sectorId));
+  }
+
+  async getSectorOverview(churchId: string, sectorId: string) {
+    const sector = await this.sectorModel.findOne({
+      where: { id: sectorId, churchId, isActive: true } as any,
+    });
+    if (!sector) throw new NotFoundException('Sector not found');
+
+    const currentYear = await this.serviceYearModel.findOne({
+      where: { churchId, isCurrent: true } as any,
+    });
+    const serviceYearId = currentYear ? currentYear.id : undefined;
+
+    const services = await this.serviceModel.findAll({
+      where: { churchId, sectorId: sector.id, isActive: true } as any,
+      order: [['id', 'ASC']],
+    });
+
+    if (services.length === 0) {
+      return {
+        sector: {
+          id: sector.id,
+          name: sector.name,
+          type: (sector as any).type || null,
+          description: (sector as any).description || null,
+        },
+        totalServices: 0,
+        totalServants: 0,
+        totalStudents: 0,
+        averageAttendance: 0,
+        services: [],
+      };
+    }
+
+    const serviceIds = services.map((s) => s.id);
+
+    // 1. Classes counts per service
+    const classes = await this.classModel.findAll({
+      where: { churchId, serviceId: { [Op.in]: serviceIds }, isActive: true } as any,
+      attributes: ['id', 'serviceId'],
+    });
+    const classesCountMap = new Map<number, number>();
+    for (const c of classes) {
+      const sid = (c as any).serviceId;
+      classesCountMap.set(sid, (classesCountMap.get(sid) || 0) + 1);
+    }
+
+    // 2. Servant assignments per service
+    const servantWhere: any = {
+      churchId,
+      serviceId: { [Op.in]: serviceIds },
+      isActive: true,
+    };
+    if (serviceYearId) servantWhere.serviceYearId = serviceYearId;
+
+    const servantAssignments = await this.servantAssignmentModel.findAll({
+      where: servantWhere,
+      include: [
+        {
+          model: ChurchMember,
+          include: [{ model: User, attributes: ['id', 'fullName', 'phone', 'email'] }],
+        },
+      ],
+    });
+
+    const servantsByServiceMap = new Map<number, Set<number>>();
+    const leadersByServiceMap = new Map<number, any[]>();
+    const allSectorServantIds = new Set<number>();
+
+    for (const sa of servantAssignments as any[]) {
+      const sid = sa.serviceId;
+      if (!servantsByServiceMap.has(sid)) servantsByServiceMap.set(sid, new Set());
+      servantsByServiceMap.get(sid)!.add(sa.churchMemberId);
+      allSectorServantIds.add(sa.churchMemberId);
+
+      if (sa.leaderRole === 'service_leader' || sa.leaderRole === 'assistant_service_leader') {
+        if (!leadersByServiceMap.has(sid)) leadersByServiceMap.set(sid, []);
+        const existing = leadersByServiceMap.get(sid)!.some((l) => l.id === sa.churchMemberId && l.role === sa.leaderRole);
+        if (!existing) {
+          leadersByServiceMap.get(sid)!.push({
+            id: sa.churchMemberId,
+            role: sa.leaderRole,
+            fullName: sa.churchMember?.user?.fullName || '',
+            phone: sa.churchMember?.user?.phone || '',
+          });
+        }
+      }
+    }
+
+    // 3. Enrollments (students) per service
+    const enrollWhere: any = {
+      churchId,
+      serviceId: { [Op.in]: serviceIds },
+      isActive: true,
+    };
+    if (serviceYearId) enrollWhere.serviceYearId = serviceYearId;
+
+    const enrollments = await this.enrollmentModel.findAll({
+      where: enrollWhere,
+      attributes: ['churchMemberId', 'serviceId'],
+    });
+
+    const studentsByServiceMap = new Map<number, Set<number>>();
+    const allSectorStudentIds = new Set<number>();
+
+    for (const e of enrollments as any[]) {
+      const sid = e.serviceId;
+      if (!studentsByServiceMap.has(sid)) studentsByServiceMap.set(sid, new Set());
+      studentsByServiceMap.get(sid)!.add(e.churchMemberId);
+      allSectorStudentIds.add(e.churchMemberId);
+    }
+
+    // 4. Attendance per service
+    const sessionWhere: any = {
+      churchId,
+      serviceId: { [Op.in]: serviceIds },
+    };
+    if (serviceYearId) sessionWhere.serviceYearId = serviceYearId;
+
+    const sessions = await this.sessionModel.findAll({
+      where: sessionWhere,
+      attributes: ['id', 'serviceId'],
+    });
+
+    const sessionsByServiceMap = new Map<number, number[]>();
+    const allSessionIds: number[] = [];
+    for (const s of sessions as any[]) {
+      const sid = s.serviceId;
+      if (!sessionsByServiceMap.has(sid)) sessionsByServiceMap.set(sid, []);
+      sessionsByServiceMap.get(sid)!.push(s.id);
+      allSessionIds.push(s.id);
+    }
+
+    const attendanceRateMap = new Map<number, number>();
+    if (allSessionIds.length > 0) {
+      const records = await this.attendanceRecordModel.findAll({
+        where: {
+          churchId,
+          attendanceSessionId: { [Op.in]: allSessionIds },
+        },
+        attributes: [
+          'attendanceSessionId',
+          'status',
+          [this.attendanceRecordModel.sequelize!.fn('COUNT', this.attendanceRecordModel.sequelize!.col('id')), 'count'],
+        ],
+        group: ['attendanceSessionId', 'status'],
+        raw: true,
+      }) as any[];
+
+      const sessionToServiceMap = new Map<number, number>();
+      for (const [sid, sids] of sessionsByServiceMap.entries()) {
+        for (const id of sids) sessionToServiceMap.set(id, sid);
+      }
+
+      const serviceCounts = new Map<number, { present: number; total: number }>();
+      for (const r of records) {
+        const sid = sessionToServiceMap.get(Number(r.attendanceSessionId));
+        if (sid) {
+          if (!serviceCounts.has(sid)) serviceCounts.set(sid, { present: 0, total: 0 });
+          const count = parseInt(r.count, 10) || 0;
+          serviceCounts.get(sid)!.total += count;
+          if (r.status === 'present') {
+            serviceCounts.get(sid)!.present += count;
+          }
+        }
+      }
+
+      for (const [sid, c] of serviceCounts.entries()) {
+        const rate = c.total > 0 ? Math.round((c.present / c.total) * 100) : 0;
+        attendanceRateMap.set(sid, rate);
+      }
+    }
+
+    let totalRateSum = 0;
+    let servicesWithAttendance = 0;
+
+    const servicesList = services.map((s) => {
+      const sid = s.id;
+      const rate = attendanceRateMap.get(sid) || 0;
+      if (attendanceRateMap.has(sid)) {
+        totalRateSum += rate;
+        servicesWithAttendance++;
+      }
+      return {
+        id: s.id,
+        name: s.name,
+        description: (s as any).description || null,
+        sectorId: s.sectorId,
+        classesCount: classesCountMap.get(sid) || 0,
+        servantsCount: servantsByServiceMap.get(sid)?.size || 0,
+        studentsCount: studentsByServiceMap.get(sid)?.size || 0,
+        attendanceRate: rate,
+        leaders: leadersByServiceMap.get(sid) || [],
+      };
+    });
+
+    const averageAttendance = servicesWithAttendance > 0 ? Math.round(totalRateSum / servicesWithAttendance) : 0;
+
+    return {
+      sector: {
+        id: sector.id,
+        name: sector.name,
+        type: (sector as any).type || null,
+        description: (sector as any).description || null,
+      },
+      totalServices: servicesList.length,
+      totalServants: allSectorServantIds.size,
+      totalStudents: allSectorStudentIds.size,
+      averageAttendance,
+      services: servicesList,
+    };
   }
 
   async getServices(churchId: string, sectorId?: string) {

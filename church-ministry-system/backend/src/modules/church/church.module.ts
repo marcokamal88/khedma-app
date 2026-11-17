@@ -11,9 +11,29 @@ import { MemberRole } from '../users/entities/member-role.entity';
 import { ServantAssignment } from '../users/entities/servant-assignment.entity';
 import { AttendanceSession } from '../attendance/entities/attendance-session.entity';
 import { MemberProfile } from '../users/entities/member-profile.entity';
+import { Enrollment } from '../users/entities/enrollment.entity';
+import { SectorAssignment } from '../users/entities/sector-assignment.entity';
+import { AttendanceRecord } from '../attendance/entities/attendance-record.entity';
+import { ServiceYear } from '../service-year/entities/service-year.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Sector, Service, StageGroup, Class, MemberRole, ServantAssignment, AttendanceSession, MemberProfile]), TaioModule],
+  imports: [
+    SequelizeModule.forFeature([
+      Sector,
+      Service,
+      StageGroup,
+      Class,
+      MemberRole,
+      ServantAssignment,
+      AttendanceSession,
+      AttendanceRecord,
+      MemberProfile,
+      Enrollment,
+      SectorAssignment,
+      ServiceYear,
+    ]),
+    TaioModule,
+  ],
   controllers: [ChurchController],
   providers: [ChurchService],
   exports: [ChurchService],
